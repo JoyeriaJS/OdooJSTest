@@ -149,7 +149,7 @@ class Reparacion(models.Model):
         ('otros', 'Otros')
     ], string='Metal utilizado')
 
-    metales_extra = fields.Char("Metales extra")
+    metales_extra = fields.float("Metales extra")
 
     cobro_interno = fields.Float("🛠️ Cobro interno")
     hechura = fields.Float("🔨 Hechura")
@@ -365,7 +365,7 @@ class Reparacion(models.Model):
             secuencia = self.env['ir.sequence'].next_by_code('joyeria.reparacion')
             if not secuencia:
                 raise ValidationError("No se pudo generar la secuencia.")
-            vals['name'] = secuencia.replace("'", "-")
+            vals['name'] = secuencia.replace("'", "/")
 
         # Procesar vendedora ANTES de crear
         if not vals.get('vendedora_id') and vals.get('clave_autenticacion_manual'):
