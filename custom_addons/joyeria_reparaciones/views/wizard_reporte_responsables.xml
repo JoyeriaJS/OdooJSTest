@@ -1,0 +1,26 @@
+<odoo>
+    <record id="wizard_reporte_responsables_form" model="ir.ui.view">
+        <field name="name">wizard.reporte.responsables.form</field>
+        <field name="model">wizard.reporte.responsables</field>
+        <field name="arch" type="xml">
+            <form string="Generar Reporte por Responsable">
+                <group>
+                    <field name="fecha_inicio"/>
+                    <field name="fecha_fin"/>
+                    <field name="responsable_id"/>
+                </group>
+                <footer>
+                    <button name="generar_reporte" type="object" string="Generar Reporte" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_wizard_reporte_responsables" model="ir.actions.act_window">
+        <field name="name">Reporte por Responsables</field>
+        <field name="res_model">wizard.reporte.responsables</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

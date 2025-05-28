@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+  <!-- Menú de Joyería -->
+  <menuitem id="menu_joyeria_root" name="Reparaciones"/>
+
+  <!-- Menú principal de Trabajadores -->
+  <menuitem id="menu_trabajadores_root" name="Responsables" parent="menu_joyeria_root" sequence="30"/>
+
+  <!-- Vista tree de res.users -->
+  <record id="view_tree_responsables" model="ir.ui.view">
+    <field name="name">Usuarios Responsables</field>
+    <field name="model">res.users</field>
+    <field name="arch" type="xml">
+      <tree string="Responsables">
+        <field name="name"/>
+        <field name="login"/>
+        <field name="email"/>
+      </tree>
+    </field>
+  </record>
+
+  <!-- Acción para abrir vista de responsables -->
+  <record id="action_responsables_list" model="ir.actions.act_window">
+    <field name="name">Lista de Responsables</field>
+    <field name="res_model">res.users</field>
+    <field name="view_mode">tree</field>
+    <field name="view_id" ref="view_tree_responsables"/>
+  </record>
+
+  <!-- Menú para acceder a la lista de responsables -->
+  <menuitem id="menu_responsables_list"
+            name="Lista de Responsables"
+            parent="menu_trabajadores_root"
+            action="action_responsables_list"
+            sequence="1"/>
+
+  <!-- ✅ Acción del reporte que aparece en el botón Imprimir -->
+  <record id="action_reporte_responsables" model="ir.actions.report">
+    <field name="name">Órdenes de Reparación por Responsable</field>
+    <field name="model">res.users</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">joyeria_reparaciones.reporte_reparaciones_responsable</field>
+    <field name="report_file">joyeria_reparaciones.reporte_reparaciones_responsable</field>
+    <field name="print_report_name">'Reparaciones_' + object.name</field>
+  </record>
+
+  <record id="view_users_form_inherit_reporte_responsable" model="ir.ui.view">
+    <field name="name">res.users.form.reporte.responsables</field>
+    <field name="model">res.users</field>
+    <field name="inherit_id" ref="base.view_users_form"/>
+    <field name="arch" type="xml">
+        <header position="inside">
+            <button name="%(joyeria_reparaciones.action_wizard_reporte_responsables)d"
+                    string="Reporte por Fechas"
+                    type="action"
+                    class="btn-secondary"
+                    context="{'default_responsable_id': active_id}"/>
+        </header>
+    </field>
+</record>
+  
+</odoo>

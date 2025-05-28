@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Acción para imprimir etiqueta de usuarios (res.users) -->
+    <report
+        id="reporte_etiqueta_usuario_action"
+        model="res.users"
+        string="Imprimir etiqueta de usuario"
+        report_type="qweb-pdf"
+        name="joyeria_reparaciones.report_etiqueta_usuario"
+        file="joyeria_reparaciones.report_etiqueta_usuario"
+        print_report_name="'Etiqueta - %s' % (object.name)"
+    />
+
+    <!-- Acción para imprimir etiqueta de vendedoras (joyeria.vendedora) -->
+    <report
+        id="reporte_etiqueta_vendedora_action"
+        model="joyeria.vendedora"
+        string="Imprimir etiqueta de vendedora"
+        report_type="qweb-pdf"
+        name="joyeria_reparaciones.report_etiqueta_vendedora"
+        file="joyeria_reparaciones.report_etiqueta_vendedora"
+        print_report_name="'Etiqueta - %s' % (object.name)"
+    />
+</odoo>

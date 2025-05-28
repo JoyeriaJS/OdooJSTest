@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_etiqueta_vendedora">
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <t t-foreach="docs" t-as="v">
+                    <div class="col-6 mb92">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Empresa</th>
+                                    <th>Cargo</th>
+                                    <th>Clave de Autenticación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <span t-if="v.codigo_qr" t-field="v.codigo_qr"
+                                              t-options="{'widget': 'barcode', 'symbology': 'Code128', 'width': 300, 'height': 50, 'img_style': 'width:100%;height:35%;'}"/>
+                                    </td>
+                                    <td><span t-field="v.name"/></td>
+                                    <td><span t-field="v.empresa"/></td>
+                                    <td><span t-field="v.cargo"/></td> <!-- Este campo deberás crearlo -->
+                                    <td><span t-field="v.clave_autenticacion"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+</odoo>
