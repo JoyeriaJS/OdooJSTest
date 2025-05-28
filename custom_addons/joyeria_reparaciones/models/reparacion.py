@@ -33,7 +33,7 @@ class Reparacion(models.Model):
     )
 
 
-    producto_id = fields.Many2one('joyeria.producto', string='Producto a reparar', required=True)
+    producto_id = fields.Many2one('joyeria.producto', string='Producto a reparar', required=False)
     modelo = fields.Char(string='Modelo', required=False)
     cliente_id = fields.Many2one('res.partner', string='Nombre y apellido del Cliente', required=True)
     nombre_cliente = fields.Char(string='Nombre y apellido del cliente', required=False)
