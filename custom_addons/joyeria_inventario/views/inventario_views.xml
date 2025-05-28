@@ -30,6 +30,28 @@
           </t>
         </templates>
       </kanban>
+        <record id="view_joyeria_inventario_form" model="ir.ui.view">
+        <field name="name">joyeria.inventario.form</field>
+        <field name="model">joyeria.inventario</field>
+        <field name="arch" type="xml">
+          <form string="Ingreso Manual">
+            <sheet>
+              <group>
+                <field name="name"/>
+                <field name="codigo"/>
+                <field name="sucursal"/>
+                <field name="tipo"/>
+                <field name="estado"/>
+                <field name="cantidad"/>
+                <field name="precio_compra"/>
+                <field name="precio_sugerido"/>
+                <field name="descripcion"/>
+                <field name="foto" widget="image"/>
+              </group>
+            </sheet>
+          </form>
+        </field>
+      </record>
     </field>
   </record>
 

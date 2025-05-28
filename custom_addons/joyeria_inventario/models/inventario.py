@@ -20,3 +20,9 @@ class InventarioJoyeria(models.Model):
     ], string='Estado', default='a_procesar')
 
     cantidad = fields.Integer(string='Cantidad a procesar', default=0)
+
+    codigo = fields.Char(string='Código Interno')
+    precio_compra = fields.Float(string='Precio de compra')
+    precio_sugerido = fields.Float(string='Precio sugerido')
+    descripcion = fields.Text(string='Descripción')
+    foto = fields.Binary(string='Foto del producto', attachment=True)

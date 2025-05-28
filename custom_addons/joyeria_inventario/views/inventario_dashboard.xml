@@ -1,22 +1,54 @@
 <odoo>
-  <record id="view_stock_picking_kanban" model="ir.ui.view">
-    <field name="name">stock.picking.kanban</field>
-    <field name="model">stock.picking</field>
+  <!-- Dashboard de Inventario -->
+  <record id="view_joyeria_inventario_dashboard" model="ir.ui.view">
+    <field name="name">joyeria.inventario.dashboard</field>
+    <field name="model">joyeria.inventario</field>
     <field name="arch" type="xml">
-      <kanban>
-        <field name="name"/>
-        <field name="state"/>
-        <field name="picking_type_id"/>
+      <kanban class="o_kanban_dashboard">
         <templates>
           <t t-name="kanban-box">
-            <div class="oe_kanban_global_click">
-              <strong><field name="name"/></strong><br/>
-              <field name="picking_type_id"/><br/>
-              <field name="state"/>
+            <div class="oe_kanban_card text-center">
+              <h2>Dashboard de Inventario</h2>
+              <div class="row" style="margin-top: 20px;">
+                <div class="col-4">
+                  <a class="btn btn-primary" href="/web#action=action_joyeria_productos">
+                    Ver Productos
+                  </a>
+                </div>
+                <div class="col-4">
+                  <a class="btn btn-success" href="/web#model=joyeria.inventario&view_type=form">
+                    Ingreso Manual
+                  </a>
+                </div>
+                <div class="col-4">
+                  <a class="btn btn-info" href="/web#model=wizard.cargar.excel&view_type=form">
+                    Carga por Excel
+                  </a>
+                </div>
+              </div>
+              <div class="row" style="margin-top: 20px;">
+                <div class="col-6">
+                  <a class="btn btn-warning" href="/web#model=joyeria.inventario&view_type=tree">
+                    Movimiento entre sucursales
+                  </a>
+                </div>
+                <div class="col-6">
+                  <a class="btn btn-secondary" href="/web#model=joyeria.reportes&view_type=form">
+                    Reportes
+                  </a>
+                </div>
+              </div>
             </div>
           </t>
         </templates>
       </kanban>
     </field>
+  </record>
+
+  <record id="action_joyeria_inventario_dashboard" model="ir.actions.act_window">
+    <field name="name">Dashboard de Inventario</field>
+    <field name="res_model">joyeria.inventario</field>
+    <field name="view_mode">kanban</field>
+    <field name="view_id" ref="view_joyeria_inventario_dashboard"/>
   </record>
 </odoo>
