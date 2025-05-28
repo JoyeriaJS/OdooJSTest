@@ -37,7 +37,7 @@ class Reparacion(models.Model):
     modelo = fields.Char(string='Modelo', required=False)
     cliente_id = fields.Many2one('res.partner', string='Nombre y apellido del Cliente', required=True)
     nombre_cliente = fields.Char(string='Nombre y apellido del cliente', required=False)
-    apellido_cliente = fields.Char(string="Apellido del cliente", required=True)
+    apellido_cliente = fields.Char(string="Apellido del cliente", required=False)
     correo_cliente = fields.Char(string="Correo electrónico")
     telefono = fields.Char(string='Teléfono', required=True)
     direccion_entrega = fields.Char(string='Dirección de entrega')
