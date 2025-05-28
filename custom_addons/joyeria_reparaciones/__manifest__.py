@@ -22,7 +22,7 @@
         'report/report_actions.xml',
         'report/report_etiqueta_usuario.xml',
         'report/report_etiqueta_vendedora.xml',
-        'views/wizard_reporte_responsables.xml',
+        #'views/wizard_reporte_responsables.xml',
         #'views/res_users_inherit.xml',
 
 
