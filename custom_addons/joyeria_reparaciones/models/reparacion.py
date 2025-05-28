@@ -362,7 +362,7 @@ class Reparacion(models.Model):
 
         # Generar secuencia
         if vals.get('name', 'Nuevo') == 'Nuevo':
-            secuencia = self.env['joyeria.data'].next_by_code('joyeria.reparacion')
+            secuencia = self.env['ir.sequence'].next_by_code('joyeria.reparacion')
             if not secuencia:
                 raise ValidationError("No se pudo generar la secuencia.")
             vals['name'] = secuencia.replace("'", "-")
