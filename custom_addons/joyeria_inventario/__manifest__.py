@@ -4,7 +4,7 @@
     'summary': 'Gestión de inventario por locales',
     'description': 'Módulo personalizado para controlar inventario en locales de joyería.',
     'author': 'Tu Nombre',
-    'depends': ['base', 'stock', 'product'],
+    'depends': ['base',  'product'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
