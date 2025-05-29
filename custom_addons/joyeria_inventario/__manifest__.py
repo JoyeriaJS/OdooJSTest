@@ -11,7 +11,7 @@
         'views/inventario_views.xml',
         'views/inventario_dashboard.xml',
         'views/joyeria_inventario_menu.xml',
-        'views/cargar_excel_view.xml',  # NUEVO
+        #'views/cargar_excel_view.xml',  # NUEVO
     ],
     'installable': True,
     'application': True,
