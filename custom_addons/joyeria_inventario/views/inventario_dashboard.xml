@@ -16,24 +16,24 @@
                   </a>
                 </div>
                 <div class="col-4">
-                  <a class="btn btn-success" href="/web#model=joyeria.inventario&view_type=form">
+                  <a class="btn btn-success" href="/web#model=joyeria.inventario&amp;view_type=form">
                     Ingreso Manual
                   </a>
                 </div>
                 <div class="col-4">
-                  <a class="btn btn-info" href="/web#model=wizard.cargar.excel&view_type=form">
+                  <a class="btn btn-info" href="/web#model=wizard.cargar.excel&amp;view_type=form">
                     Carga por Excel
                   </a>
                 </div>
               </div>
               <div class="row" style="margin-top: 20px;">
                 <div class="col-6">
-                  <a class="btn btn-warning" href="/web#model=joyeria.inventario&view_type=tree">
+                  <a class="btn btn-warning" href="/web#model=joyeria.inventario&amp;view_type=tree">
                     Movimiento entre sucursales
                   </a>
                 </div>
                 <div class="col-6">
-                  <a class="btn btn-secondary" href="/web#model=joyeria.reportes&view_type=form">
+                  <a class="btn btn-secondary" href="/web#model=joyeria.reportes&amp;view_type=form">
                     Reportes
                   </a>
                 </div>
