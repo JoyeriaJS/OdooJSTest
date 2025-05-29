@@ -68,10 +68,10 @@
     </record>
 
     <!-- Menús -->
-    <menuitem id="menu_joyeria_inventario_root" name="Inventario" sequence="10"/>
     <menuitem id="menu_joyeria_inventario" name="Resumen de inventario"
-              parent="menu_joyeria_inventario_root"
-              action="action_joyeria_inventario_kanban"/>
+          parent="menu_joyeria_inventory_root"
+          action="action_joyeria_inventario_kanban"/>
+
 
   </data>
 </odoo>
