@@ -9,13 +9,12 @@ ENV LANG=${LOCALE}
 USER 0
 
 RUN apt-get -y update && apt-get install -y --no-install-recommends locales netcat-openbsd \
-    && locale-gen ${LOCALE}
+    && locale-gen ${LOCALE} \
+    && pip3 install pandas openpyxl
 
 WORKDIR /app
 
-
 COPY --chmod=755 entrypoint.sh ./
-
 COPY ./custom_addons /mnt/custom_addons
 
 ENTRYPOINT ["/bin/sh"]
