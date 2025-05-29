@@ -9,8 +9,7 @@ ENV LANG=${LOCALE}
 USER 0
 
 RUN apt-get -y update && apt-get install -y --no-install-recommends locales netcat-openbsd \
-    && locale-gen ${LOCALE} \
-    && pip3 install --no-cache-dir pandas openpyxl
+    && locale-gen ${LOCALE}
 
 WORKDIR /app
 
