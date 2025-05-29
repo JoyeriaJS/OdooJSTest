@@ -1,6 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_joyeria_inventario_user,access.joyeria.inventario.user,model_joyeria_inventario,base.group_user,1,1,1,1
-access_wizard_cargar_excel,wizard.cargar.excel,model_wizard_cargar_excel,,1,1,1,1
+
 
 
 
