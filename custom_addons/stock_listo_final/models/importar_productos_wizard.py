@@ -141,7 +141,6 @@ class ImportarProductosWizard(models.TransientModel):
                     pricelist = Pricelist.create({'name': pricelist_name, 'currency_id': currency_id})
                 # Agregar regla de precio para este producto y esta lista
                 item_model.create({
-                    'applied_on': 'product',  # ¡CORREGIDO!
                     'product_tmpl_id': product.id,
                     'pricelist_id': pricelist.id,
                     'fixed_price': price,
