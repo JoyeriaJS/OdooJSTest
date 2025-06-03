@@ -36,7 +36,7 @@
                   <td style="border: 1px solid #000; padding: 4px;"><t t-esc="r.peso_valor"/></td>
                   <td style="border: 1px solid #000; padding: 75px;"><t t-esc="r.solicitud_cliente or ''"/></td>
                   <td style="border: 1px solid #000; padding: 4px;"><t t-esc="r.fecha_entrega.strftime('%d/%m/%Y') if r.fecha_entrega else ''"/></td>
-                  <td style="border: 1px solid #000; padding: 75px;"><t t-esc="''"/></td>
+                  <td style="border: 1px solid #000; padding: 4px;"><t t-esc="''"/></td>
                 </tr>
               </t>
             </tbody>
