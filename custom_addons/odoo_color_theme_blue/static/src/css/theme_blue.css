@@ -7,8 +7,8 @@
 .btn-primary,
 .o_form_button_save,
 .o_form_button_create {
-    background-color: #11497B !important;
-    border-color: #11497B !important;
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
 }
 .o_main_navbar .dropdown-toggle,
 .o_main_navbar .o_menu_brand {
@@ -17,5 +17,5 @@
 .btn-primary:hover,
 .o_form_button_save:hover,
 .o_form_button_create:hover {
-    background-color: #0d3c68 !important;
+    background-color: var(--primary-hover) !important;
 }

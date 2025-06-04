@@ -5,10 +5,12 @@
     "author": "ChatGPT",
     "category": "Theme/Backend",
     "depends": ["web"],
-    "data": [
-        "views/assets.xml"
-    ],
+    "assets": {
+        "web._assets_primary_variables": [
+            "odoo_color_theme_blue/static/src/css/theme_blue.css"
+        ]
+    },
     "installable": True,
     "application": False,
-    "auto_install": False,
+    "auto_install": False
 }
