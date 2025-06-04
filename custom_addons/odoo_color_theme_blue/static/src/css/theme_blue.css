@@ -232,3 +232,41 @@ input[type="checkbox"].o_checkbox_input:checked::after,
     background-image: url('data:image/svg+xml;utf8,<svg fill="white" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path d="M5 9.5l3 3 5-5" stroke="%2321e3b5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>');
     pointer-events: none;
 }
+/* Ticket verde en canal seleccionado del menú lateral Odoo Discuss */
+.o_mail_nav_panel .o_mail_channel_selected,
+.o_mail_nav_panel .o_mail_channel_preview.o-active,
+.o_mail_nav_panel .o_mail_channel_preview.active,
+.o_mail_nav_panel .o_mail_channel_preview.o_active,
+.o_mail_nav_panel .o_mail_channel_preview.selected {
+    position: relative !important;
+    background: var(--primary) !important;
+    color: #fff !important;
+}
+.o_mail_nav_panel .o_mail_channel_selected::after,
+.o_mail_nav_panel .o_mail_channel_preview.o-active::after,
+.o_mail_nav_panel .o_mail_channel_preview.active::after,
+.o_mail_nav_panel .o_mail_channel_preview.o_active::after,
+.o_mail_nav_panel .o_mail_channel_preview.selected::after {
+    content: "✔";
+    color: #19e6c5;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    text-shadow: 0 0 3px #0009;
+    z-index: 2;
+}
+@media (max-width: 991px) {
+    .o_mail_nav_panel .o_mail_channel_selected::after,
+    .o_mail_nav_panel .o_mail_channel_preview.o-active::after,
+    .o_mail_nav_panel .o_mail_channel_preview.active::after,
+    .o_mail_nav_panel .o_mail_channel_preview.o_active::after,
+    .o_mail_nav_panel .o_mail_channel_preview.selected::after {
+        right: 8px;
+        font-size: 24px;
+    }
+}
+
