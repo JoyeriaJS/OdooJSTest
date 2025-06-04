@@ -1,7 +1,7 @@
 :root {
-    --primary: #11497B !important;
-    --primary-hover: #0d3c68 !important;
-    --primary-light: #1976d2 !important;
+    --primary: #18191a !important;
+    --primary-hover: #232527 !important;
+    --primary-light: #232527 !important;
     --background: #18191a !important;
     --text-color: #fff !important;
     --hover-green: #20e17c !important;
@@ -16,20 +16,35 @@ body,
 .o_action_manager,
 .o_action_manager .o_view_controller,
 .o_action_manager .o_controller_with_searchpanel,
-.o_form_view {
+.o_form_view,
+.o_kanban_view,
+.o_list_view,
+.o_form_label,
+.o_form_view label,
+.o_list_view th,
+.o_list_view td,
+.o_form_view .o_field_widget,
+.o_menu_systray > .dropdown-toggle,
+.o_main_navbar .dropdown-toggle,
+.o_main_navbar .o_menu_brand,
+.o_kanban_record,
+.o_form_sheet_bg,
+.o_form_sheet {
     background-color: var(--background) !important;
     color: var(--text-color) !important;
+    border-color: #232527 !important;
 }
 
 .o_main_navbar,
 .btn-primary,
 .o_form_button_save,
 .o_form_button_create {
-    background-color: var(--primary) !important;
-    border-color: var(--primary) !important;
+    background-color: var(--background) !important;
+    border-color: var(--background) !important;
     color: #fff !important;
 }
 
+.o_menu_systray > .dropdown-toggle,
 .o_main_navbar .dropdown-toggle,
 .o_main_navbar .o_menu_brand {
     color: #fff !important;
@@ -53,8 +68,6 @@ button:hover,
 a,
 span,
 div,
-.o_list_view,
-.o_kanban_view,
 .o_form_label,
 .o_form_view label,
 .o_list_view th,
