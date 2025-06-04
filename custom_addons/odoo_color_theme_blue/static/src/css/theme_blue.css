@@ -50,33 +50,44 @@ body, .o_web_client {
     color: #fff !important;
 }
 
-/* Ticket verde en elemento seleccionado del menú lateral */
+/* --- TICKET VERDE AGUA SOLO EN CANAL SELECCIONADO DE ODOO DISCUSS --- */
 .o_mail_nav_panel .o_mail_channel_selected,
-.o_mail_nav_panel .o_mail_channel_preview.o_active {
+.o_mail_nav_panel .o_mail_channel_preview.o-active,
+.o_mail_nav_panel .o_mail_channel_preview.active,
+.o_mail_nav_panel .o_mail_channel_preview.o_active,
+.o_mail_nav_panel .o_mail_channel_preview.selected {
     position: relative !important;
     background: var(--primary) !important;
     color: #fff !important;
 }
 .o_mail_nav_panel .o_mail_channel_selected::after,
-.o_mail_nav_panel .o_mail_channel_preview.o_active::after {
+.o_mail_nav_panel .o_mail_channel_preview.o-active::after,
+.o_mail_nav_panel .o_mail_channel_preview.active::after,
+.o_mail_nav_panel .o_mail_channel_preview.o_active::after,
+.o_mail_nav_panel .o_mail_channel_preview.selected::after {
     content: "✔";
     color: #19e6c5;
     font-size: 20px;
     font-weight: bold;
     position: absolute;
-    right: 22px;
+    right: 18px;
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
-    filter: drop-shadow(0 0 3px #0009);
+    text-shadow: 0 0 3px #0009;
+    z-index: 2;
 }
 @media (max-width: 991px) {
     .o_mail_nav_panel .o_mail_channel_selected::after,
-    .o_mail_nav_panel .o_mail_channel_preview.o_active::after {
-        right: 10px;
+    .o_mail_nav_panel .o_mail_channel_preview.o-active::after,
+    .o_mail_nav_panel .o_mail_channel_preview.active::after,
+    .o_mail_nav_panel .o_mail_channel_preview.o_active::after,
+    .o_mail_nav_panel .o_mail_channel_preview.selected::after {
+        right: 8px;
         font-size: 24px;
     }
 }
+/* --- FIN TICKET VERDE --- */
 
 /* Fondo del centro */
 .o_content, .o_mail_discuss_content, .o_mail_discuss .o_mail_discuss_sidebar, .o_mail_discuss .o_mail_discuss_content {
@@ -148,125 +159,3 @@ input:focus, textarea:focus, select:focus, .o_input:focus {
 ::-webkit-scrollbar-thumb {
     background: var(--primary) !important;
 }
-/* Ticket verde agua en canal seleccionado de la bandeja de entrada y todos los menús laterales de mensajes */
-.o_mail_nav_panel .o_mail_channel_selected,
-.o_mail_nav_panel .o_mail_channel_preview.o-active,
-.o_mail_nav_panel .o_mail_channel_preview.active,
-.o_mail_nav_panel .o_mail_channel_preview.o_active,
-.o_mail_nav_panel .o_mail_channel_preview.selected {
-    position: relative !important;
-    background: var(--primary) !important;
-    color: #fff !important;
-}
-
-.o_mail_nav_panel .o_mail_channel_selected::after,
-.o_mail_nav_panel .o_mail_channel_preview.o-active::after,
-.o_mail_nav_panel .o_mail_channel_preview.active::after,
-.o_mail_nav_panel .o_mail_channel_preview.o_active::after,
-.o_mail_nav_panel .o_mail_channel_preview.selected::after {
-    content: "✔";
-    color: #19e6c5;
-    font-size: 20px;
-    font-weight: bold;
-    position: absolute;
-    right: 22px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    filter: drop-shadow(0 0 3px #0009);
-    z-index: 2;
-}
-
-@media (max-width: 991px) {
-    .o_mail_nav_panel .o_mail_channel_selected::after,
-    .o_mail_nav_panel .o_mail_channel_preview.o-active::after,
-    .o_mail_nav_panel .o_mail_channel_preview.active::after,
-    .o_mail_nav_panel .o_mail_channel_preview.o_active::after,
-    .o_mail_nav_panel .o_mail_channel_preview.selected::after {
-        right: 10px;
-        font-size: 24px;
-    }
-}
-/* Oculta el check estándar */
-input[type="checkbox"].o_list_record_selector,
-input[type="checkbox"].o_checkbox_input,
-.o_checkbox input[type="checkbox"] {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    background-color: #fff !important;
-    border: 2px solid #19e6c5 !important;
-    width: 18px !important;
-    height: 18px !important;
-    border-radius: 4px !important;
-    display: inline-block !important;
-    vertical-align: middle;
-    position: relative;
-    cursor: pointer;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-/* Cuando está marcado, muestra el ticket verde agua centrado */
-input[type="checkbox"].o_list_record_selector:checked,
-input[type="checkbox"].o_checkbox_input:checked,
-.o_checkbox input[type="checkbox"]:checked {
-    background-color: #19e6c5 !important;
-    border-color: #19e6c5 !important;
-}
-
-/* El ticket SVG como pseudo-elemento */
-input[type="checkbox"].o_list_record_selector:checked::after,
-input[type="checkbox"].o_checkbox_input:checked::after,
-.o_checkbox input[type="checkbox"]:checked::after {
-    content: "";
-    display: block;
-    width: 18px;
-    height: 18px;
-    position: absolute;
-    left: 0;
-    top: 0;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 14px 14px;
-    /* SVG tick verde agua */
-    background-image: url('data:image/svg+xml;utf8,<svg fill="white" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path d="M5 9.5l3 3 5-5" stroke="%2321e3b5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>');
-    pointer-events: none;
-}
-/* Ticket verde en canal seleccionado del menú lateral Odoo Discuss */
-.o_mail_nav_panel .o_mail_channel_selected,
-.o_mail_nav_panel .o_mail_channel_preview.o-active,
-.o_mail_nav_panel .o_mail_channel_preview.active,
-.o_mail_nav_panel .o_mail_channel_preview.o_active,
-.o_mail_nav_panel .o_mail_channel_preview.selected {
-    position: relative !important;
-    background: var(--primary) !important;
-    color: #fff !important;
-}
-.o_mail_nav_panel .o_mail_channel_selected::after,
-.o_mail_nav_panel .o_mail_channel_preview.o-active::after,
-.o_mail_nav_panel .o_mail_channel_preview.active::after,
-.o_mail_nav_panel .o_mail_channel_preview.o_active::after,
-.o_mail_nav_panel .o_mail_channel_preview.selected::after {
-    content: "✔";
-    color: #19e6c5;
-    font-size: 20px;
-    font-weight: bold;
-    position: absolute;
-    right: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    text-shadow: 0 0 3px #0009;
-    z-index: 2;
-}
-@media (max-width: 991px) {
-    .o_mail_nav_panel .o_mail_channel_selected::after,
-    .o_mail_nav_panel .o_mail_channel_preview.o-active::after,
-    .o_mail_nav_panel .o_mail_channel_preview.active::after,
-    .o_mail_nav_panel .o_mail_channel_preview.o_active::after,
-    .o_mail_nav_panel .o_mail_channel_preview.selected::after {
-        right: 8px;
-        font-size: 24px;
-    }
-}
-
