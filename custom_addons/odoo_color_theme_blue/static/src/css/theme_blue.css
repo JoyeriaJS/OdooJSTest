@@ -2,20 +2,86 @@
     --primary: #11497B !important;
     --primary-hover: #0d3c68 !important;
     --primary-light: #1976d2 !important;
+    --background: #18191a !important;
+    --text-color: #fff !important;
+    --hover-green: #20e17c !important;
 }
+
+body,
+.o_web_client,
+.o_content,
+.o_main_navbar,
+.o_control_panel,
+.o_control_panel_main,
+.o_action_manager,
+.o_action_manager .o_view_controller,
+.o_action_manager .o_controller_with_searchpanel,
+.o_form_view {
+    background-color: var(--background) !important;
+    color: var(--text-color) !important;
+}
+
 .o_main_navbar,
 .btn-primary,
 .o_form_button_save,
 .o_form_button_create {
     background-color: var(--primary) !important;
     border-color: var(--primary) !important;
+    color: #fff !important;
 }
+
 .o_main_navbar .dropdown-toggle,
 .o_main_navbar .o_menu_brand {
     color: #fff !important;
 }
+
 .btn-primary:hover,
 .o_form_button_save:hover,
-.o_form_button_create:hover {
-    background-color: var(--primary-hover) !important;
+.o_form_button_create:hover,
+.o_menu_systray > .dropdown-toggle:hover,
+.o_web_client .o_menu_apps .dropdown-menu .dropdown-item:hover,
+a:hover,
+button:hover,
+.o_kanban_record:hover,
+.o_list_view .o_data_row:hover,
+.o_form_sheet_bg .o_form_sheet:hover,
+.o_form_view .o_form_sheet_bg:hover {
+    background-color: var(--hover-green) !important;
+    color: #18191a !important;
+}
+
+a,
+span,
+div,
+.o_list_view,
+.o_kanban_view,
+.o_form_label,
+.o_form_view label,
+.o_list_view th,
+.o_list_view td,
+.o_form_view .o_field_widget {
+    color: var(--text-color) !important;
+}
+
+input,
+textarea,
+select,
+.o_input,
+.o_field_widget input,
+.o_field_widget textarea {
+    background-color: #232527 !important;
+    color: #fff !important;
+    border-color: #333 !important;
+}
+
+.o_control_panel,
+.o_searchview,
+.o_searchview .o_searchview_input_container,
+.o_searchview .o_searchview_input_container input {
+    background-color: #232527 !important;
+    color: #fff !important;
+}
+
+.o_searchview .o_searchview_input_container input::placeholder {
+    color: #bbb !important;
 }
