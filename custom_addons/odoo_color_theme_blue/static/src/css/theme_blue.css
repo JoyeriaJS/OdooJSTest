@@ -1,0 +1,21 @@
+:root {
+    --primary: #11497B !important;
+    --primary-hover: #0d3c68 !important;
+    --primary-light: #1976d2 !important;
+}
+.o_main_navbar,
+.btn-primary,
+.o_form_button_save,
+.o_form_button_create {
+    background-color: #11497B !important;
+    border-color: #11497B !important;
+}
+.o_main_navbar .dropdown-toggle,
+.o_main_navbar .o_menu_brand {
+    color: #fff !important;
+}
+.btn-primary:hover,
+.o_form_button_save:hover,
+.o_form_button_create:hover {
+    background-color: #0d3c68 !important;
+}
