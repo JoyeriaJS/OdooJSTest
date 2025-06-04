@@ -50,6 +50,34 @@ body, .o_web_client {
     color: #fff !important;
 }
 
+/* Ticket verde en elemento seleccionado del menú lateral */
+.o_mail_nav_panel .o_mail_channel_selected,
+.o_mail_nav_panel .o_mail_channel_preview.o_active {
+    position: relative !important;
+    background: var(--primary) !important;
+    color: #fff !important;
+}
+.o_mail_nav_panel .o_mail_channel_selected::after,
+.o_mail_nav_panel .o_mail_channel_preview.o_active::after {
+    content: "✔";
+    color: #19e6c5;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    right: 22px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    filter: drop-shadow(0 0 3px #0009);
+}
+@media (max-width: 991px) {
+    .o_mail_nav_panel .o_mail_channel_selected::after,
+    .o_mail_nav_panel .o_mail_channel_preview.o_active::after {
+        right: 10px;
+        font-size: 24px;
+    }
+}
+
 /* Fondo del centro */
 .o_content, .o_mail_discuss_content, .o_mail_discuss .o_mail_discuss_sidebar, .o_mail_discuss .o_mail_discuss_content {
     background: var(--main-bg) !important;
