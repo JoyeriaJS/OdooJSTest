@@ -1,13 +1,14 @@
 :root {
     --primary: #18191a !important;
-    --primary-hover: #232527 !important;
+    --primary-hover: #18191a !important;
     --primary-light: #232527 !important;
     --background: #18191a !important;
     --text-color: #fff !important;
     --hover-green: #20e17c !important;
+    --border-color: #333 !important;
 }
 
-/* Fondo global y textos */
+/* Fondo negro absoluto en todo el backend */
 body,
 .o_web_client,
 .o_content,
@@ -20,70 +21,54 @@ body,
 .o_form_view,
 .o_kanban_view,
 .o_list_view,
+.o_control_panel .o_cp_searchview,
+.o_menu_systray,
+.o_dialog,
+.modal-content,
+.o_notification_manager,
+.o_popover,
+.o_popover .popover-body,
+.o_popover .popover-header {
+    background-color: var(--background) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Navbar, menús laterales, menús desplegables */
+.o_main_navbar,
+.o_menu_systray,
+.o_menu_systray .dropdown-toggle,
+.o_main_navbar .dropdown-toggle,
+.o_main_navbar .o_menu_brand,
+.o_control_panel_main,
+.o_mail_systray_dropdown,
+.o_mail_systray_dropdown * {
+    background-color: var(--background) !important;
+    color: #fff !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Bordes y líneas divisorias suaves */
+hr, .o_horizontal_separator, .modal-header, .modal-footer, .o_form_sheet, .o_kanban_card, .o_kanban_record, .o_list_view th, .o_list_view td, .o_field_widget, .o_cp_searchview, .o_cp_searchview input {
+    border-color: var(--border-color) !important;
+}
+
+/* Textos */
+a,
+span,
+div,
 .o_form_label,
 .o_form_view label,
 .o_list_view th,
 .o_list_view td,
-.o_form_view .o_field_widget,
-.o_menu_systray > .dropdown-toggle,
-.o_main_navbar .dropdown-toggle,
-.o_main_navbar .o_menu_brand,
-.o_kanban_record,
-.o_form_sheet_bg,
-.o_form_sheet,
-.o_notification_manager,
-.o_dialog,
-.o_dialog .modal-content,
-.modal-content,
-.o_list_renderer thead,
-.o_list_renderer tbody,
-.o_list_renderer .o_data_row,
-.o_list_renderer .o_data_cell,
-.o_searchview,
-.o_cp_searchview,
-.o_cp_searchview input,
-.o_control_panel .o_cp_searchview,
-.o_control_panel .o_cp_searchview input,
-.o_popover,
-.o_popover .popover-body,
-.o_popover .popover-header,
-.o_mail_systray_dropdown,
-.o_mail_systray_dropdown *,
-.o_mail_systray_dropdown .dropdown-menu,
-.o_mail_systray_dropdown .dropdown-menu * {
-    background-color: var(--background) !important;
+.o_field_widget label,
+label {
     color: var(--text-color) !important;
-    border-color: #232527 !important;
 }
 
-/* Botones principales, favoritos, guardado, etc */
-.o_form_button_save,
-.o_form_button_create,
+/* Botones estilo minimalista: fondo negro, borde blanco, texto blanco */
 .btn,
 .btn-primary,
-.o_favorites_menu .o_favorite,
-.o_favorites_menu .o_favorite_selected,
-.o_favorites_menu .dropdown-item,
-.o_dropdown_menu .dropdown-item,
-.o_list_button_add,
-.o_list_button_discard,
-.o_list_button_save,
-.o_list_button_edit,
-.o_form_button_edit,
-.o_button,
-.o_notebook .nav-link,
-.o_menu_systray .dropdown-toggle,
-.o_main_navbar .dropdown-toggle,
-.o_main_navbar .o_menu_brand {
-    background-color: var(--primary) !important;
-    color: var(--text-color) !important;
-    border-color: var(--primary-hover) !important;
-}
-
-/* Rosado original de Odoo fuera */
-.btn-primary,
-.btn.btn-primary,
-.o_button.btn-primary,
 .o_form_button_save,
 .o_form_button_create,
 .o_list_button_save,
@@ -92,40 +77,41 @@ body,
 .o_form_button_edit,
 .o_list_button_discard,
 .o_button {
-    background-color: var(--primary) !important;
-    color: var(--text-color) !important;
-    border-color: var(--primary-hover) !important;
+    background: transparent !important;
+    color: #fff !important;
+    border: 1.5px solid #fff !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    transition: border-color 0.15s, color 0.15s;
 }
 
-/* HOVER VERDE: botones, filas listas, tarjetas, menú */
+/* Hover de botones y links: borde y texto verde, fondo negro */
+.btn:hover,
+.btn-primary:hover,
 .o_form_button_save:hover,
 .o_form_button_create:hover,
-.btn-primary:hover,
-.o_button.btn-primary:hover,
 .o_list_button_save:hover,
 .o_list_button_add:hover,
 .o_list_button_edit:hover,
 .o_form_button_edit:hover,
 .o_list_button_discard:hover,
-.o_kanban_record:hover,
-.o_list_renderer .o_data_row:hover,
-.o_cp_searchview input:hover,
-.o_menu_systray .dropdown-toggle:hover,
-.o_main_navbar .dropdown-toggle:hover,
-.o_notebook .nav-link.active,
-.o_notebook .nav-link:focus,
-.o_notebook .nav-link:hover,
+.o_button:hover,
 a:hover,
-button:hover,
-.o_popover .dropdown-item:hover,
-.o_dropdown_menu .dropdown-item:hover,
-.o_mail_systray_dropdown .dropdown-item:hover {
-    background-color: var(--hover-green) !important;
-    color: #18191a !important;
+button:hover {
+    background: transparent !important;
     border-color: var(--hover-green) !important;
+    color: var(--hover-green) !important;
 }
 
-/* Inputs y selects en negro, texto blanco */
+/* Estado de focus (seleccionado) igual: borde verde */
+input:focus, textarea:focus, select:focus, .o_input:focus {
+    outline: 2px solid var(--hover-green) !important;
+    border-color: var(--hover-green) !important;
+    background-color: #232527 !important;
+    color: #fff !important;
+}
+
+/* Inputs, selects, campos edición: fondo gris oscuro, texto blanco */
 input,
 textarea,
 select,
@@ -136,7 +122,7 @@ select,
 .o_searchview input {
     background-color: #232527 !important;
     color: #fff !important;
-    border-color: #333 !important;
+    border-color: var(--border-color) !important;
 }
 
 .o_cp_searchview input::placeholder,
@@ -144,7 +130,39 @@ select,
     color: #bbb !important;
 }
 
-/* Forzar legibilidad máxima en popups/dialogos/tooltip */
+/* Listas y tablas: filas fondo negro, texto blanco, fila hover subrayada en verde */
+.o_list_renderer .o_data_row,
+.o_list_renderer .o_data_cell,
+.o_list_renderer thead,
+.o_list_renderer tbody {
+    background-color: var(--background) !important;
+    color: #fff !important;
+}
+.o_list_renderer .o_data_row:hover {
+    border-bottom: 2px solid var(--hover-green) !important;
+    background: var(--background) !important;
+    color: var(--hover-green) !important;
+}
+
+/* Tarjetas Kanban */
+.o_kanban_card,
+.o_kanban_record,
+.o_kanban_view .o_kanban_group,
+.o_kanban_view .o_kanban_quick_create,
+.o_kanban_view .o_column_quick_create {
+    background-color: #232527 !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Hover de Kanban: borde verde, texto verde */
+.o_kanban_record:hover {
+    border: 2px solid var(--hover-green) !important;
+    color: var(--hover-green) !important;
+}
+
+/* Dialogos, popups, tooltips, mail */
 .o_dialog .modal-header,
 .o_dialog .modal-footer,
 .modal-header,
@@ -155,47 +173,28 @@ select,
 .o_mail_systray_dropdown *,
 .o_popover,
 .o_popover .popover-header,
-.o_popover .popover-body {
-    background-color: var(--background) !important;
-    color: var(--text-color) !important;
-}
-
-/* Correcciones para campos seleccionados/focus */
-input:focus, textarea:focus, select:focus, .o_input:focus {
-    outline: 2px solid var(--hover-green) !important;
+.o_popover .popover-body,
+.o_tooltip, .tooltip, .popover, .popover-header, .popover-body {
     background-color: #232527 !important;
     color: #fff !important;
+    border-color: var(--border-color) !important;
 }
 
-/* Bordes, flechas, detalles menores */
-hr, .o_horizontal_separator {
-    border-color: #232527 !important;
-}
-
-.o_form_label, .o_field_widget label, .o_list_view th, .o_list_view td, label {
-    color: #fff !important;
-}
-
-a, .o_menu_systray .dropdown-toggle, .o_main_navbar .dropdown-toggle, .o_main_navbar .o_menu_brand {
-    color: #fff !important;
-}
-
-/* Fix para fondo de las tarjetas/kanban */
-.o_kanban_card, .o_kanban_record, .o_kanban_view .o_kanban_group, .o_kanban_view .o_kanban_quick_create, .o_kanban_view .o_column_quick_create {
-    background-color: #232527 !important;
-    color: #fff !important;
-}
-
-/* Tooltips, popups, toolmenu */
-.o_tooltip, .tooltip, .popover, .popover-header, .popover-body, .modal-content, .modal-header, .modal-footer {
-    background-color: #232527 !important;
-    color: #fff !important;
-}
-
-/* Scrollbars también oscuros */
+/* Scrollbars oscuros */
 ::-webkit-scrollbar {
     background: #232527 !important;
 }
 ::-webkit-scrollbar-thumb {
     background: #36383b !important;
+}
+
+/* Subrayado verde en links activos (menú, tabs) */
+.o_notebook .nav-link.active,
+.o_notebook .nav-link:focus,
+.o_notebook .nav-link:hover,
+.o_menu_systray .dropdown-toggle:hover,
+.o_main_navbar .dropdown-toggle:hover {
+    color: var(--hover-green) !important;
+    border-bottom: 2px solid var(--hover-green) !important;
+    background: transparent !important;
 }
