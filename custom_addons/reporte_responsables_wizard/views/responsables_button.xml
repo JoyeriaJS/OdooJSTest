@@ -1,0 +1,22 @@
+<odoo>
+    <record id="action_open_reporte_responsables_wizard" model="ir.actions.act_window">
+        <field name="name">Órdenes de reparaciones por responsable dinámico</field>
+        <field name="res_model">reporte.responsables.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'active_id': active_id, 'default_responsable_id': active_id}</field>
+    </record>
+
+    <act_window id="open_reporte_responsables_wizard"
+                name="Órdenes de reparaciones por responsable dinámico"
+                src_model="res.users"
+                multi="False"
+                binding_model_id="base.model_res_users"
+                binding_view_types="list,form"
+                res_model="reporte.responsables.wizard"
+                view_mode="form"
+                target="new"
+                context="{'active_id': active_id, 'default_responsable_id': active_id}"
+                key2="client_action_multi"
+                />
+</odoo>

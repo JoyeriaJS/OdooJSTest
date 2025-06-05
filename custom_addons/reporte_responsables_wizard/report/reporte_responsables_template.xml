@@ -1,0 +1,41 @@
+<odoo>
+    <template id="reporte_responsables_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="wiz">
+                <t t-set="responsable" t-value="wiz.responsable_id"/>
+                <t t-set="fecha_inicio" t-value="wiz.fecha_inicio"/>
+                <t t-set="fecha_fin" t-value="wiz.fecha_fin"/>
+                <t t-set="reparaciones" t-value="env['joyeria.reparacion'].sudo().search([
+                    ('responsable_id', '=', responsable.id),
+                    ('fecha_entrega', '>=', fecha_inicio),
+                    ('fecha_entrega', '<=', fecha_fin)
+                ], order='fecha_entrega desc')"/>
+                <div class="page">
+                    <h2 style="text-align: center;">Órdenes de Reparación para <t t-esc="responsable.name"/></h2>
+                    <p style="text-align: center;">Desde <t t-esc="fecha_inicio"/> hasta <t t-esc="fecha_fin"/></p>
+                    <br/>
+                    <table style="width:100%;border:1px solid #888;border-collapse: collapse;">
+                        <tr>
+                            <th style="border:1px solid #888;padding:5px;">Cliente</th>
+                            <th style="border:1px solid #888;padding:5px;">Producto</th>
+                            <th style="border:1px solid #888;padding:5px;">Servicio</th>
+                            <th style="border:1px solid #888;padding:5px;">Fecha entrega</th>
+                            <th style="border:1px solid #888;padding:5px;">Estado</th>
+                        </tr>
+                        <t t-foreach="reparaciones" t-as="r">
+                            <tr>
+                                <td style="border:1px solid #888;padding:5px;"><t t-esc="r.cliente_id.name"/></td>
+                                <td style="border:1px solid #888;padding:5px;"><t t-esc="r.producto_id.name"/></td>
+                                <td style="border:1px solid #888;padding:5px;"><t t-esc="r.servicio_id.name"/></td>
+                                <td style="border:1px solid #888;padding:5px;"><t t-esc="r.fecha_entrega"/></td>
+                                <td style="border:1px solid #888;padding:5px;"><t t-esc="r.state"/></td>
+                            </tr>
+                        </t>
+                    </table>
+                    <br/>
+                    <p style="text-align: right;">Total: <t t-esc="reparaciones | length"/> reparaciones</p>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
