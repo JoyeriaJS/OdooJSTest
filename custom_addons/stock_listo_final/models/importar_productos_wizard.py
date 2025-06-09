@@ -44,9 +44,6 @@ class ImportarProductosWizard(models.TransientModel):
         item_model = self.env['product.pricelist.item']
 
         for row in range(3, sheet.nrows):  # Empieza en la fila de los datos reales
-            # Salta filas completamente vacías
-            if all(str(sheet.cell(row, col).value).strip() == "" for col in range(sheet.ncols)):
-                continue
             try:
                 # ---- CATEGORÍA PERSONALIZADA ----
                 metal = str(sheet.cell(row, 10).value).strip()
@@ -155,12 +152,9 @@ class ImportarProductosWizard(models.TransientModel):
                     'name': 'Import Products',
                     'type': 'server',
                     'level': 'info',
-                    'message': f"Error al importar producto: {locals().get('nombre','?')} | Error: {e}",
+                    'message': f"Error al importar producto: {nombre} | Error: {e}",
                     'path': 'importar_productos_wizard',
                     'func': 'importar_productos',
                     'line': '0',
                 })
                 continue  # Siguiente producto
-
-
-
