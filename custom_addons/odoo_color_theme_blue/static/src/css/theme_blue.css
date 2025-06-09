@@ -177,7 +177,7 @@ input:focus, textarea:focus, select:focus, .o_input:focus {
 }
 .o_appdrawer .o_app:hover {
     background: var(--primary) !important;
-    box-shadow: 0 0 0 3px #21e3b555;
+    box-shadow: 0 0 0 3px #12645155;
     border-color: var(--primary-hover);
 }
 .o_appdrawer .o_app .o_app_icon {
@@ -215,6 +215,6 @@ input:focus, textarea:focus, select:focus, .o_input:focus {
 .o_appdrawer .o_app:focus {
     background: var(--primary-hover) !important;
     border-color: var(--primary-hover) !important;
-    box-shadow: 0 0 0 3px #20e17c55;
+    box-shadow: 0 0 0 3px #199c5955;
 }
 
