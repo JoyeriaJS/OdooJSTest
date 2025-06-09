@@ -45,16 +45,9 @@ class ImportarProductosWizard(models.TransientModel):
 
         for row in range(3, sheet.nrows):  # Empieza en la fila de los datos reales
             try:
-                # ---- CATEGORÍA PERSONALIZADA ----
-                metal = str(sheet.cell(row, 10).value).strip()
-                prod_nac_imp = str(sheet.cell(row, 11).value).strip()
-                taller_externa = str(sheet.cell(row, 12).value).strip()
-                tipo_joya = str(sheet.cell(row, 14).value).strip()
-                category_name = f"{metal} / {prod_nac_imp} / {taller_externa} / {tipo_joya}"
-
-                categ = Category.search([('name', '=', category_name)], limit=1)
-                if not categ:
-                    categ = Category.create({'name': category_name})
+                # Salta filas completamente vacías (todas sus celdas vacías)
+                if all(not str(sheet.cell(row, col).value).strip() for col in range(sheet.ncols)):
+                    continue
 
                 # ---- CAMPOS PRINCIPALES ----
                 codigo = str(sheet.cell(row, 9).value).strip()         # default_code
@@ -70,15 +63,30 @@ class ImportarProductosWizard(models.TransientModel):
                 atributo = str(sheet.cell(row, 17).value).strip()      # Atributo (ej: Talla)
                 valores_atributo = str(sheet.cell(row, 18).value).strip()  # Valores atributo
 
-                # ---- DESCARGA Y REDIMENSIONA LA IMAGEN ----
-                image_data = False
-                if imagen_url and imagen_url.startswith('http'):
-                    try:
-                        resp = requests.get(imagen_url, timeout=10)
-                        if resp.status_code == 200:
-                            image_data = self.resize_image_128(resp.content)
-                    except Exception:
-                        image_data = False
+                # Validación: si NO hay nombre, no lo importamos (log opcional)
+                if not nombre:
+                    _logger = self.env['ir.logging']
+                    _logger.create({
+                        'name': 'Import Products',
+                        'type': 'server',
+                        'level': 'info',
+                        'message': f"Fila {row+1}: Producto sin nombre, omitido.",
+                        'path': 'importar_productos_wizard',
+                        'func': 'importar_productos',
+                        'line': str(row+1),
+                    })
+                    continue
+
+                # ---- CATEGORÍA PERSONALIZADA ----
+                metal = str(sheet.cell(row, 10).value).strip()
+                prod_nac_imp = str(sheet.cell(row, 11).value).strip()
+                taller_externa = str(sheet.cell(row, 12).value).strip()
+                tipo_joya = str(sheet.cell(row, 14).value).strip()
+                category_name = f"{metal} / {prod_nac_imp} / {taller_externa} / {tipo_joya}"
+
+                categ = Category.search([('name', '=', category_name)], limit=1)
+                if not categ:
+                    categ = Category.create({'name': category_name})
 
                 # ---- DUPLICADOS: NO crear si ya existe por código interno, nombre o código de barras ----
                 duplicado = False
@@ -90,6 +98,16 @@ class ImportarProductosWizard(models.TransientModel):
                     duplicado = True
                 if duplicado:
                     continue  # Salta, ya existe por alguna clave única
+
+                # ---- DESCARGA Y REDIMENSIONA LA IMAGEN ----
+                image_data = False
+                if imagen_url and imagen_url.startswith('http'):
+                    try:
+                        resp = requests.get(imagen_url, timeout=10)
+                        if resp.status_code == 200:
+                            image_data = self.resize_image_128(resp.content)
+                    except Exception:
+                        image_data = False
 
                 # ---- ATRIBUTOS Y VARIANTES ----
                 attribute_line_ids = []
@@ -109,11 +127,11 @@ class ImportarProductosWizard(models.TransientModel):
                         attribute_line_ids.append((0, 0, {'attribute_id': attr.id, 'value_ids': [(6, 0, value_ids)]}))
 
                 vals = {
-                    'default_code': codigo,
+                    'default_code': codigo if codigo else "",
                     'name': nombre,
                     'categ_id': categ.id,
                     'type': 'product',
-                    'barcode': cod_barras,
+                    'barcode': cod_barras if cod_barras else "",
                     'list_price': tarifa_publica,
                     'standard_price': costo,
                     'weight': peso,
@@ -146,15 +164,14 @@ class ImportarProductosWizard(models.TransientModel):
                         'min_quantity': 1,
                     })
             except Exception as e:
-                # Log simple en consola de servidor o logging Odoo
                 _logger = self.env['ir.logging']
                 _logger.create({
                     'name': 'Import Products',
                     'type': 'server',
                     'level': 'info',
-                    'message': f"Error al importar producto: {nombre} | Error: {e}",
+                    'message': f"Error fila {row+1}: {str(e)}",
                     'path': 'importar_productos_wizard',
                     'func': 'importar_productos',
-                    'line': '0',
+                    'line': str(row+1),
                 })
                 continue  # Siguiente producto
