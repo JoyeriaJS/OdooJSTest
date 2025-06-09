@@ -123,14 +123,7 @@ a, a:visited, .o_mail_systray_dropdown .o_mail_channel_name, .o_mail_systray_dro
     color: var(--sidebar-text) !important;
 }
 
-/* Resaltado de hover en verde agua */
-.o_mail_nav_panel .o_mail_channel_preview:hover,
-.o_mail_nav_panel .o_mail_channel_title:hover,
-.o_mail_nav_panel .o_mail_channel_selected,
-.o_mail_nav_panel .o_mail_channel_selected * {
-    background: var(--primary) !important;
-    color: #fff !important;
-}
+
 
 
 /* Entradas y selects */
