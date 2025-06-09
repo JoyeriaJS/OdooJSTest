@@ -113,7 +113,7 @@
                   decoration-primary="estado == 'reparado'"
                   decoration-danger="estado == 'cancelado'">
                 <field name="name" string="Referencia de reparación" type="open"/>
-                <field name="producto_id" string="Producto a reparar"/>
+                <field name="tipo_joya" string="Producto a reparar"/>
                 <field name="cliente_id" string="Cliente"/>
                 <field name="direccion_entrega" string="Dirección de entrega"/>
                 <field name="vencimiento_garantia" string="Vencimiento de la garantía"/>
