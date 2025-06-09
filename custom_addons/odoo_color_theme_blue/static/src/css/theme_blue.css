@@ -132,10 +132,6 @@ a, a:visited, .o_mail_systray_dropdown .o_mail_channel_name, .o_mail_systray_dro
     color: #fff !important;
 }
 
-/* Íconos en verde agua */
-.fa, .o_mail_nav_panel .fa, .o_mail_nav_panel .fa-lg, .o_mail_nav_panel .fa-2x, .o_mail_nav_panel .fa-3x {
-    color: var(--primary) !important;
-}
 
 /* Entradas y selects */
 input, textarea, select, .o_input, .o_field_widget input, .o_field_widget textarea {
