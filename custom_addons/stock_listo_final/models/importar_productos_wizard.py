@@ -45,9 +45,16 @@ class ImportarProductosWizard(models.TransientModel):
 
         for row in range(3, sheet.nrows):  # Empieza en la fila de los datos reales
             try:
-                # Salta filas completamente vacías (todas sus celdas vacías)
-                if all(not str(sheet.cell(row, col).value).strip() for col in range(sheet.ncols)):
-                    continue
+                # ---- CATEGORÍA PERSONALIZADA ----
+                metal = str(sheet.cell(row, 10).value).strip()
+                prod_nac_imp = str(sheet.cell(row, 11).value).strip()
+                taller_externa = str(sheet.cell(row, 12).value).strip()
+                tipo_joya = str(sheet.cell(row, 14).value).strip()
+                category_name = f"{metal} / {prod_nac_imp} / {taller_externa} / {tipo_joya}"
+
+                categ = Category.search([('name', '=', category_name)], limit=1)
+                if not categ:
+                    categ = Category.create({'name': category_name})
 
                 # ---- CAMPOS PRINCIPALES ----
                 codigo = str(sheet.cell(row, 9).value).strip()         # default_code
@@ -63,42 +70,6 @@ class ImportarProductosWizard(models.TransientModel):
                 atributo = str(sheet.cell(row, 17).value).strip()      # Atributo (ej: Talla)
                 valores_atributo = str(sheet.cell(row, 18).value).strip()  # Valores atributo
 
-                # Validación: si NO hay nombre, no lo importamos (log opcional)
-                if not nombre:
-                    _logger = self.env['ir.logging']
-                    _logger.create({
-                        'name': 'Import Products',
-                        'type': 'server',
-                        'level': 'info',
-                        'message': f"Fila {row+1}: Producto sin nombre, omitido.",
-                        'path': 'importar_productos_wizard',
-                        'func': 'importar_productos',
-                        'line': str(row+1),
-                    })
-                    continue
-
-                # ---- CATEGORÍA PERSONALIZADA ----
-                metal = str(sheet.cell(row, 10).value).strip()
-                prod_nac_imp = str(sheet.cell(row, 11).value).strip()
-                taller_externa = str(sheet.cell(row, 12).value).strip()
-                tipo_joya = str(sheet.cell(row, 14).value).strip()
-                category_name = f"{metal} / {prod_nac_imp} / {taller_externa} / {tipo_joya}"
-
-                categ = Category.search([('name', '=', category_name)], limit=1)
-                if not categ:
-                    categ = Category.create({'name': category_name})
-
-                # ---- DUPLICADOS: NO crear si ya existe por código interno, nombre o código de barras ----
-                duplicado = False
-                if codigo and Product.search([('default_code', '=', codigo)], limit=1):
-                    duplicado = True
-                if nombre and Product.search([('name', '=', nombre)], limit=1):
-                    duplicado = True
-                if cod_barras and Product.search([('barcode', '=', cod_barras)], limit=1):
-                    duplicado = True
-                if duplicado:
-                    continue  # Salta, ya existe por alguna clave única
-
                 # ---- DESCARGA Y REDIMENSIONA LA IMAGEN ----
                 image_data = False
                 if imagen_url and imagen_url.startswith('http'):
@@ -108,6 +79,15 @@ class ImportarProductosWizard(models.TransientModel):
                             image_data = self.resize_image_128(resp.content)
                     except Exception:
                         image_data = False
+
+                # ---- DUPLICADOS: solo si código Y nombre coinciden, o si el código de barras ya existe ----
+                duplicado = False
+                if codigo and nombre:
+                    duplicado = Product.search([('default_code', '=', codigo), ('name', '=', nombre)], limit=1)
+                if cod_barras and Product.search([('barcode', '=', cod_barras)], limit=1):
+                    duplicado = True
+                if duplicado:
+                    continue  # Salta, ya existe por ambas claves únicas
 
                 # ---- ATRIBUTOS Y VARIANTES ----
                 attribute_line_ids = []
@@ -127,11 +107,11 @@ class ImportarProductosWizard(models.TransientModel):
                         attribute_line_ids.append((0, 0, {'attribute_id': attr.id, 'value_ids': [(6, 0, value_ids)]}))
 
                 vals = {
-                    'default_code': codigo if codigo else "",
+                    'default_code': codigo,
                     'name': nombre,
                     'categ_id': categ.id,
                     'type': 'product',
-                    'barcode': cod_barras if cod_barras else "",
+                    'barcode': cod_barras,
                     'list_price': tarifa_publica,
                     'standard_price': costo,
                     'weight': peso,
@@ -164,14 +144,15 @@ class ImportarProductosWizard(models.TransientModel):
                         'min_quantity': 1,
                     })
             except Exception as e:
+                # Log simple en consola de servidor o logging Odoo
                 _logger = self.env['ir.logging']
                 _logger.create({
                     'name': 'Import Products',
                     'type': 'server',
                     'level': 'info',
-                    'message': f"Error fila {row+1}: {str(e)}",
+                    'message': f"Error al importar producto: {nombre} | Error: {e}",
                     'path': 'importar_productos_wizard',
                     'func': 'importar_productos',
-                    'line': str(row+1),
+                    'line': '0',
                 })
                 continue  # Siguiente producto
