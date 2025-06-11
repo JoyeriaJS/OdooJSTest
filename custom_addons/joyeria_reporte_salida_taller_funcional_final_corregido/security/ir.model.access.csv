@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id,perm_read,perm_write,perm_create,perm_unlink
+access_reporte_salida_taller,access_reporte_salida_taller,model_joyeria_salida_taller,,1,0,1,0
