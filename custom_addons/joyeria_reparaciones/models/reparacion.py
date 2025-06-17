@@ -175,7 +175,7 @@ class Reparacion(models.Model):
     @api.onchange('fecha_recepcion')
     def _onchange_fecha_recepcion(self):
         if self.fecha_recepcion:
-            self.vencimiento_garantia = self.fecha_recepcion + relativedelta(months=1)
+            self.vencimiento_garantia = self.fecha_recepcion + relativedelta(months=3)
 
 
 
