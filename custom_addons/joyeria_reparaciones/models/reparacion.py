@@ -162,26 +162,11 @@ class Reparacion(models.Model):
     fecha_firma = fields.Datetime(string='Fecha de firma', readonly=True)
     clave_firma_manual = fields.Char(string='Clave o QR para firma')
 
-    
 
-
-
-
-    
-
-    
-
-
-    @api.depends('fecha_recepcion')
-    def _compute_vencimiento_garantia(self):
-        for rec in self:
-            if rec.fecha_recepcion:
-                # Suma un mes exacto
-                rec.vencimiento_garantia = \
-                    (fields.Datetime.from_string(rec.fecha_recepcion)
-                     + relativedelta(months=1)).date()
-            else:
-                rec.vencimiento_garantia = False
+    @api.onchange('fecha_recepcion')
+    def _onchange_fecha_recepcion(self):
+        if self.fecha_recepcion:
+            self.vencimiento_garantia = self.fecha_recepcion + relativedelta(months=1)
 
 
 
