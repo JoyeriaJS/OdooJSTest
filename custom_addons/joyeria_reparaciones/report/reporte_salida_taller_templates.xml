@@ -41,7 +41,6 @@
                 <th>Total del mes:</th>
                 <!-- espacio para las columnas no numéricas -->
                 <th colspan="2"/>
-                <th><t t-esc="grp['sums']['metales_extra']"/></th>
                 <th><t t-esc="grp['sums']['cobro_interno']"/></th>
                 <th><t t-esc="grp['sums']['hechura']"/></th>
                 <th><t t-esc="grp['sums']['cobros_extras']"/></th>
