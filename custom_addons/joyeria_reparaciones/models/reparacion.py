@@ -172,10 +172,16 @@ class Reparacion(models.Model):
     
 
 
-    @api.onchange('fecha_recepcion')
-    def _onchange_fecha_recepcion(self):
-        if self.fecha_recepcion:
-            self.vencimiento_garantia = self.fecha_recepcion + relativedelta(months=3)
+    @api.depends('fecha_recepcion')
+    def _compute_vencimiento_garantia(self):
+        for rec in self:
+            if rec.fecha_recepcion:
+                # Suma un mes exacto
+                rec.vencimiento_garantia = \
+                    (fields.Datetime.from_string(rec.fecha_recepcion)
+                     + relativedelta(months=1)).date()
+            else:
+                rec.vencimiento_garantia = False
 
 
 
