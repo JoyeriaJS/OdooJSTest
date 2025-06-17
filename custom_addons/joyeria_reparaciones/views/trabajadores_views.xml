@@ -5,7 +5,7 @@
   <menuitem id="menu_joyeria_root" name="Reparaciones"/>
 
   <!-- Menú principal de Trabajadores -->
-  <menuitem id="menu_trabajadores_root" name="Responsables" parent="menu_joyeria_root" sequence="30"/>
+  <menuitem id="menu_trabajadores_root" name="Responsables" parent="menu_joyeria_root" sequence="30" groups="base.group_system"/>
 
   <!-- Vista tree de res.users -->
   <record id="view_tree_responsables" model="ir.ui.view">
