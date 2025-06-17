@@ -28,6 +28,8 @@
         'report/reporte_salida_taller_report_action.xml',
         'report/reporte_salida_taller_templates.xml',
 
+        
+
 
 
         
