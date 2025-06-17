@@ -41,7 +41,7 @@ class Reparacion(models.Model):
     correo_cliente = fields.Char(string="Correo electrónico")
     telefono = fields.Char(string='Teléfono', required=True)
     direccion_entrega = fields.Char(string='Dirección de entrega')
-    vencimiento_garantia = fields.Date(string='Vencimiento de la garantía')
+    vencimiento_garantia = fields.Date(string='Vencimiento de la garantía',compute='_compute_vencimiento_garantia',store=True)
     fecha_entrega = fields.Date(string='Fecha de entrega', tracking=True)
     responsable_id = fields.Many2one('res.users', string="Responsable", default=lambda self: self.env.user, tracking=True)
     fecha_retiro = fields.Datetime(string='Fecha y hora de retiro', tracking=True)
@@ -163,10 +163,16 @@ class Reparacion(models.Model):
     clave_firma_manual = fields.Char(string='Clave o QR para firma')
 
 
-    @api.onchange('fecha_recepcion')
-    def _onchange_fecha_recepcion(self):
-        if self.fecha_recepcion:
-            self.vencimiento_garantia = self.fecha_recepcion + relativedelta(months=1)
+    @api.depends('fecha_recepcion')
+    def _compute_vencimiento_garantia(self):
+        for rec in self:
+            if rec.fecha_recepcion:
+                # Suma un mes exacto
+                rec.vencimiento_garantia = \
+                    (fields.Datetime.from_string(rec.fecha_recepcion)
+                     + relativedelta(months=1)).date()
+            else:
+                rec.vencimiento_garantia = False
 
 
 
