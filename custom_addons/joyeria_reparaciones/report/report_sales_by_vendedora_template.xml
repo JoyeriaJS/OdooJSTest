@@ -1,0 +1,47 @@
+<odoo>
+  <template id="report_sales_by_vendedora_template">
+    <t t-call="web.external_layout">
+      <main class="page">
+        <h2 style="text-align:center; margin-bottom:1em;">
+          Ventas por Vendedora y Mes
+        </h2>
+        <!-- Iteramos por cada grupo (vendedora + mes) -->
+        <t t-foreach="groups" t-as="grp">
+          <h3>
+            <t t-esc="grp['vendedora']"/> —
+            <t t-esc="('%02d/%04d' % (grp['month'], grp['year']))"/>
+          </h3>
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>RMA</th>
+                <th>Fecha Firma</th>
+                <th>Saldo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <t t-foreach="grp['docs']" t-as="r">
+                <tr>
+                  <td><t t-esc="r.name"/></td>
+                  <td>
+                    <t t-esc="r.fecha_firma and
+                      r.fecha_firma.strftime('%d/%m/%Y %H:%M:%S') or ''"/>
+                  </td>
+                  <td><t t-esc="r.saldo or 0.0"/></td>
+                </tr>
+              </t>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th>Total del mes:</th>
+                <th/>
+                <th><t t-esc="grp['total']"/></th>
+              </tr>
+            </tfoot>
+          </table>
+          <div style="page-break-after: always;"/>
+        </t>
+      </main>
+    </t>
+  </template>
+</odoo>

@@ -1,0 +1,58 @@
+<odoo>
+  <template id="report_sales_by_store_template">
+    <t t-call="web.external_layout">
+      <main class="page">
+        <h2 style="text-align:center; margin-bottom:1em;">
+          Ventas por Tienda y Mes
+        </h2>
+        <t t-foreach="groups" t-as="grp">
+          <h3>
+            <t t-esc="grp['store']"/> —
+            <t t-esc="('%02d/%04d' % (grp['month'], grp['year']))"/>
+          </h3>
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>RMA</th>
+                <th>Fecha Recepción</th>
+                <th>Precio Unitario</th>
+                <th>Extra</th>
+                <th>Abono</th>
+                <th>Saldo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <t t-foreach="grp['docs']" t-as="r">
+                <tr>
+                  <td><t t-esc="r.name"/></td>
+                  <td>
+                    <t t-esc="r.fecha_recepcion and
+                      r.fecha_recepcion.strftime('%d/%m/%Y') or ''"/>
+                  </td>
+                  <td><t t-esc="r.precio_unitario or 0.0"/></td>
+                  <td><t t-esc="r.extra or 0.0"/></td>
+                  <td><t t-esc="r.abono or 0.0"/></td>
+                  <td>
+                    <t t-esc="(r.precio_unitario or 0.0)
+                               + (r.extra or 0.0)
+                               - (r.abono or 0.0)"/>
+                  </td>
+                </tr>
+              </t>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th colspan="2">Total</th>
+                <th><t t-esc="grp['sums']['precio_unitario']"/></th>
+                <th><t t-esc="grp['sums']['extra']"/></th>
+                <th><t t-esc="grp['sums']['abono']"/></th>
+                <th><t t-esc="grp['sums']['saldo']"/></th>
+              </tr>
+            </tfoot>
+          </table>
+          <div style="page-break-after: always;"/>
+        </t>
+      </main>
+    </t>
+  </template>
+</odoo>
