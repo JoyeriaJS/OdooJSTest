@@ -27,6 +27,10 @@
         #'views/res_users_inherit.xml',
         'report/reporte_salida_taller_report_action.xml',
         'report/reporte_salida_taller_templates.xml',
+        'report/report_sales_by_store.xml',
+        'report/report_sales_by_store_template.xml',
+        'report/report_sales_by_vendedora.xml',
+        'report/report_sales_by_vendedora_template.xml',
 
         
 
