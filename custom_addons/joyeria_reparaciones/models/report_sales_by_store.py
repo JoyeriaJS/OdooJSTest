@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, models
 from collections import OrderedDict
-from odoo.exceptions import AccessError
 
 class ReportSalesByStore(models.AbstractModel):
     _name = 'report.joyeria_reparaciones.report_sales_by_store_template'
@@ -9,8 +8,6 @@ class ReportSalesByStore(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        if not self.env.user.has_group('base.group_system'):
-            raise AccessError("Sólo los administradores pueden generar este reporte.")
         docs = self.env['joyeria.reparacion'].browse(docids).filtered(lambda r: r.fecha_recepcion)
         groups = OrderedDict()
         # Precios fijos
