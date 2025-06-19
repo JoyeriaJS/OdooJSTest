@@ -2,68 +2,71 @@
   <!-- Plantilla QWeb para Reporte de Salida de Taller agrupado por mes/año -->
   <template id="reporte_salida_taller_template">
     <t t-call="web.external_layout">
-      <!-- Encabezado fijo -->
-      <div class="row mb16">
-        <div class="col-12 text-right">
-          <strong>Joyería Sebastián, Chile</strong>
+      <div class="page">
+        <!-- Encabezado fijo -->
+        <div class="row mb16">
+          <div class="col-12 text-right">
+            <strong>Joyería Sebastián, Chile</strong>
+          </div>
         </div>
-      </div>
 
-      <h2>Reporte Salida Taller</h2>
+        <h2>Reporte Salida Taller</h2>
 
-      <!-- Recorremos cada grupo (mes/año) -->
-      <t t-foreach="groups" t-as="grp">
-        <!-- Título del grupo: MM/YYYY -->
-        <h3>
-          <t t-esc="('%02d/%04d' % (grp['month'], grp['year']))"/>
-        </h3>
+        <!-- Recorremos cada grupo (mes/año) -->
+        <t t-foreach="groups" t-as="grp">
+          <!-- Título del grupo: MM/YYYY -->
+          <h3>
+            <t t-esc="('%02d/%04d' % (grp['month'], grp['year']))"/>
+          </h3>
 
-        <table class="table table-sm">
-          <thead>
-            <tr>
-              <th>RMA</th>
-              <th>Metal Utilizado</th>
-              <th>Peso</th>
-              <th>Metales Extra</th>
-              <th>Cobro Interno</th>
-              <th>Hechura</th>
-              <th>Cobros Extras</th>
-              <th>Total Salida Taller</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Cada RMA dentro del grupo -->
-            <t t-foreach="grp['docs']" t-as="rec">
+          <table class="table table-sm">
+            <thead>
               <tr>
-                <td><t t-esc="rec.name"/></td>
-                <td><t t-esc="rec.metal_utilizado or ''"/></td>
-                <td><t t-esc="rec.peso_valor or 0.0"/></td>
-                <td><t t-esc="rec.metales_extra or 0.0"/></td>
-                <td><t t-esc="rec.cobro_interno or 0.0"/></td>
-                <td><t t-esc="rec.hechura or 0.0"/></td>
-                <td><t t-esc="rec.cobros_extras or 0.0"/></td>
-                <td><t t-esc="rec.total_salida_taller or 0.0"/></td>
+                <th>RMA</th>
+                <th>Metal Utilizado</th>
+                <th>Peso</th>
+                <th>Metales Extra</th>
+                <th>Cobro Interno</th>
+                <th>Hechura</th>
+                <th>Cobros Extras</th>
+                <th>Total Salida Taller</th>
               </tr>
-            </t>
-          </tbody>
-          <tfoot>
-            <tr>
-              <th>Total del mes:</th>
-              <!-- hueco para Metal Utilizado -->
-              <th/>
-              <th><t t-esc="grp['sums']['peso_valor']"/></th>
-              <th><t t-esc="grp['sums']['metales_extra']"/></th>
-              <th><t t-esc="grp['sums']['cobro_interno']"/></th>
-              <th><t t-esc="grp['sums']['hechura']"/></th>
-              <th><t t-esc="grp['sums']['cobros_extras']"/></th>
-              <th><t t-esc="grp['sums']['total_salida_taller']"/></th>
-            </tr>
-          </tfoot>
-        </table>
+            </thead>
+            <tbody>
+              <!-- Cada RMA dentro del grupo -->
+              <t t-foreach="grp['docs']" t-as="rec">
+                <tr>
+                  <td><t t-esc="rec.name"/></td>
+                  <td><t t-esc="rec.metal_utilizado or ''"/></td>
+                  <td><t t-esc="rec.peso_valor or 0.0"/></td>
+                  <td><t t-esc="rec.metales_extra or 0.0"/></td>
+                  <td><t t-esc="rec.cobro_interno or 0.0"/></td>
+                  <td><t t-esc="rec.hechura or 0.0"/></td>
+                  <td><t t-esc="rec.cobros_extras or 0.0"/></td>
+                  <td><t t-esc="rec.total_salida_taller or 0.0"/></td>
+                </tr>
+              </t>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th>Total del mes:</th>
+                <!-- hueco para Metal Utilizado -->
+                <th/>
+                <!-- Sumamos los floats -->
+                <th><t t-esc="grp['sums']['peso_valor']"/></th>
+                <th><t t-esc="grp['sums']['metales_extra']"/></th>
+                <th><t t-esc="grp['sums']['cobro_interno']"/></th>
+                <th><t t-esc="grp['sums']['hechura']"/></th>
+                <th><t t-esc="grp['sums']['cobros_extras']"/></th>
+                <th><t t-esc="grp['sums']['total_salida_taller']"/></th>
+              </tr>
+            </tfoot>
+          </table>
 
-        <!-- Salto de página tras cada mes (opcional) -->
-        <div style="page-break-after: always;"/>
-      </t>
+          <!-- Salto de página tras cada mes -->
+          <div style="page-break-after: always;"/>
+        </t>
+      </div>
     </t>
   </template>
 </odoo>
