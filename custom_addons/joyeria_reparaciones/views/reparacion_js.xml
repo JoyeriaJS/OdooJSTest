@@ -14,7 +14,7 @@
                             <field name="correo_cliente"/>
                             <field name="telefono"/>
                             <field name="direccion_entrega"/>
-                            <field name="responsable_id"/>
+                            <field name="responsable_id" groups="base.group_system"/>
                             <field name="qr" widget="image" class="oe_avatar" readonly="1"/>
                         </group>
 
