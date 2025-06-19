@@ -1,52 +1,59 @@
+<!-- report_sales_by_store_template.xml -->
 <odoo>
   <template id="report_sales_by_store_template">
     <t t-call="web.external_layout">
       <main class="page">
-        <h2 style="text-align:center; margin-bottom:1em;">
-          Ventas por Tienda y Mes
-        </h2>
+        <h2 style="text-align:center;margin-bottom:1em;">Ventas por Tienda y Mes</h2>
         <t t-foreach="groups" t-as="grp">
           <h3>
-            <t t-esc="grp['store']"/> —
-            <t t-esc="('%02d/%04d' % (grp['month'], grp['year']))"/>
+            <t t-esc="grp.store"/> —
+            <t t-esc="('%02d/%04d' % (grp.month, grp.year))"/>
           </h3>
           <table class="table table-sm">
             <thead>
               <tr>
                 <th>RMA</th>
                 <th>Fecha Recepción</th>
+                <th>Peso</th>
                 <th>Precio Unitario</th>
                 <th>Extra</th>
-                <th>Abono</th>
                 <th>Saldo</th>
+                <th>Oro Rosado</th>
+                <th>Oro Amarillo</th>
+                <th>Total Metales</th>
+                <th>Total Taller</th>
               </tr>
             </thead>
             <tbody>
-              <t t-foreach="grp['docs']" t-as="r">
+              <t t-foreach="grp.docs" t-as="row">
+                <t t-set="r" t-value="row['rec']"/>
                 <tr>
                   <td><t t-esc="r.name"/></td>
                   <td>
-                    <t t-esc="r.fecha_recepcion and
-                      r.fecha_recepcion.strftime('%d/%m/%Y') or ''"/>
+                    <t t-esc="r.fecha_recepcion and r.fecha_recepcion.strftime('%d/%m/%Y') or ''"/>
                   </td>
+                  <td><t t-esc="row.weight"/></td>
                   <td><t t-esc="r.precio_unitario or 0.0"/></td>
                   <td><t t-esc="r.extra or 0.0"/></td>
-                  <td><t t-esc="r.abono or 0.0"/></td>
-                  <td>
-                    <t t-esc="(r.precio_unitario or 0.0)
-                               + (r.extra or 0.0)
-                               - (r.abono or 0.0)"/>
-                  </td>
+                  <td><t t-esc="row.saldo"/></td>
+                  <td><t t-esc="row.rosado"/></td>
+                  <td><t t-esc="row.amarillo"/></td>
+                  <td><t t-esc="row.total_metales"/></td>
+                  <td><t t-esc="row.total_taller"/></td>
                 </tr>
               </t>
             </tbody>
             <tfoot>
               <tr>
-                <th colspan="2">Total</th>
-                <th><t t-esc="grp['sums']['precio_unitario']"/></th>
-                <th><t t-esc="grp['sums']['extra']"/></th>
-                <th><t t-esc="grp['sums']['abono']"/></th>
-                <th><t t-esc="grp['sums']['saldo']"/></th>
+                <th colspan="2">Total del mes:</th>
+                <th><t t-esc="grp.sums.peso_valor      "/></th>
+                <th><t t-esc="grp.sums.precio_unitario"/></th>
+                <th><t t-esc="grp.sums.extra           "/></th>
+                <th><t t-esc="grp.sums.saldo           "/></th>
+                <th><t t-esc="grp.sums.rosado          "/></th>
+                <th><t t-esc="grp.sums.amarillo        "/></th>
+                <th><t t-esc="grp.sums.total_metales   "/></th>
+                <th><t t-esc="grp.sums.total_taller    "/></th>
               </tr>
             </tfoot>
           </table>
