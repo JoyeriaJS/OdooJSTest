@@ -31,6 +31,7 @@ class ReportSalesByStore(models.AbstractModel):
                         'metales_extra':     0.0,
                         'precio_unitario':   0.0,
                         'extra':             0.0,
+                        'extra2':             0.0,
                         'saldo':             0.0,
                         'cobro_interno':     0.0,
                         'hechura':           0.0,
@@ -80,6 +81,7 @@ class ReportSalesByStore(models.AbstractModel):
             s['metales_extra']     += w_ext
             s['precio_unitario']   += rec.precio_unitario or 0.0
             s['extra']             += rec.extra or 0.0
+            s['extra2']            += rec.extra or 0.0
             s['saldo']             += saldo
             s['cobro_interno']     += rec.cobro_interno or 0.0
             s['hechura']           += rec.hechura or 0.0

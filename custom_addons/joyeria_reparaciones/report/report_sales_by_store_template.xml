@@ -20,6 +20,7 @@
                 <th>Metales Extra (g)</th>
                 <th>Precio Unitario</th>
                 <th>Extra</th>
+                <th>Extra2</th>
                 <th>Saldo</th>
                 <th>Cobro Interno</th>
                 <th>Hechura</th>
@@ -42,6 +43,7 @@
                   <td><t t-esc="row['metales_extra']"/></td>
                   <td><t t-esc="r.precio_unitario or 0.0"/></td>
                   <td><t t-esc="r.extra or 0.0"/></td>
+                  <td><t t-esc="r.extra2 or 0.0"/></td>
                   <td><t t-esc="row['saldo']"/></td>
                   <td><t t-esc="r.cobro_interno or 0.0"/></td>
                   <td><t t-esc="r.hechura or 0.0"/></td>
@@ -60,6 +62,7 @@
                 <th><t t-esc="grp['sums']['metales_extra']"/></th>
                 <th><t t-esc="grp['sums']['precio_unitario']"/></th>
                 <th><t t-esc="grp['sums']['extra']"/></th>
+                <th><t t-esc="grp['sums']['extra2']"/></th>
                 <th><t t-esc="grp['sums']['saldo']"/></th>
                 <th><t t-esc="grp['sums']['cobro_interno']"/></th>
                 <th><t t-esc="grp['sums']['hechura']"/></th>
