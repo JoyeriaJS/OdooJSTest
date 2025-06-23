@@ -35,13 +35,16 @@
     </record>
 
     <!-- 2) El usuario POS solo ve las líneas generadas por una sesión POS -->
+    <!-- Antes: provocaba el error porque buscaba pos_session_id directamente en account.bank.statement -->
     <record id="rule_pos_bank_statement_line_user" model="ir.rule">
-      <field name="name">POS: Only POS lines</field>
-      <field name="model_id" ref="account.model_account_bank_statement_line"/>
-      <field name="groups" eval="[(4, ref('group_pos_user'))]"/>
-      <!-- Aquí usamos statement_id.pos_session_id -->
-      <field name="domain_force">[('statement_id.pos_session_id','!=',False)]</field>
+        <field name="name">Point Of Sale Bank Statement Line POS User</field>
+        <field name="model_id" ref="account.model_account_bank_statement_line"/>
+        <field name="groups" eval="[(4, ref('pos_custom.group_pos_user'))]"/>
+       <field name="domain_force">[('pos_session_id','!=', False)]</field>
+       <!-- Ahora: usamos statement_id.pos_session_id, que sí existe en account.bank.statement_line -->
+       <field name="domain_force">[('statement_id.pos_session_id','!=', False)]</field>
     </record>
+
 
     <!-- 3) El contable ve todas las líneas -->
     <record id="rule_pos_bank_statement_line_account_user" model="ir.rule">
