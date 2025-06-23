@@ -1,4 +1,4 @@
-}<!-- report_sales_by_store_template.xml -->
+<!-- report_sales_by_store_template.xml -->
 <odoo>
   <template id="report_sales_by_store_template">
     <t t-call="web.external_layout">
