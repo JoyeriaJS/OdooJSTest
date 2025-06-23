@@ -2,7 +2,7 @@
   <report
     id="action_report_sales_by_store"
     model="joyeria.reparacion"
-    string="Reporte Ventas por Tienda y Mes"
+    string="Cobro de taller a locales"
     report_type="qweb-pdf"
     name="joyeria_reparaciones.report_sales_by_store_template"
     file="joyeria_reparaciones.report_sales_by_store_template"
