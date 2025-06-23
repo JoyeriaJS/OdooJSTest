@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
   <!-- Categoría de Punto de Venta -->
   <record id="base.module_category_sales_point_of_sale" model="ir.module.category">
-    <field name="description">
-      Punto de venta personalizado.
-    </field>
+    <field name="name">Punto de Venta personalizado</field>
+    <field name="description">Tu PoS custom</field>
     <field name="sequence">21</field>
   </record>
 
-  <!-- Grupos POS -->
-  <record id="group_pos_user"    model="res.groups">
+  <!-- Grupo PoS User -->
+  <record id="group_pos_user" model="res.groups">
     <field name="name">PoS User</field>
     <field name="category_id" ref="base.module_category_sales_point_of_sale"/>
   </record>
+
+  <!-- Grupo PoS Manager -->
   <record id="group_pos_manager" model="res.groups">
     <field name="name">PoS Manager</field>
     <field name="category_id" ref="base.module_category_sales_point_of_sale"/>
     <field name="implied_ids" eval="[
-      (4, ref('group_pos_user')),
+      (4, ref('pos_custom.group_pos_user')),
       (4, ref('stock.group_stock_user'))
     ]"/>
     <field name="users" eval="[
@@ -26,9 +28,9 @@
     ]"/>
   </record>
 
-  <data noupdate="1">
+  <data>
 
-    <!-- 1) El contador ve todos los extractos -->
+    <!-- 1) El contador ve todos los extractos bancarios -->
     <record id="rule_pos_bank_statement_account_user" model="ir.rule">
       <field name="name">PoS Bank Statement: Accountant</field>
       <field name="model_id" ref="account.model_account_bank_statement"/>
@@ -36,16 +38,15 @@
       <field name="domain_force">[(1, '=', 1)]</field>
     </record>
 
-    <!-- 2) El usuario POS ve solo líneas de extractos con sesión PoS -->
+    <!-- 2) El PoS User ve sólo las líneas de extractos con sesión PoS -->
     <record id="rule_pos_bank_statement_line_user" model="ir.rule">
       <field name="name">PoS Bank Statement Line: PoS User</field>
       <field name="model_id" ref="account.model_account_bank_statement_line"/>
       <field name="groups" eval="[(4, ref('pos_custom.group_pos_user'))]"/>
-      <!-- Aquí corregido: usamos la relación statement_id -->
-      <field name="domain_force">[('statement_id.pos_session_id','!=',False)]</field>
+      <field name="domain_force">[('statement_id.session_id','!=', False)]</field>
     </record>
 
-    <!-- 3) El contador POS ve todas las líneas -->
+    <!-- 3) El contador PoS ve todas las líneas -->
     <record id="rule_pos_bank_statement_line_account_user" model="ir.rule">
       <field name="name">PoS Bank Statement Line: Accountant</field>
       <field name="model_id" ref="account.model_account_bank_statement_line"/>
@@ -53,7 +54,7 @@
       <field name="domain_force">[(1, '=', 1)]</field>
     </record>
 
-    <!-- Reglas multi-compañía para órdenes, sesiones, etc. -->
+    <!-- Reglas multi-compañía -->
     <record id="rule_pos_multi_company" model="ir.rule">
       <field name="name">PoS Order: multi-company</field>
       <field name="model_id" ref="model_pos_order"/>
@@ -80,12 +81,13 @@
       <field name="name">Invoice PoS User</field>
       <field name="model_id" ref="account.model_account_move"/>
       <field name="groups" eval="[(4, ref('pos_custom.group_pos_user'))]"/>
-      <field name="domain_force">[('pos_order_ids','!=',False)]</field>
+      <field name="domain_force">[('pos_order_ids','!=', False)]</field>
     </record>
 
-    <!-- Asignar al administrador PoS por defecto -->
+    <!-- Asignar PoS Manager por defecto en nuevos usuarios -->
     <record id="base.default_user" model="res.users">
       <field name="groups_id" eval="[(4, ref('pos_custom.group_pos_manager'))]"/>
     </record>
+
   </data>
 </odoo>
