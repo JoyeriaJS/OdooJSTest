@@ -456,25 +456,17 @@ class Reparacion(models.Model):
 
 ###write funcional"""""""""
     def write(self, vals):
-        for rec in self:
-            # Validar que no se cambie el tipo de peso una vez creado
-            if 'peso' in vals and vals['peso'] != rec.peso:
-                raise ValidationError("No se permite cambiar el tipo de peso una vez creado el registro.")
-
-            # Validar que no se cambie el valor del peso una vez creado
-            if 'peso_valor' in vals and vals['peso_valor'] != rec.peso_valor:
-                raise ValidationError("No se permite modificar el valor del peso una vez creado el registro.")
-
-        res = super().write(vals)
+        # Llamamos al super sin validaciones de peso
+        res = super(Reparacion, self).write(vals)
         for rec in self:
             # ✍️ Procesar firma si se ingresó clave
             if vals.get('clave_firma_manual'):
                 rec._procesar_firma()
-
             # 📦 Procesar vendedora si se ingresó clave
             if vals.get('clave_autenticacion_manual'):
                 rec._procesar_vendedora()
         return res
+
 
 
 
