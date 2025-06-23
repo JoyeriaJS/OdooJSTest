@@ -4,7 +4,7 @@
     <t t-call="web.external_layout">
       <main class="page">
         <h2 style="text-align:center; margin-bottom:1em;">
-          Ventas por Tienda y Mes (por Fecha de Firma)
+          Reporte de cobros a taller por local y mes
         </h2>
         <t t-foreach="groups" t-as="grp">
           <h3>
