@@ -1,4 +1,4 @@
-# pos_custom/security/point_of_sale_security.xml
+
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
   <!-- Categoría PoS personalizada -->
