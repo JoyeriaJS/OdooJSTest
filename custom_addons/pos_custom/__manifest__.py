@@ -8,7 +8,6 @@
     'sequence': 40,
     'summary': 'User-friendly PoS interface for shops and restaurants',
     'depends': ['stock_account', 'barcodes', 'web_editor', 'digest'],
-    'pre_init_hook': 'pre_init_hook',
     'uninstall_hook': 'uninstall_hook',
     'data': [
         'security/point_of_sale_security.xml',
