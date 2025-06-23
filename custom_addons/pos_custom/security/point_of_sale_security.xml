@@ -1,4 +1,3 @@
-
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
   <!-- Categoría PoS personalizada -->
@@ -16,8 +15,14 @@
   <record id="group_pos_manager" model="res.groups">
     <field name="name">PoS Manager</field>
     <field name="category_id" ref="base.module_category_sales_point_of_sale"/>
-    <field name="implied_ids" eval="[(4, ref('pos_custom.group_pos_user')), (4, ref('stock.group_stock_user'))]"/>
-    <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    <field name="implied_ids" eval="[
+      (4, ref('pos_custom.group_pos_user')),
+      (4, ref('stock.group_stock_user'))
+    ]"/>
+    <field name="users" eval="[
+      (4, ref('base.user_root')),
+      (4, ref('base.user_admin'))
+    ]"/>
   </record>
 
   <data noupdate="1">
@@ -43,7 +48,7 @@
       <field name="domain_force">[(1, '=', 1)]</field>
     </record>
 
-    <!-- Reglas multi-compañía (opcional) -->
+    <!-- Reglas multi-compañía -->
     <record id="rule_pos_multi_company" model="ir.rule">
       <field name="name">PoS Order: multi-company</field>
       <field name="model_id" ref="model_pos_order"/>
