@@ -2,8 +2,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
-    'name': 'Punto de venta 2',
-    'version': '1.0.1',
+    'name': 'Punto de venta custom 2',
+    'version': '1.0',
     'category': 'Sales/Point of Sale',
     'sequence': 40,
     'summary': 'User-friendly PoS interface for shops and restaurants',
