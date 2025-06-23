@@ -113,6 +113,7 @@ class Reparacion(models.Model):
 
     precio_unitario = fields.Float(string='Precio unitario', tracking=True)
     extra = fields.Float(string='Extra', tracking=True)
+    extra2 = fields.Float(string='Extra 2', tracking=True)
     subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
     abono = fields.Float(string='Abono', tracking=True,)
     saldo = fields.Float(string="Saldo", compute='_compute_saldo', store=True)
@@ -266,10 +267,10 @@ class Reparacion(models.Model):
                 rec.estado = rec.estado  # No cambia el valor, pero evita la edición
 
 
-    @api.depends('cantidad', 'precio_unitario', 'extra')
+    @api.depends('cantidad', 'precio_unitario', 'extra', 'extra2')
     def _compute_subtotal(self):
         for rec in self:
-            rec.subtotal = rec.cantidad * rec.precio_unitario + rec.extra
+            rec.subtotal = rec.cantidad * rec.precio_unitario + rec.extra + rec.extra2
 
     @api.depends('subtotal', 'abono')
     def _compute_saldo(self):

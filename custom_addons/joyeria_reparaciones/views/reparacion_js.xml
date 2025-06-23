@@ -65,6 +65,7 @@
                         <group string="Datos Financieros" col="2">
                             <field name="precio_unitario" />
                             <field name="extra"/>
+                            <field name="extra2"/>
                             <field name="subtotal" readonly="1"/>
                             <field name="abono"/>
                             <field name="saldo" readonly="1"/>
