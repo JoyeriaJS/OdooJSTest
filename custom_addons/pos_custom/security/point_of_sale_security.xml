@@ -40,7 +40,7 @@
       <field name="model_id" ref="account.model_account_bank_statement_line"/>
       <field name="groups" eval="[(4, ref('pos_custom.group_pos_user'))]"/>
       <!-- ¡Aquí está la clave! -->
-      <field name="domain_force">[('statement_id.pos_session_id','!=', False)]</field>
+      <field name="domain_force">[('statement_id.pos_session_id','!=', True)]</field>
     </record>
 
     <!-- 3) El contador PoS ve todas las líneas -->
