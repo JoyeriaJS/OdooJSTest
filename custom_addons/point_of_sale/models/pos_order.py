@@ -26,20 +26,6 @@ class PosOrder(models.Model):
     _inherit = ["portal.mixin"]
     _description = "Point of Sale Orders"
     _order = "date_order desc, name desc, id desc"
-    vendedora_id   = fields.Many2one(
-        'joyeria.vendedora', string="Vendedora (QR)")
-    auth_datetime  = fields.Datetime(
-        string="Fecha Autorización", readonly=True)
-    
-
-    @api.model
-    def create_from_ui(self, orders, draft=False):
-        # Transfiere los datos de QR y hora al crear el pedido
-        for order in orders:
-            data = order['data']
-            order['data']['vendedora_id']  = data.get('vendedora_id', False)
-            order['data']['auth_datetime'] = data.get('auth_datetime', False)
-        return super().create_from_ui(orders, draft=draft)
 
     @api.model
     def _amount_line_tax(self, line, fiscal_position_id):

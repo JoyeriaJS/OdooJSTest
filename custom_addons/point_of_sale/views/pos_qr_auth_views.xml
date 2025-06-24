@@ -1,0 +1,36 @@
+<odoo>
+    <record id="view_pos_session_form_qr_auth" model="ir.ui.view">
+        <field name="name">pos.session.form.qr.auth</field>
+        <field name="model">pos.session</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_session_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="vendedora_id"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_rma_pos_report_wizard_form" model="ir.ui.view">
+        <field name="name">rma.pos.report.wizard.form</field>
+        <field name="model">rma.pos.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reporte RMA + POS">
+                <group>
+                    <field name="date_start"/>
+                    <field name="date_end"/>
+                </group>
+                <footer>
+                    <button string="Imprimir" type="object" name="print_report" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_rma_pos_report_wizard" model="ir.actions.act_window">
+        <field name="name">Reporte RMA + POS</field>
+        <field name="res_model">rma.pos.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_rma_pos_report_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+    <menuitem id="menu_rma_pos_report_wizard" name="Reporte RMA+POS" parent="pos.menu_pos_root" action="action_rma_pos_report_wizard"/>
+</odoo>
