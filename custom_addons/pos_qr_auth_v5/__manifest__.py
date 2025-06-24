@@ -1,6 +1,6 @@
 {
     'name': 'POS QR Auth',
-    'version': '1.2',
+    'version': '1.3',
     'author': 'Joyería Sebastián',
     'category': 'Point of Sale',
     'license': 'AGPL-3',

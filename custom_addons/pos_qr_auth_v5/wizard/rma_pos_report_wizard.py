@@ -20,17 +20,18 @@ class RmaPosReportWizard(models.TransientModel):
         date_end = data.get('date_end')
         rmas = self.env['joyeria.reparacion'].search([
             ('fecha_retiro', '>=', date_start),
-            ('fecha_retiro', '<=', date_end)
+            ('fecha_retiro', '<=', date_end),
         ])
         poses = self.env['pos.order'].search([
             ('date_order', '>=', date_start),
-            ('date_order', '<=', date_end)
+            ('date_order', '<=', date_end),
         ])
         total_rma = sum(rma.amount_total for rma in rmas)
         total_pos = sum(pos.amount_total for pos in poses)
         return {
             'doc_ids': docids,
             'doc_model': 'rma.pos.report.wizard',
+            'docs': wizard,
             'rmas': rmas,
             'poses': poses,
             'totals': {'rma': total_rma, 'pos': total_pos, 'grand': total_rma + total_pos},
