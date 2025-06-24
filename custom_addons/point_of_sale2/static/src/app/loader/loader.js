@@ -1,3 +1,5 @@
+/** @odoo-module */
+
 import { Component, useEffect } from "@odoo/owl";
 
 export class Loader extends Component {

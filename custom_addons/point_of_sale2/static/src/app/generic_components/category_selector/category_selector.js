@@ -1,5 +1,6 @@
+/** @odoo-module */
+
 import { Component } from "@odoo/owl";
-import { useService } from "@web/core/utils/hooks";
 
 /**
  * @typedef {Object} Category
@@ -7,6 +8,7 @@ import { useService } from "@web/core/utils/hooks";
  * @property {string?} name
  * @property {string?} icon
  * @property {string?} separator
+ * @property {string?} imageUrl
  */
 export class CategorySelector extends Component {
     static template = "point_of_sale.CategorySelector";
@@ -17,23 +19,19 @@ export class CategorySelector extends Component {
             shape: {
                 id: Number,
                 name: { type: String, optional: true },
-                color: { type: Number, optional: true },
-                imgSrc: String,
                 icon: { type: String, optional: true },
+                separator: { type: String, optional: true },
                 showSeparator: { type: Boolean, optional: true },
-                isSelected: { type: Boolean, optional: true },
-                isChildren: { type: Boolean, optional: true },
+                imageUrl: { type: [String, Boolean], optional: true },
             },
         },
         class: { type: String, optional: true },
-        style: { type: String, optional: true },
+        showImage: { type: Boolean, optional: true },
         onClick: { type: Function },
     };
     static defaultProps = {
         class: "",
-        style: "",
+        showImage: true,
+        showSeparator: false,
     };
-    setup() {
-        this.ui = useService("ui");
-    }
 }

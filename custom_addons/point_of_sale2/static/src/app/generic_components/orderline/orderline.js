@@ -1,3 +1,5 @@
+/** @odoo-module */
+
 import { Component } from "@odoo/owl";
 
 export class Orderline extends Component {
@@ -7,7 +9,6 @@ export class Orderline extends Component {
         line: {
             type: Object,
             shape: {
-                isSelected: { type: Boolean, optional: true },
                 productName: String,
                 price: String,
                 qty: String,
@@ -18,19 +19,13 @@ export class Orderline extends Component {
                 oldUnitPrice: { type: String, optional: true },
                 customerNote: { type: String, optional: true },
                 internalNote: { type: String, optional: true },
-                imageSrc: { type: String, optional: true },
-                packLotLines: { type: Array, optional: true },
-                price_without_discount: { type: String, optional: true },
-                taxGroupLabels: { type: String, optional: true },
+                attributes: { type: Array, optional: true },
+                "*": true,
             },
         },
-        showTaxGroupLabels: { type: Boolean, optional: true },
         slots: { type: Object, optional: true },
-        basic_receipt: { type: Boolean, optional: true },
     };
     static defaultProps = {
         class: {},
-        showTaxGroupLabels: false,
-        basic_receipt: false,
     };
 }

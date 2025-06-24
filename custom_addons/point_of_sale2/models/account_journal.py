@@ -22,10 +22,10 @@ class AccountJournal(models.Model):
             ('session_id.state', '=', 'opened')
         ], limit=1)
         if(hanging_journal_entries):
-            raise ValidationError(_("This journal is associated with payment method %(payment_method)s that is being used by order %(pos_order)s in the active pos session %(pos_session)s",
-                payment_method=hanging_journal_entries.payment_method_id.name,
-                pos_order=hanging_journal_entries.pos_order_id.name,
-                pos_session=hanging_journal_entries.session_id.name))
+            payment_method = hanging_journal_entries.payment_method_id.name
+            pos_order = hanging_journal_entries.pos_order_id.name
+            pos_session = hanging_journal_entries.session_id.name
+            raise ValidationError(_("This journal is associated with payment method %s that is being used by order %s in the active pos session %s", payment_method, pos_order, pos_session))
 
     @api.ondelete(at_uninstall=False)
     def _unlink_journal_except_with_active_payments(self):
@@ -40,20 +40,5 @@ class AccountJournal(models.Model):
         res = super()._get_journal_inbound_outstanding_payment_accounts()
         account_ids = set(res.ids)
         for payment_method in self.sudo().pos_payment_method_ids:
-            account_ids.add(payment_method.outstanding_account_id.id)
+            account_ids.add(payment_method.outstanding_account_id.id or self.company_id.account_journal_payment_debit_account_id.id)
         return self.env['account.account'].browse(account_ids)
-
-    @api.model
-    def _ensure_company_account_journal(self):
-        journal = self.search([
-            ('code', '=', 'POSS'),
-            ('company_id', '=', self.env.company.id),
-        ], limit=1)
-        if not journal:
-            journal = self.create({
-                'name': _('Point of Sale'),
-                'code': 'POSS',
-                'type': 'general',
-                'company_id': self.env.company.id,
-            })
-        return journal

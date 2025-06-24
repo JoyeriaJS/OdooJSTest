@@ -7,9 +7,7 @@ from odoo import fields
 from odoo.addons.point_of_sale.tests.common import TestPoSCommon
 from freezegun import freeze_time
 from dateutil.relativedelta import relativedelta
-from datetime import datetime, timedelta
-from pprint import pformat
-import unittest.mock
+
 
 @odoo.tests.tagged('post_install', '-at_install')
 class TestPoSBasicConfig(TestPoSCommon):
@@ -30,7 +28,6 @@ class TestPoSBasicConfig(TestPoSCommon):
         self.product99 = self.create_product('Product_99', self.categ_basic, 99, 50)
         self.product_multi_tax = self.create_product('Multi-tax product', self.categ_basic, 100, 100, (self.taxes['tax8'] | self.taxes['tax9']).ids)
         self.adjust_inventory([self.product1, self.product2, self.product3], [100, 50, 50])
-        self.company_data_2 = self.setup_other_company()
 
     def test_orders_no_invoiced(self):
         """ Test for orders without invoice
@@ -110,9 +107,9 @@ class TestPoSBasicConfig(TestPoSCommon):
         self._run_test({
             'payment_methods': self.cash_pm1 | self.bank_pm1,
             'orders': [
-                {'pos_order_lines_ui_args': [(self.product1, 10), (self.product2, 5)], 'uuid': '00100-010-0001'},
-                {'pos_order_lines_ui_args': [(self.product2, 7), (self.product3, 1)], 'uuid': '00100-010-0002'},
-                {'pos_order_lines_ui_args': [(self.product1, 1), (self.product3, 5), (self.product2, 3)], 'payments': [(self.bank_pm1, 220)], 'uuid': '00100-010-0003'},
+                {'pos_order_lines_ui_args': [(self.product1, 10), (self.product2, 5)], 'uid': '00100-010-0001'},
+                {'pos_order_lines_ui_args': [(self.product2, 7), (self.product3, 1)], 'uid': '00100-010-0002'},
+                {'pos_order_lines_ui_args': [(self.product1, 1), (self.product3, 5), (self.product2, 3)], 'payments': [(self.bank_pm1, 220)], 'uid': '00100-010-0003'},
             ],
             'before_closing_cb': _before_closing_cb,
             'journal_entries_before_closing': {},
@@ -244,9 +241,9 @@ class TestPoSBasicConfig(TestPoSCommon):
         self._run_test({
             'payment_methods': self.cash_pm1 | self.bank_pm1,
             'orders': [
-                {'pos_order_lines_ui_args': [(self.product1, 6), (self.product2, 3), (self.product3, 1), ], 'payments': [(self.cash_pm1, 150)], 'uuid': '00100-010-0001'},
-                {'pos_order_lines_ui_args': [(self.product1, 1), (self.product2, 20), ], 'payments': [(self.bank_pm1, 410)], 'uuid': '00100-010-0002'},
-                {'pos_order_lines_ui_args': [(self.product1, 10), (self.product3, 1), ], 'payments': [(self.bank_pm1, 130)], 'is_invoiced': True, 'customer': self.customer, 'uuid': '00100-010-0003'},
+                {'pos_order_lines_ui_args': [(self.product1, 6), (self.product2, 3), (self.product3, 1), ], 'payments': [(self.cash_pm1, 150)], 'uid': '00100-010-0001'},
+                {'pos_order_lines_ui_args': [(self.product1, 1), (self.product2, 20), ], 'payments': [(self.bank_pm1, 410)], 'uid': '00100-010-0002'},
+                {'pos_order_lines_ui_args': [(self.product1, 10), (self.product3, 1), ], 'payments': [(self.bank_pm1, 130)], 'is_invoiced': True, 'customer': self.customer, 'uid': '00100-010-0003'},
             ],
             'before_closing_cb': _before_closing_cb,
             'journal_entries_before_closing': {
@@ -302,7 +299,7 @@ class TestPoSBasicConfig(TestPoSCommon):
         self._run_test({
             'payment_methods': self.cash_pm1 | self.bank_pm1,
             'orders': [
-                {'pos_order_lines_ui_args': [(self.product0, 1)], 'payments': [(self.bank_pm1, 0)], 'customer': self.customer, 'is_invoiced': True, 'uuid': '00100-010-0001'},
+                {'pos_order_lines_ui_args': [(self.product0, 1)], 'payments': [(self.bank_pm1, 0)], 'customer': self.customer, 'is_invoiced': True, 'uid': '00100-010-0001'},
             ],
             'journal_entries_before_closing': {
                 '00100-010-0001': {
@@ -327,7 +324,7 @@ class TestPoSBasicConfig(TestPoSCommon):
     def test_return_order_invoiced(self):
 
         def _before_closing_cb():
-            order = self.pos_session.order_ids.filtered(lambda order: '666-666-666' in order.uuid)
+            order = self.pos_session.order_ids.filtered(lambda order: '666-666-666' in order.pos_reference)
 
             # refund
             order.refund()
@@ -347,7 +344,7 @@ class TestPoSBasicConfig(TestPoSCommon):
         self._run_test({
             'payment_methods': self.cash_pm1 | self.bank_pm1,
             'orders': [
-                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments': [(self.cash_pm1, 100)], 'customer': self.customer, 'is_invoiced': True, 'uuid': '666-666-666'},
+                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments': [(self.cash_pm1, 100)], 'customer': self.customer, 'is_invoiced': True, 'uid': '666-666-666'},
             ],
             'before_closing_cb': _before_closing_cb,
             'journal_entries_before_closing': {
@@ -427,7 +424,7 @@ class TestPoSBasicConfig(TestPoSCommon):
             self.assertAlmostEqual(orders_total, self.pos_session.total_payments_amount, msg='Total order amount should be equal to the total payment amount.')
 
             # return order
-            order_to_return = self.pos_session.order_ids.filtered(lambda order: '12345-123-1234' in order.uuid)
+            order_to_return = self.pos_session.order_ids.filtered(lambda order: '12345-123-1234' in order.pos_reference)
             order_to_return.refund()
             refund_order = self.pos_session.order_ids.filtered(lambda order: order.state == 'draft')
 
@@ -476,8 +473,8 @@ class TestPoSBasicConfig(TestPoSCommon):
         self._run_test({
             'payment_methods': self.cash_pm1 | self.bank_pm1,
             'orders': [
-                {'pos_order_lines_ui_args': [(self.product1, 1), (self.product2, 5)], 'payments': [(self.bank_pm1, 110)], 'uuid': '00100-010-0001'},
-                {'pos_order_lines_ui_args': [(self.product1, 3), (self.product2, 2), (self.product3, 1)], 'payments': [(self.cash_pm1, 100)], 'uuid': '12345-123-1234'},
+                {'pos_order_lines_ui_args': [(self.product1, 1), (self.product2, 5)], 'payments': [(self.bank_pm1, 110)], 'uid': '00100-010-0001'},
+                {'pos_order_lines_ui_args': [(self.product1, 3), (self.product2, 2), (self.product3, 1)], 'payments': [(self.cash_pm1, 100)], 'uid': '12345-123-1234'},
             ],
             'before_closing_cb': _before_closing_cb,
             'journal_entries_before_closing': {},
@@ -505,9 +502,9 @@ class TestPoSBasicConfig(TestPoSCommon):
         self._run_test({
             'payment_methods': self.cash_split_pm1 | self.bank_pm1,
             'orders': [
-                {'pos_order_lines_ui_args': [(self.product1, 10), (self.product2, 5)], 'payments': [(self.cash_split_pm1, 100), (self.bank_pm1, 100)], 'customer': self.customer, 'is_invoiced': False, 'uuid': '00100-010-0001'},
-                {'pos_order_lines_ui_args': [(self.product2, 7), (self.product3, 1)], 'payments': [(self.cash_split_pm1, 70), (self.bank_pm1, 100)], 'customer': self.customer, 'is_invoiced': False, 'uuid': '00100-010-0002'},
-                {'pos_order_lines_ui_args': [(self.product1, 1), (self.product3, 5), (self.product2, 3)], 'payments': [(self.cash_split_pm1, 120), (self.bank_pm1, 100)], 'customer': self.customer, 'is_invoiced': False, 'uuid': '00100-010-0003'},
+                {'pos_order_lines_ui_args': [(self.product1, 10), (self.product2, 5)], 'payments': [(self.cash_split_pm1, 100), (self.bank_pm1, 100)], 'customer': self.customer, 'is_invoiced': False, 'uid': '00100-010-0001'},
+                {'pos_order_lines_ui_args': [(self.product2, 7), (self.product3, 1)], 'payments': [(self.cash_split_pm1, 70), (self.bank_pm1, 100)], 'customer': self.customer, 'is_invoiced': False, 'uid': '00100-010-0002'},
+                {'pos_order_lines_ui_args': [(self.product1, 1), (self.product3, 5), (self.product2, 3)], 'payments': [(self.cash_split_pm1, 120), (self.bank_pm1, 100)], 'customer': self.customer, 'is_invoiced': False, 'uid': '00100-010-0003'},
             ],
             'journal_entries_before_closing': {},
             'journal_entries_after_closing': {
@@ -613,10 +610,10 @@ class TestPoSBasicConfig(TestPoSCommon):
         ))
 
         # sync orders
-        self.env['pos.order'].sync_from_ui(orders)
+        order = self.env['pos.order'].create_from_ui(orders)
 
-        self.assertEqual(orders[0]['amount_return'], 0, msg='The amount return should be 0')
-        self.assertEqual(orders[1]['amount_return'], 0, msg='The amount return should be 0')
+        self.assertEqual(orders[0]['data']['amount_return'], 0, msg='The amount return should be 0')
+        self.assertEqual(orders[1]['data']['amount_return'], 0, msg='The amount return should be 0')
 
         # close the session
         self.pos_session.action_pos_session_validate()
@@ -631,17 +628,17 @@ class TestPoSBasicConfig(TestPoSCommon):
         self._run_test({
             'payment_methods': self.cash_pm1 | self.cash_split_pm1 | self.bank_pm1 | self.bank_split_pm1,
             'orders': [
-                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.cash_pm1, 100)], 'customer': self.customer, 'is_invoiced': True, 'uuid': '00100-010-0001'},
-                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.bank_pm1, 100)], 'customer': self.customer, 'is_invoiced': True, 'uuid': '00100-010-0002'},
-                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.cash_split_pm1, 100)], 'customer': self.customer, 'is_invoiced': True, 'uuid': '00100-010-0003'},
-                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.bank_split_pm1, 100)], 'customer': self.customer, 'is_invoiced': True, 'uuid': '00100-010-0004'},
-                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.cash_pm1, 100)], 'customer': self.customer, 'is_invoiced': False, 'uuid': '00100-010-0005'},
-                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.bank_pm1, 100)], 'customer': self.customer, 'is_invoiced': False, 'uuid': '00100-010-0006'},
-                {'pos_order_lines_ui_args': [(self.product99, 1)], 'payments':[(self.cash_split_pm1, 99)], 'customer': self.customer, 'is_invoiced': False, 'uuid': '00100-010-0007'},
-                {'pos_order_lines_ui_args': [(self.product99, 1)], 'payments':[(self.bank_split_pm1, 99)], 'customer': self.customer, 'is_invoiced': False, 'uuid': '00100-010-0008'},
-                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.bank_pm1, 100)], 'customer': self.other_customer, 'is_invoiced': True, 'uuid': '00100-010-0009'},
-                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.bank_pm1, 100)], 'customer': self.other_customer, 'is_invoiced': True, 'uuid': '00100-010-0010'},
-                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.bank_pm1, 100)], 'customer': self.customer, 'is_invoiced': True, 'uuid': '00100-010-0011'},
+                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.cash_pm1, 100)], 'customer': self.customer, 'is_invoiced': True, 'uid': '00100-010-0001'},
+                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.bank_pm1, 100)], 'customer': self.customer, 'is_invoiced': True, 'uid': '00100-010-0002'},
+                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.cash_split_pm1, 100)], 'customer': self.customer, 'is_invoiced': True, 'uid': '00100-010-0003'},
+                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.bank_split_pm1, 100)], 'customer': self.customer, 'is_invoiced': True, 'uid': '00100-010-0004'},
+                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.cash_pm1, 100)], 'customer': self.customer, 'is_invoiced': False, 'uid': '00100-010-0005'},
+                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.bank_pm1, 100)], 'customer': self.customer, 'is_invoiced': False, 'uid': '00100-010-0006'},
+                {'pos_order_lines_ui_args': [(self.product99, 1)], 'payments':[(self.cash_split_pm1, 99)], 'customer': self.customer, 'is_invoiced': False, 'uid': '00100-010-0007'},
+                {'pos_order_lines_ui_args': [(self.product99, 1)], 'payments':[(self.bank_split_pm1, 99)], 'customer': self.customer, 'is_invoiced': False, 'uid': '00100-010-0008'},
+                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.bank_pm1, 100)], 'customer': self.other_customer, 'is_invoiced': True, 'uid': '00100-010-0009'},
+                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.bank_pm1, 100)], 'customer': self.other_customer, 'is_invoiced': True, 'uid': '00100-010-0010'},
+                {'pos_order_lines_ui_args': [(self.product1, 10)], 'payments':[(self.bank_pm1, 100)], 'customer': self.customer, 'is_invoiced': True, 'uid': '00100-010-0011'},
             ],
             'journal_entries_before_closing': {
                 '00100-010-0001': {
@@ -821,21 +818,8 @@ class TestPoSBasicConfig(TestPoSCommon):
         self.open_new_session(0)
         session = self.pos_session
         order_data = self.create_ui_order_data([(self.product3, 1)])
-        amount_paid = order_data['amount_paid']
-        with (
-            self.assertLogs('odoo.addons.point_of_sale.models.pos_order', level='DEBUG') as cm,
-            unittest.mock.patch('odoo.addons.point_of_sale.models.pos_order.randrange', return_value=1996)
-        ):
-            res = self.env['pos.order'].sync_from_ui([order_data])
-            # Basic check for logs on order synchronization
-            order_log_str = self.env['pos.order']._get_order_log_representation(order_data)
-            odoo_order_id = res['pos.order'][0]['id']
-            self.assertEqual(len(cm.output), 4)
-            self.assertEqual(cm.output[0], f"INFO:odoo.addons.point_of_sale.models.pos_order:PoS synchronisation #1996 started for PoS orders references: [{order_log_str}]")
-            self.assertTrue(cm.output[1].startswith(f'DEBUG:odoo.addons.point_of_sale.models.pos_order:PoS synchronisation #1996 processing order {order_log_str} order full data: '))
-            self.assertEqual(cm.output[2], f'INFO:odoo.addons.point_of_sale.models.pos_order:PoS synchronisation #1996 order {order_log_str} created pos.order #{odoo_order_id}')
-            self.assertEqual(cm.output[3], 'INFO:odoo.addons.point_of_sale.models.pos_order:PoS synchronisation #1996 finished')
-            
+        amount_paid = order_data['data']['amount_paid']
+        self.env['pos.order'].create_from_ui([order_data])
         session.post_closing_cash_details(amount_paid)
         session.close_session_from_ui()
 
@@ -856,8 +840,9 @@ class TestPoSBasicConfig(TestPoSCommon):
 
         def open_and_check(pos_data):
             self.config = pos_data['config']
-            self.open_new_session(pos_data['amount_paid'])
+            self.open_new_session()
             session = self.pos_session
+            session.set_cashbox_pos(pos_data['amount_paid'], False)
             self.assertEqual(session.cash_register_balance_start, pos_data['amount_paid'])
 
         pos01_config = self.config
@@ -880,8 +865,8 @@ class TestPoSBasicConfig(TestPoSCommon):
             session = self.pos_session
 
             order_data = self.create_ui_order_data([(self.product3, pos_data['p_qty'])])
-            pos_data['amount_paid'] += order_data['amount_paid']
-            self.env['pos.order'].sync_from_ui([order_data])
+            pos_data['amount_paid'] += order_data['data']['amount_paid']
+            self.env['pos.order'].create_from_ui([order_data])
 
             session.post_closing_cash_details(pos_data['amount_paid'])
             session.close_session_from_ui()
@@ -889,8 +874,8 @@ class TestPoSBasicConfig(TestPoSCommon):
         open_and_check(pos01_data)
         open_and_check(pos02_data)
 
-    def test_load_data_should_not_fail(self):
-        """load_data shouldn't fail
+    def test_load_pos_data_should_not_fail(self):
+        """load_pos_data shouldn't fail
 
         (Include test conditions here if possible)
 
@@ -906,8 +891,8 @@ class TestPoSBasicConfig(TestPoSCommon):
 
         self.open_new_session()
 
-        # calling load_data should not raise an error
-        self.pos_session.load_data([])
+        # calling load_pos_data should not raise an error
+        self.pos_session.load_pos_data()
 
     def test_invoice_past_refund(self):
         """ Test invoicing a past refund
@@ -935,7 +920,7 @@ class TestPoSBasicConfig(TestPoSCommon):
         """
         def _before_closing_cb():
             # Return the order
-            order_to_return = self.pos_session.order_ids.filtered(lambda order: '12345-123-1234' in order.uuid)
+            order_to_return = self.pos_session.order_ids.filtered(lambda order: '12345-123-1234' in order.pos_reference)
             order_to_return.refund()
             refund_order = self.pos_session.order_ids.filtered(lambda order: order.state == 'draft')
 
@@ -953,7 +938,7 @@ class TestPoSBasicConfig(TestPoSCommon):
         self._run_test({
             'payment_methods': self.cash_pm1 | self.bank_pm1,
             'orders': [
-                {'pos_order_lines_ui_args': [(self.product3, 1)], 'payments': [(self.cash_pm1, 30)], 'uuid': '12345-123-1234'},
+                {'pos_order_lines_ui_args': [(self.product3, 1)], 'payments': [(self.cash_pm1, 30)], 'uid': '12345-123-1234'},
             ],
             'before_closing_cb': _before_closing_cb,
             'journal_entries_before_closing': {},
@@ -985,7 +970,7 @@ class TestPoSBasicConfig(TestPoSCommon):
             # Check the credit note
             self.assertTrue(return_to_invoice.account_move, 'Invoice should be created.')
             self.assertEqual(return_to_invoice.account_move.move_type, 'out_refund', 'Invoice should be a credit note.')
-            self.assertEqual(return_to_invoice.account_move.invoice_date, new_session_date.date(), 'Invoice date should be the same as the session it is created in.')
+            self.assertEqual(return_to_invoice.account_move.invoice_date, new_session_date, 'Invoice date should be the same as the session it is created in.')
             self.assertRecordValues(return_to_invoice.account_move, [{
                 'amount_untaxed': 30,
                 'amount_tax': 0,
@@ -1001,7 +986,7 @@ class TestPoSBasicConfig(TestPoSCommon):
         self._run_test({
             'payment_methods': self.cash_pm1 | self.bank_pm1,
             'orders': [
-                {'pos_order_lines_ui_args': [(self.product99, 1)], 'payments': [(self.bank_pm1, 99)], 'customer': False, 'is_invoiced': False, 'uuid': '00100-010-0001'},
+                {'pos_order_lines_ui_args': [(self.product99, 1)], 'payments': [(self.bank_pm1, 99)], 'customer': False, 'is_invoiced': False, 'uid': '00100-010-0001'},
             ],
             'journal_entries_before_closing': {},
             'journal_entries_after_closing': {
@@ -1053,7 +1038,7 @@ class TestPoSBasicConfig(TestPoSCommon):
         self._run_test({
             'payment_methods': self.cash_pm1 | self.bank_pm1,
             'orders': [
-                {'pos_order_lines_ui_args': [(self.product_multi_tax, 1)], 'payments': [(self.bank_pm1, 117.72)], 'customer': False, 'is_invoiced': False, 'uuid': '00100-010-0001'},
+                {'pos_order_lines_ui_args': [(self.product_multi_tax, 1)], 'payments': [(self.bank_pm1, 117.72)], 'customer': False, 'is_invoiced': False, 'uid': '00100-010-0001'},
             ],
             'journal_entries_before_closing': {},
             'journal_entries_after_closing': {
@@ -1096,165 +1081,3 @@ class TestPoSBasicConfig(TestPoSCommon):
             {'account_id': self.tax_received_account.id, 'balance': -9.72, 'reconciled': False},
             {'account_id': self.receivable_account.id, 'balance': 117.72, 'reconciled': True},
         ])
-
-    def test_limited_products_loading(self):
-        self.env['ir.config_parameter'].sudo().set_param('point_of_sale.limited_product_count', 3)
-
-        # Make the service products that are available in the pos inactive.
-        # We don't need them to test the loading of 'consu' products.
-        self.env['product.template'].search([('available_in_pos', '=', True), ('type', '=', 'service')]).write({'active': False})
-
-        session = self.open_new_session(0)
-
-        def get_top_product_ids(count):
-            data = session.load_data([])
-            return [p['id'] for p in data['product.product']['data'][:count]]
-
-        self.patch(self.env.cr, 'now', lambda: datetime.now() + timedelta(days=1))
-        self.env['pos.order'].sync_from_ui([self.create_ui_order_data([(self.product1, 1)])])
-        self.assertEqual(get_top_product_ids(1), [self.product1.id])
-
-        self.patch(self.env.cr, 'now', lambda: datetime.now() + timedelta(days=2))
-        self.env['pos.order'].sync_from_ui([self.create_ui_order_data([(self.product2, 1)])])
-        self.assertEqual(get_top_product_ids(2), [self.product2.id, self.product1.id])
-
-        self.patch(self.env.cr, 'now', lambda: datetime.now() + timedelta(days=3))
-        self.env['pos.order'].sync_from_ui([self.create_ui_order_data([(self.product3, 1)])])
-        self.assertEqual(get_top_product_ids(3), [self.product3.id, self.product2.id, self.product1.id])
-
-    def test_closing_entry_by_product(self):
-        # set the Group by Product at Closing Entry
-        self.config.is_closing_entry_by_product = True
-        self.open_new_session()
-
-        # 4 orders
-
-        # Orders
-        # ======
-        # +---------+----------+---------------+----------+-----+-------+
-        # | order   | payments | invoiced?     | product  | qty | total |
-        # +---------+----------+---------------+----------+-----+-------+
-        # | order 1 | bank     | no            | product1 |   2 |    60 |
-        # |         |          |               | product4 |   3 | 39.84 |
-        # +---------+----------+---------------+----------+-----+-------+
-        # | order 2 | bank     | yes           | product4 |   1 | 29.88 |
-        # |         |          |               | product2 |   5 |   400 |
-        # +---------+----------+---------------+----------+-----+-------+
-        # | order 3 | bank     | yes           | product1 |   3 | 29.88 |
-        # |         |          |               | product2 |  10 |   400 |
-        # +---------+----------+---------------+----------+-----+-------+
-        # | order 4 | bank     | yes           | product1 |   5 | 29.88 |
-        # |         |          |               | product0 |  10|   400 |
-        # +---------+----------+---------------+----------+-----+-------+
-
-        # Expected Output
-        # +---------------+-----------+
-        # | invoice_line  | Quantity  |
-        # +---------------+-----------+
-        # | Product 0     |      10   |
-        # +---------------+-----------+
-        # | Product 1     |      10   |
-        # +---------------+-----------+
-        # | Product 2     |      15   |
-        # +---------------+-----------+
-        # | Product 4     |       4   |
-        # +---------------+-----------+
-
-        # create orders
-        orders = []
-
-        # create orders
-        orders = []
-        orders.append(self.create_ui_order_data(
-            [(self.product1, 2), (self.product4, 3)],
-            payments=[(self.bank_pm1, 49.88)]
-        ))
-        orders.append(self.create_ui_order_data(
-            [(self.product4, 1), (self.product2, 5)],
-            payments=[(self.bank_pm1, 109.96)]
-        ))
-        orders.append(self.create_ui_order_data(
-            [(self.product1, 3), (self.product2, 10)],
-            payments=[(self.bank_pm1, 230)]
-        ))
-        orders.append(self.create_ui_order_data(
-            [(self.product1, 5), (self.product0, 10)],
-            payments=[(self.bank_pm1, 50)]
-        ))
-
-        # sync orders
-        self.env['pos.order'].sync_from_ui(orders)
-        # close the session
-        self.pos_session.action_pos_session_validate()
-
-        # check values after the session is closed
-        session_account_move = self.pos_session.move_id
-
-        # Define expected quantities for each product
-        expected_product_quantity = {
-            self.product0: 10,
-            self.product1: 10,
-            self.product2: 15,
-            self.product4: 4,
-        }
-        # Iterate through invoice lines and assert the expected quantities
-        for i in session_account_move.line_ids:
-            if i.product_id and expected_product_quantity.get(i.product_id):
-                self.assertEqual(i.quantity, expected_product_quantity.get(i.product_id), f"Unexpected quantity for {i.product_id.name}")
-
-    def test_pos_payment_method_copy(self):
-        """
-        Test POS payment method copy:
-            - Create two payment methods in which one of the payment method's journal type be cash
-            - Copy multiple payment methods
-            - Check the duplicated cash payment method journal should be empty
-        """
-        pm_1 = self.cash_pm1
-        pm_2 = self.bank_pm1
-        pm_3, pm_4 = (pm_1 + pm_2).copy()
-
-        self.assertTrue(pm_3)
-        self.assertFalse(pm_3.journal_id)
-        self.assertTrue(pm_4)
-        self.assertEqual(pm_4.journal_id.type, "bank")
-
-    def test_loading_products_with_access_right_issue(self):
-        product = self.env['product.product'].create({
-            'name': 'Product with access right issue',
-            'available_in_pos': True,
-            'type': 'consu',
-        })
-
-        self.env['ir.rule'].create({
-            'name': 'Test',
-            'model_id': self.env['ir.model']._get('product.product').id,
-            'domain_force': '[(\'id\', \'!=\', %s)]' % product.id,
-            'groups': [(4, self.env.ref('base.group_user').id)]
-        })
-
-        session = self.open_new_session()
-
-        data = session.load_data([])
-
-        self.assertNotIn(product.id, [p['id'] for p in data['product.product']['data']])
-        self.assertTrue(data['product.product']['data'])
-
-    def test_double_syncing_same_order(self):
-        """ Test that double syncing the same order doesn't create duplicates records
-        """
-        self.open_new_session()
-
-        # Create an order
-        order_data = self.create_ui_order_data([(self.product1, 1)], payments=[(self.cash_pm1, 10)], customer=self.customer, is_invoiced=True)
-        order_data['access_token'] = '0123456789'
-        res = self.env['pos.order'].sync_from_ui([order_data])
-        order_id = res['pos.order'][0]['id']
-
-        # Sync the same order again
-        res = self.env['pos.order'].sync_from_ui([order_data])
-        self.assertEqual(res['pos.order'][0]['id'], order_id, 'Syncing the same order should not create a new one')
-
-        order = self.env['pos.order'].browse(order_id)
-        self.assertEqual(order.picking_count, 1, 'Order should have one picking')
-        self.assertEqual(len(order.payment_ids), 1, 'Order should have one payment')
-        self.assertEqual(self.env['account.move'].search_count([('ref', '=', order.name)]), 1, 'Order should have one invoice')

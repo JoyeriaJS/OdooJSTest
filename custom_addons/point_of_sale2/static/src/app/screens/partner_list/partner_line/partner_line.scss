@@ -1,3 +1,7 @@
+.partner-line.active {
+    background-color: $o-component-active-bg;
+}
+
 @include media-breakpoint-down(lg) {
 
     .partner-line {
@@ -14,7 +18,7 @@
             background-color: transparent;
         }
     }
-    
+
     .partner-line-balance{
         order: 3;
     }
@@ -24,25 +28,7 @@
     .edit-partner-button-cell {
         order: 4;
     }
-}
-
-.partner-line {
-    &:hover i.oi-chevron-right {
-        transition: $transition-base;
-        transform: translateX(.5rem);
-        color: $o-main-link-color;
-    }
-    &.selected {
-        background-color: $o-component-active-bg;
-        border: $border-width solid $o-component-active-border;
-    }
-
-    &.selected .btn.btn-link:hover .fa-check {
+    .partner-line-last-column-placeholder {
         display: none;
-    }
-
-    &.selected .btn.btn-link:hover::after {
-        content: "\e852";
-        font-family: 'odoo_ui_icons';
     }
 }

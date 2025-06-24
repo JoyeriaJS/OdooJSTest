@@ -1,10 +1,11 @@
 import odoo
 
 from odoo.addons.point_of_sale.tests.common import TestPoSCommon
+from odoo.addons.product.tests.common import TestProductCommon
 from odoo.fields import Command
 
 @odoo.tests.tagged('post_install', '-at_install')
-class TestStockProductUpdates(TestPoSCommon):
+class TestStockProductUpdates(TestPoSCommon, TestProductCommon):
 
     def setUp(self):
         super(TestStockProductUpdates, self).setUp()

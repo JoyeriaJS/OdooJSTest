@@ -1,6 +1,5 @@
+/** @odoo-module **/
 import { loadAllImages } from "@point_of_sale/utils";
-
-import { Reactive } from "@web/core/utils/reactive";
 
 export const printerService = {
     dependencies: ["renderer"],
@@ -8,15 +7,13 @@ export const printerService = {
         return new PrinterService(env, { renderer });
     },
 };
-export class PrinterService extends Reactive {
+export class PrinterService {
     constructor(...args) {
-        super(...args);
         this.setup(...args);
     }
     setup(env, { renderer }) {
         this.renderer = renderer;
         this.device = null;
-        this.state = { isPrinting: false };
     }
     setPrinter(newDevice) {
         this.device = newDevice;
@@ -36,22 +33,17 @@ export class PrinterService extends Reactive {
         throw {
             title: printResult.message.title || "Error",
             body: printResult.message.body,
-            errorCode: printResult.errorCode,
         };
     }
     async print(component, props, options) {
-        this.state.isPrinting = true;
         const el = await this.renderer.toHtml(component, props);
+        // Load all images before printing
         try {
             await loadAllImages(el);
         } catch (e) {
             console.error("Images could not be loaded correctly", e);
         }
-        try {
-            return await this.printHtml(el, options);
-        } finally {
-            this.state.isPrinting = false;
-        }
+        return await this.printHtml(el, options);
     }
     is = () => Boolean(this.device?.printReceipt);
 }

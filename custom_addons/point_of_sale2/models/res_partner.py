@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import api, fields, models
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 
 class ResPartner(models.Model):
-    _name = 'res.partner'
-    _inherit = ['res.partner', 'pos.load.mixin']
+    _inherit = 'res.partner'
 
     pos_order_count = fields.Integer(
         compute='_compute_pos_order',
@@ -12,28 +13,6 @@ class ResPartner(models.Model):
         groups="point_of_sale.group_pos_user",
     )
     pos_order_ids = fields.One2many('pos.order', 'partner_id', readonly=True)
-
-    @api.model
-    def _load_pos_data_domain(self, data):
-        config_id = self.env['pos.config'].browse(data['pos.config']['data'][0]['id'])
-
-        # Collect partner IDs from loaded orders
-        loaded_order_partner_ids = {order['partner_id'] for order in data['pos.order']['data']}
-
-        # Extract partner IDs from the tuples returned by get_limited_partners_loading
-        limited_partner_ids = {partner[0] for partner in config_id.get_limited_partners_loading()}
-
-        limited_partner_ids.add(self.env.user.partner_id.id)  # Ensure current user is included
-        partner_ids = limited_partner_ids.union(loaded_order_partner_ids)
-        return [('id', 'in', list(partner_ids))]
-
-    @api.model
-    def _load_pos_data_fields(self, config_id):
-        return [
-            'id', 'name', 'street', 'city', 'state_id', 'country_id', 'vat', 'lang', 'phone', 'zip', 'mobile', 'email',
-            'barcode', 'write_date', 'property_account_position_id', 'property_product_pricelist', 'parent_name', 'contact_address',
-            'company_type',
-        ]
 
     def _compute_pos_order(self):
         # retrieve all children partners and prefetch 'parent_id' on them
@@ -65,8 +44,16 @@ class ResPartner(models.Model):
             action['domain'] = [('partner_id', '=', self.id)]
         return action
 
-    def open_commercial_entity(self):
-        return {
-            **super().open_commercial_entity(),
-            **({'target': 'new'} if self.env.context.get('target') == 'new' else {}),
-        }
+    @api.model
+    def create_from_ui(self, partner):
+        """ create or modify a partner from the point of sale ui.
+            partner contains the partner's fields. """
+        # image is a dataurl, get the data after the comma
+        if partner.get('image_1920'):
+            partner['image_1920'] = partner['image_1920'].split(',')[1]
+        partner_id = partner.pop('id', False)
+        if partner_id:  # Modifying existing partner
+            self.browse(partner_id).write(partner)
+        else:
+            partner_id = self.create(partner).id
+        return partner_id

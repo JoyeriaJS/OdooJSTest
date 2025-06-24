@@ -1,28 +1,22 @@
-import { Dialog } from "@web/core/dialog/dialog";
+/** @odoo-module */
+import { AbstractAwaitablePopup } from "@point_of_sale/app/popup/abstract_awaitable_popup";
 import { Component, onMounted, useRef, useState, useSubEnv } from "@odoo/owl";
-import { usePos } from "../pos_hook";
-import { useRefListener, useService } from "@web/core/utils/hooks";
-import { ProductInfoBanner } from "@point_of_sale/app/components/product_info_banner/product_info_banner";
+import { useService } from "@web/core/utils/hooks";
 
 export class BaseProductAttribute extends Component {
-    static template = "";
-    static props = ["attributeLine"];
     setup() {
-        this.attributeLine = this.props.attributeLine;
-        this.values = this.attributeLine.product_template_value_ids;
+        this.env.attribute_components.push(this);
+        this.attribute = this.props.attribute;
+        this.values = this.attribute.values;
         this.state = useState({
-            attribute_value_ids: this.values[0].id.toString(),
+            attribute_value_ids: parseFloat(this.values[0].id),
             custom_value: "",
-        });
-        onMounted(() => {
-            this.env.attribute_components.push(this);
-            this.env.computeProductProduct();
         });
     }
 
     getValue() {
         const attribute_value_ids =
-            this.attributeLine.attribute_id.display_type === "multi"
+            this.attribute.display_type === "multi"
                 ? this.values.filter((val) => this.state.attribute_value_ids[val.id])
                 : [this.values.find((val) => val.id === parseInt(this.state.attribute_value_ids))];
 
@@ -36,14 +30,12 @@ export class BaseProductAttribute extends Component {
                 return val.name;
             })
             .join(", ");
-        const hasCustom = attribute_value_ids.some((val) => val.is_custom);
 
         return {
             value,
             valueIds,
             custom_value: this.state.custom_value,
             extra,
-            hasCustom,
         };
     }
 
@@ -96,57 +88,49 @@ export class MultiProductAttribute extends BaseProductAttribute {
     }
 
     initAttribute() {
-        for (const value of this.values) {
+        const attribute = this.props.attribute;
+
+        for (const value of attribute.values) {
             this.state.attribute_value_ids[value.id] = false;
         }
     }
 }
 
-export class ProductConfiguratorPopup extends Component {
+export class ProductConfiguratorPopup extends AbstractAwaitablePopup {
     static template = "point_of_sale.ProductConfiguratorPopup";
     static components = {
         RadioProductAttribute,
-        ProductInfoBanner,
         PillsProductAttribute,
         SelectProductAttribute,
         ColorProductAttribute,
         MultiProductAttribute,
-        Dialog,
     };
-    static props = ["product", "getPayload", "close"];
 
     setup() {
-        useSubEnv({
-            attribute_components: [],
-            computeProductProduct: this.computeProductProduct.bind(this),
-        });
-        this.pos = usePos();
-        this.ui = useState(useService("ui"));
-        this.inputArea = useRef("input-area");
+        super.setup();
+        useSubEnv({ attribute_components: [] });
         this.state = useState({
-            product: this.props.product,
-            payload: this.env.attribute_components,
+            quantity: this.props.quantity || 1,
         });
-        useRefListener(this.inputArea, "touchend", this.computeProductProduct.bind(this));
-        useRefListener(this.inputArea, "click", this.computeProductProduct.bind(this));
+        this.ui = useService("ui");
     }
-    computePayload() {
+
+    getPayload() {
         const attribute_custom_values = [];
         let attribute_value_ids = [];
         var price_extra = 0.0;
+        const quantity = this.state.quantity;
 
-        this.state.payload.forEach((attribute_component) => {
-            const { valueIds, extra, custom_value, hasCustom } = attribute_component.getValue();
+        this.env.attribute_components.forEach((attribute_component) => {
+            const { valueIds, extra, custom_value } = attribute_component.getValue();
             attribute_value_ids.push(valueIds);
 
-            if (hasCustom) {
+            if (custom_value) {
                 // for custom values, it will never be a multiple attribute
                 attribute_custom_values[valueIds[0]] = custom_value;
             }
-            const attr = this.pos.data.models["product.template.attribute.value"].get(valueIds[0]);
-            if (attr && attr.attribute_id.create_variant !== "always") {
-                price_extra += extra;
-            }
+
+            price_extra += extra;
         });
 
         attribute_value_ids = attribute_value_ids.flat();
@@ -154,29 +138,8 @@ export class ProductConfiguratorPopup extends Component {
             attribute_value_ids,
             attribute_custom_values,
             price_extra,
+            quantity,
         };
-    }
-    computeProductProduct() {
-        let product = this.props.product;
-        const formattedPayload = this.computePayload();
-        const hasVariants = this.props.product.attribute_line_ids.some(
-            (line) => line.attribute_id.create_variant !== "no_variant"
-        );
-
-        if (hasVariants) {
-            const newProduct = this.pos.models["product.product"]
-                .filter((p) => p.raw?.product_template_variant_value_ids?.length > 0)
-                .find((p) =>
-                    p.raw.product_template_variant_value_ids.every((v) =>
-                        formattedPayload.attribute_value_ids.includes(v)
-                    )
-                );
-            if (newProduct) {
-                product = newProduct;
-            }
-        }
-
-        this.state.product = product;
     }
     get imageUrl() {
         const product = this.props.product;
@@ -185,28 +148,13 @@ export class ProductConfiguratorPopup extends Component {
     get unitPrice() {
         return this.env.utils.formatCurrency(this.props.product.lst_price);
     }
-    close() {
-        this.props.close();
+    addOneQuantity() {
+        ++this.state.quantity;
     }
-    confirm() {
-        this.props.getPayload(this.computePayload());
-        this.props.close();
-    }
-    isArchivedCombination() {
-        const variantAttributeValueIds = this.getVariantAttributeValueIds();
-        if (variantAttributeValueIds.length === 0) {
-            return false;
+    removeOneQuantity() {
+        if (this.state.quantity == 1) {
+            return;
         }
-        return this.props.product._isArchivedCombination(variantAttributeValueIds);
-    }
-    getVariantAttributeValueIds() {
-        const attribute_value_ids = [];
-        this.state.payload.forEach((att_component) => {
-            const { valueIds } = att_component.getValue();
-            if (att_component.attributeLine.attribute_id.create_variant === "always") {
-                attribute_value_ids.push(valueIds);
-            }
-        });
-        return attribute_value_ids.flat();
+        --this.state.quantity;
     }
 }

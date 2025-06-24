@@ -1,7 +1,8 @@
+/** @odoo-module */
+
 import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
 import { barcodeService } from "@barcodes/barcode_service";
 import { registry } from "@web/core/registry";
-import { session } from "@web/session";
 import { EventBus, onWillDestroy, useComponent } from "@odoo/owl";
 
 const INPUT_KEYS = new Set(
@@ -55,16 +56,16 @@ const getDefaultConfig = () => ({
  * - Write more integration tests. NumberPopup can be used as test component.
  */
 class NumberBuffer extends EventBus {
-    static serviceDependencies = ["mail.sound_effects", "localization"];
+    static serviceDependencies = ["sound", "localization"];
     constructor() {
         super();
         this.setup(...arguments);
     }
-    setup(services) {
+    setup({ sound, localization }) {
         this.isReset = false;
         this.bufferHolderStack = [];
-        this.sound = services["mail.sound_effects"];
-        this.defaultDecimalPoint = services.localization.decimalPoint;
+        this.sound = sound;
+        this.defaultDecimalPoint = localization.decimalPoint;
         window.addEventListener("keyup", this._onKeyboardInput.bind(this));
     }
     /**
@@ -190,11 +191,7 @@ class NumberBuffer extends EventBus {
         return (manualCapture = false) => {
             // Manual call to NumberBuffer.capture() should allow handling more than 2 items in the buffer.
             // This is useful in tour test that make very fast screen numpad presses (clicks).
-            if (
-                manualCapture ||
-                session.test_mode ||
-                (!manualCapture && this.eventsBuffer.length <= 2)
-            ) {
+            if (manualCapture || (!manualCapture && this.eventsBuffer.length <= 2)) {
                 // Check first the buffer if its contents are all valid
                 // number input.
                 for (const event of this.eventsBuffer) {

@@ -10,7 +10,7 @@ export class RenderContainer extends Component {
     // place where to momentarily render some html code
     // we should only intact with that div through the `whenMounted` function
     static template = xml`
-        <div class="render-container-parent" style="left: -1000px; position: fixed;">
+        <div style="left: -1000px; position: fixed;">
             <div t-ref="ref">
                 <t t-if="props.comp.component" t-component="props.comp.component" t-props="props.comp.props"/>
             </div>
@@ -65,7 +65,6 @@ const renderService = {
         };
         const whenMounted = async ({ el, container, callback }) => {
             container ||= document.querySelector(".render-container");
-            container.innerHTML = "";
             return await applyWhenMounted({ el, container, callback });
         };
         return { toHtml, toCanvas, toJpeg, whenMounted };
@@ -93,20 +92,22 @@ const applyWhenMounted = async ({ el, container, callback }) => {
 
 const sanitizeNodeText = (element) => {
     if (element.nodeType === Node.TEXT_NODE) {
-        element.textContent = element.textContent.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, ""); // eslint-disable-line no-control-regex
+        element.textContent = element.textContent.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "");
         return;
     }
-    for (const child of element.childNodes) {
+    for (let child of element.childNodes) {
         sanitizeNodeText(child);
     }
-};
+}
 
 /**
  * This function assumes that the `renderer` service is available.
  */
 export const htmlToCanvas = async (el, options) => {
-    if (options.addClass) {
-        el.classList.add(...options.addClass.split(" "));
+    el.classList.add(options.addClass || "");
+    if (options.addEmailMargins === true)
+    {
+        $('.pos-receipt-print').css({ 'padding': '15px', 'padding-bottom': '30px'})
     }
     sanitizeNodeText(el);
     return await applyWhenMounted({

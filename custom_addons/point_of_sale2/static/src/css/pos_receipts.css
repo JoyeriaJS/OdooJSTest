@@ -9,6 +9,10 @@
     display: flex;
 }
 
+.pos-receipt .pos-receipt-right-align .tax-letter{
+    margin-left: 0.5em;
+}
+
 .pos-receipt .pos-receipt-center-align {
     text-align: center;
 }
@@ -40,7 +44,7 @@
 
 .pos-receipt .pos-receipt-amount {
     font-size: 125%;
-    text-align: start;
+    padding-left: 6em;
 }
 
 .pos-receipt .pos-receipt-title {
@@ -52,6 +56,14 @@
 .pos-receipt .pos-receipt-header {
     font-size: 125%;
     text-align: center;
+}
+
+.pos-receipt .pos-order-receipt-cancel {
+    color: red;
+}
+
+.pos-receipt .pos-receipt-customer-note {
+    word-break: break-all;
 }
 
 .pos-payment-terminal-receipt {
@@ -74,11 +86,18 @@
 }
 
 .pos-receipt .pos-receipt-taxes {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: min-content min-content auto auto auto;
+    width: 100%;
+    justify-items: end;
 }
 
 .pos-receipt .orderlines {
     /*rtl:ignore*/
     direction: ltr;
+}
+
+.styled-receipt {
+    padding: 15px;
+    padding-bottom: 30px;
 }

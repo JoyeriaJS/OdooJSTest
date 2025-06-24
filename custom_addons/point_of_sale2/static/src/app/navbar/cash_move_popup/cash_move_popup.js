@@ -1,23 +1,25 @@
+/** @odoo-module */
+
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 import { parseFloat } from "@web/views/fields/parsers";
-import { Component, useState } from "@odoo/owl";
+import { useState } from "@odoo/owl";
 import { usePos } from "@point_of_sale/app/store/pos_hook";
 
+import { AbstractAwaitablePopup } from "@point_of_sale/app/popup/abstract_awaitable_popup";
 import { CashMoveReceipt } from "@point_of_sale/app/navbar/cash_move_popup/cash_move_receipt/cash_move_receipt";
-import { Dialog } from "@web/core/dialog/dialog";
 import { useAsyncLockedMethod } from "@point_of_sale/app/utils/hooks";
 import { Input } from "@point_of_sale/app/generic_components/inputs/input/input";
 
-export class CashMovePopup extends Component {
+export class CashMovePopup extends AbstractAwaitablePopup {
     static template = "point_of_sale.CashMovePopup";
-    static components = { Input, Dialog };
-    static props = ["confirmKey?", "close", "getPayload?"];
+    static components = { Input };
     setup() {
         super.setup();
-        this.notification = useService("notification");
+        this.notification = useService("pos_notification");
+        this.popup = useService("popup");
+        this.orm = useService("orm");
         this.pos = usePos();
-        this.dialog = useService("dialog");
         this.hardwareProxy = useService("hardware_proxy");
         this.printer = useService("printer");
         this.state = useState({
@@ -27,14 +29,13 @@ export class CashMovePopup extends Component {
             reason: "",
         });
         this.confirm = useAsyncLockedMethod(this.confirm);
-        this.ui = useService("ui");
     }
 
     async confirm() {
         const amount = parseFloat(this.state.amount);
         const formattedAmount = this.env.utils.formatCurrency(amount);
         if (!amount) {
-            this.notification.add(_t("Cash in/out of %s is ignored.", formattedAmount));
+            this.notification.add(_t("Cash in/out of %s is ignored.", formattedAmount), 3000);
             return this.props.close();
         }
 
@@ -42,14 +43,13 @@ export class CashMovePopup extends Component {
         const translatedType = _t(type);
         const extras = { formattedAmount, translatedType };
         const reason = this.state.reason.trim();
-
-        await this.pos.data.call(
-            "pos.session",
-            "try_cash_in_out",
-            this._prepare_try_cash_in_out_payload(type, amount, reason, extras),
-            {},
-            true
-        );
+        await this.orm.call("pos.session", "try_cash_in_out", [
+            [this.pos.pos_session.id],
+            type,
+            amount,
+            reason,
+            extras,
+        ]);
         await this.pos.logEmployeeMessage(
             `${_t("Cash")} ${translatedType} - ${_t("Amount")}: ${formattedAmount}`,
             "CASH_DRAWER_ACTION"
@@ -61,12 +61,16 @@ export class CashMovePopup extends Component {
             headerData: this.pos.getReceiptHeaderData(),
             date: new Date().toLocaleString(),
         });
-
         this.props.close();
         this.notification.add(
             _t("Successfully made a cash %s of %s.", type, formattedAmount),
             3000
         );
+    }
+    _onAmountKeypress(event) {
+        if (["-", "+"].includes(event.key)) {
+            event.preventDefault();
+        }
     }
     _onWindowKeyup(event) {
         if (event.key === this.props.confirmKey && !["TEXTAREA"].includes(event.target.tagName)) {
@@ -83,11 +87,5 @@ export class CashMovePopup extends Component {
         return this.env.utils.isValidFloat(value)
             ? this.env.utils.formatCurrency(parseFloat(value))
             : "";
-    }
-    _prepare_try_cash_in_out_payload(type, amount, reason, extras) {
-        return [[this.pos.session.id], type, amount, reason, extras];
-    }
-    isValidCashMove() {
-        return this.env.utils.isValidFloat(this.state.amount) && this.state.reason.trim() !== "";
     }
 }

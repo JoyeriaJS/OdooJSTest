@@ -1,7 +1,6 @@
 from odoo.fields import Command
 
-
-def setup_product_combo_items(self):
+def setup_pos_combo_items(self):
     tax10 = self.env["account.tax"].create(
         {
             "name": "10%",
@@ -16,7 +15,7 @@ def setup_product_combo_items(self):
             "amount": 20,
             "amount_type": "percent",
             "type_tax_use": "sale",
-            "price_include_override": "tax_included",
+            "price_include": True,
             "include_base_amount": True,
         }
     )
@@ -29,65 +28,70 @@ def setup_product_combo_items(self):
         }
     )
 
-    pos_category_1 = self.env["pos.category"].create({
-        "name": "Category 1",
-    })
-    pos_category_2 = self.env["pos.category"].create({ 
-        "name": "Category 2",
-    })
-    pos_category_3 = self.env["pos.category"].create({
-        "name": "Category 3",
-    })
-
     combo_product_1 = self.env["product.product"].create(
         {
             "name": "Combo Product 1",
-            "is_storable": True,
+            "type": "product",
             "available_in_pos": True,
             "list_price": 10,
             "taxes_id": [(6, 0, [tax10.id])],
-            "pos_categ_ids": [(6, 0, [pos_category_1.id])],
         }
     )
 
     combo_product_2 = self.env["product.product"].create(
         {
             "name": "Combo Product 2",
-            "is_storable": True,
+            "type": "product",
             "available_in_pos": True,
             "list_price": 11,
             "taxes_id": [(6, 0, [tax20in.id])],
-            "pos_categ_ids": [(6, 0, [pos_category_1.id])],
         }
     )
 
     combo_product_3 = self.env["product.product"].create(
         {
             "name": "Combo Product 3",
-            "is_storable": True,
+            "type": "product",
             "available_in_pos": True,
             "list_price": 16,
             "taxes_id": [(6, 0, [tax30.id])],
-            "pos_categ_ids": [(6, 0, [pos_category_1.id])],
         }
     )
 
-    self.desk_accessories_combo = self.env["product.combo"].create(
+    desk_organizer_combo_line = self.env["pos.combo.line"].create(
+        {
+            "product_id": combo_product_1.id,
+            "combo_price": 0,
+        }
+    )
+
+    desk_pad_combo_line = self.env["pos.combo.line"].create(
+        {
+            "product_id": combo_product_2.id,
+            "combo_price": 0,
+        }
+    )
+
+    monitor_stand_combo_line = self.env["pos.combo.line"].create(
+        {
+            "product_id": combo_product_3.id,
+            "combo_price": 2,
+        }
+    )
+
+    self.desk_accessories_combo = self.env["pos.combo"].create(
         {
             "name": "Desk Accessories Combo",
-            "combo_item_ids": [
-                Command.create({
-                    "product_id": combo_product_1.id,
-                    "extra_price": 0,
-                }),
-                Command.create({
-                    "product_id": combo_product_2.id,
-                    "extra_price": 0,
-                }),
-                Command.create({
-                    "product_id": combo_product_3.id,
-                    "extra_price": 2,
-                }),
+            "combo_line_ids": [
+                (
+                    6,
+                    0,
+                    [
+                        desk_organizer_combo_line.id,
+                        desk_pad_combo_line.id,
+                        monitor_stand_combo_line.id,
+                    ],
+                )
             ],
         }
     )
@@ -95,37 +99,42 @@ def setup_product_combo_items(self):
     combo_product_4 = self.env["product.product"].create(
         {
             "name": "Combo Product 4",
-            "is_storable": True,
+            "type": "product",
             "available_in_pos": True,
             "list_price": 20,
             "taxes_id": [(6, 0, [tax10.id])],
-            "pos_categ_ids": [(6, 0, [pos_category_2.id])],
         }
     )
 
     combo_product_5 = self.env["product.product"].create(
         {
             "name": "Combo Product 5",
-            "is_storable": True,
+            "type": "product",
             "available_in_pos": True,
             "list_price": 25,
             "taxes_id": [(6, 0, [tax20in.id])],
-            "pos_categ_ids": [(6, 0, [pos_category_2.id])],
         }
     )
 
-    self.desks_combo = self.env["product.combo"].create(
+    product_4_combo_line = self.env["pos.combo.line"].create(
+        {
+            "product_id": combo_product_4.id,
+            "combo_price": 0,
+        }
+    )
+
+    product_5_combo_line = self.env["pos.combo.line"].create(
+        {
+            "product_id": combo_product_5.id,
+            "combo_price": 2,
+        }
+    )
+
+    self.desks_combo = self.env["pos.combo"].create(
         {
             "name": "Desks Combo",
-            "combo_item_ids": [
-                Command.create({
-                    "product_id": combo_product_4.id,
-                    "extra_price": 0,
-                }),
-                Command.create({
-                    "product_id": combo_product_5.id,
-                    "extra_price": 2,
-                }),
+            "combo_line_ids": [
+                (6, 0, [product_4_combo_line.id, product_5_combo_line.id])
             ],
         }
     )
@@ -133,44 +142,40 @@ def setup_product_combo_items(self):
     combo_product_6 = self.env["product.product"].create(
         {
             "name": "Combo Product 6",
-            "is_storable": True,
+            "type": "product",
             "available_in_pos": True,
             "list_price": 30,
             "taxes_id": [(6, 0, [tax30.id])],
-            "pos_categ_ids": [(6, 0, [pos_category_3.id])],
         }
     )
 
     combo_product_7 = self.env["product.product"].create(
         {
             "name": "Combo Product 7",
-            "is_storable": True,
+            "type": "product",
             "available_in_pos": True,
             "list_price": 32,
             "taxes_id": [(6, 0, [tax10.id])],
-            "pos_categ_ids": [(6, 0, [pos_category_3.id])],
         }
     )
 
     combo_product_8 = self.env["product.product"].create(
         {
             "name": "Combo Product 8",
-            "is_storable": True,
+            "type": "product",
             "available_in_pos": True,
             "list_price": 40,
             "taxes_id": [(6, 0, [tax20in.id])],
-            "pos_categ_ids": [(6, 0, [pos_category_3.id])],
         }
     )
 
     combo_product_9 = self.env["product.product"].create(
         {
             "name": "Combo Product 9",
-            "is_storable": True,
+            "type": "product",
             "available_in_pos": True,
             "list_price": 50,
             "taxes_id": [(6, 0, [tax20in.id])],
-            "pos_categ_ids": [(6, 0, [pos_category_3.id])],
         }
     )
 
@@ -195,64 +200,51 @@ def setup_product_combo_items(self):
         'value_ids': [(6, 0, [chair_color_red.id, chair_color_blue.id])]
     })
 
-    color_attribute = self.env['product.attribute'].create({
-        'name': 'Color always',
-        'sequence': 4,
-        'create_variant': 'always',
-        'value_ids': [(0, 0, {
-            'name': 'White',
-            'sequence': 1,
-        }), (0, 0, {
-            'name': 'Red',
-            'sequence': 2,
-        })],
-    })
-
-    product_10_template = self.env['product.template'].create({
-        'name': 'Combo Product 10',
-        'list_price': 200,
-        'taxes_id': False,
-        'available_in_pos': True,
-        'attribute_line_ids': [(0, 0, {
-            'attribute_id': color_attribute.id,
-            'value_ids': [(6, 0, color_attribute.value_ids.ids)]
-        })],
-    })
-
-    self.chairs_combo = self.env["product.combo"].create(
+    product_6_combo_line = self.env["pos.combo.line"].create(
         {
-            "name": "Chairs Combo",
-            "combo_item_ids": [
-                Command.create({
-                    "product_id": combo_product_6.id,
-                    "extra_price": 0,
-                }),
-                Command.create({
-                    "product_id": combo_product_7.id,
-                    "extra_price": 0,
-                }),
-                Command.create({
-                    "product_id": combo_product_8.id,
-                    "extra_price": 5,
-                }),
-                Command.create({
-                    "product_id": combo_product_9.id,
-                    "extra_price": 0,
-                }),
-                Command.create({
-                    "product_id": product_10_template.product_variant_ids[0].id,
-                    "extra_price": 0,
-                }),
-                Command.create({
-                    "product_id": product_10_template.product_variant_ids[1].id,
-                    "extra_price": 0,
-                }),
-            ],
+            "product_id": combo_product_6.id,
+            "combo_price": 0,
         }
     )
 
-    # Archive one variant
-    product_10_template.product_variant_ids[0].write({'active': False})
+    product_7_combo_line = self.env["pos.combo.line"].create(
+        {
+            "product_id": combo_product_7.id,
+            "combo_price": 0,
+        }
+    )
+
+    product_8_combo_line = self.env["pos.combo.line"].create(
+        {
+            "product_id": combo_product_8.id,
+            "combo_price": 5,
+        }
+    )
+
+    product_9_combo_line = self.env["pos.combo.line"].create(
+        {
+            "product_id": combo_product_9.id,
+            "combo_price": 5,
+        }
+    )
+
+    self.chairs_combo = self.env["pos.combo"].create(
+        {
+            "name": "Chairs Combo",
+            "combo_line_ids": [
+                (
+                    6,
+                    0,
+                    [
+                        product_6_combo_line.id,
+                        product_7_combo_line.id,
+                        product_8_combo_line.id,
+                        product_9_combo_line.id,
+                    ],
+                )
+            ],
+        }
+    )
 
     # Create Office Combo
     self.office_combo = self.env["product.product"].create(
@@ -267,6 +259,50 @@ def setup_product_combo_items(self):
             "combo_ids": [
                 (6, 0, [self.desks_combo.id, self.chairs_combo.id, self.desk_accessories_combo.id])
             ],
-            "pos_categ_ids": [(6, 0, [pos_category_2.id])],
+        }
+    )
+
+    #Create Combo with custom attribute
+    custom_attribute = self.env['product.attribute'].create({
+        'name': 'Custom Attribute',
+        'display_type': 'radio',
+        'create_variant': 'no_variant',
+        'value_ids': [
+                Command.create({'name': 'Custom Value', 'is_custom': True}),
+        ]
+    })
+
+    self.product_tmpl_with_custom_attr = self.env["product.template"].create(
+        {
+            "name": "Custom Attr Product",
+            "available_in_pos": True,
+            "attribute_line_ids": [
+                Command.create({
+                    'attribute_id': custom_attribute.id,
+                    'value_ids': [Command.set(custom_attribute.value_ids.ids)],
+                })
+            ],
+        }
+    )
+
+    custom_combo_line = self.env["pos.combo.line"].create(
+        {
+            "product_id": self.product_tmpl_with_custom_attr.product_variant_id.id,
+            "combo_price": 100,
+        }
+    )
+
+    custom_combo = self.env["pos.combo"].create({
+        "name": "Attr Combo",
+        "combo_line_ids": custom_combo_line.ids,
+    })
+
+    self.combo_product_with_custom_attr = self.env["product.product"].create(
+        {
+            "available_in_pos": True,
+            "list_price": 40,
+            "name": "Custom Attr Combo",
+            "type": "combo",
+            "combo_ids": custom_combo.ids,
         }
     )

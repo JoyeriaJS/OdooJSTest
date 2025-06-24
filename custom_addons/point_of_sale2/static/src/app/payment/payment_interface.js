@@ -1,3 +1,5 @@
+/** @odoo-module */
+
 /**
  * Implement this interface to support a new payment method in the POS:
  *
@@ -17,14 +19,14 @@
  * in the `pos.session` model
  */
 export class PaymentInterface {
-    constructor(pos, payment_method_id) {
-        this.setup(pos, payment_method_id);
+    constructor(pos, payment_method) {
+        this.setup(pos, payment_method);
     }
 
-    setup(pos, payment_method_id) {
+    setup(pos, payment_method) {
         this.env = pos.env;
         this.pos = pos;
-        this.payment_method_id = payment_method_id;
+        this.payment_method = payment_method;
         this.supports_reversals = false;
     }
 
@@ -38,16 +40,6 @@ export class PaymentInterface {
     }
 
     /**
-     * This getter determines if send_payment_request
-     * is called automatically upon selecting the payment method.
-     * Overriding this to false allows manual input of an amount
-     * before sending the request to the terminal.
-     */
-    get fast_payments() {
-        return true;
-    }
-
-    /**
      * Called when a user clicks the "Send" button in the
      * interface. This should initiate a payment request and return a
      * Promise that resolves when the final status of the payment line
@@ -58,12 +50,12 @@ export class PaymentInterface {
      * should also set card_type and transaction_id on the line for
      * successful transactions.
      *
-     * @param {string} uuid - The uuid of the paymentline
+     * @param {string} cid - The id of the paymentline
      * @returns {Promise} resolved with a boolean that is false when
      * the payment should be retried. Rejected when the status of the
      * paymentline will be manually updated.
      */
-    send_payment_request(uuid) {}
+    send_payment_request(cid) {}
 
     /**
      * Called when a user removes a payment line that's still waiting
@@ -74,10 +66,10 @@ export class PaymentInterface {
      * automatically after the returned promise resolves.
      *
      * @param {} order - The order of the paymentline
-     * @param {string} uuid - The id of the paymentline
+     * @param {string} cid - The id of the paymentline
      * @returns {Promise}
      */
-    send_payment_cancel(order, uuid) {}
+    send_payment_cancel(order, cid) {}
 
     /**
      * This is an optional method. When implementing this make sure to
@@ -86,10 +78,10 @@ export class PaymentInterface {
      * 'done'. The paymentline will be removed based on returned
      * Promise.
      *
-     * @param {string} uuid - The id of the paymentline
+     * @param {string} cid - The id of the paymentline
      * @returns {Promise} returns true if the reversal was successful.
      */
-    send_payment_reversal(uuid) {}
+    send_payment_reversal(cid) {}
 
     /**
      * Called when the payment screen in the POS is closed (by

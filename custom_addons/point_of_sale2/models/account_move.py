@@ -10,20 +10,19 @@ class AccountMove(models.Model):
     pos_order_ids = fields.One2many('pos.order', 'account_move')
     pos_payment_ids = fields.One2many('pos.payment', 'account_move_id')
     pos_refunded_invoice_ids = fields.Many2many('account.move', 'refunded_invoices', 'refund_account_move', 'original_account_move')
-    reversed_pos_order_id = fields.Many2one('pos.order', string="Reversed POS Order",
-        help="The pos order that was reverted after closing the session to create an invoice for it.")
-    pos_session_ids = fields.One2many("pos.session", "move_id", "POS Sessions")
 
-    @api.depends('tax_cash_basis_created_move_ids', 'pos_session_ids')
+    @api.depends('tax_cash_basis_created_move_ids')
     def _compute_always_tax_exigible(self):
         super()._compute_always_tax_exigible()
         # The pos closing move does not create caba entries (anymore); we set the tax values directly on the closing move.
         # (But there may still be old closing moves that used caba entries from previous versions.)
-        for move in self:
-            if move.always_tax_exigible or move.tax_cash_basis_created_move_ids:
-                continue
-            if move.pos_session_ids:
-                move.always_tax_exigible = True
+        relevant_moves = self.filtered(lambda move: not (move.always_tax_exigible or move.tax_cash_basis_created_move_ids))
+        if not relevant_moves:
+            return
+        sessions = self.env['pos.session'].with_context(active_test=False).search([
+            ('move_id', 'in', relevant_moves.ids),
+        ])
+        sessions.move_id.always_tax_exigible = True
 
     def _stock_account_get_last_step_stock_moves(self):
         stock_moves = super(AccountMove, self)._stock_account_get_last_step_stock_moves()
@@ -68,21 +67,10 @@ class AccountMove(models.Model):
                     reconciled_partials = move._get_all_reconciled_invoice_partials()
                     for i, reconciled_partial in enumerate(reconciled_partials):
                         counterpart_line = reconciled_partial['aml']
-                        pos_payment = counterpart_line.move_id.sudo().pos_payment_ids[:1]
+                        pos_payment = counterpart_line.move_id.sudo().pos_payment_ids
                         move.invoice_payments_widget['content'][i].update({
                             'pos_payment_name': pos_payment.payment_method_id.name,
                         })
-
-    def _compute_amount(self):
-        super()._compute_amount()
-        for move in self:
-            if move.move_type == 'entry' and move.reversed_pos_order_id:
-                move.amount_total_signed = move.amount_total_signed * -1
-
-    def _compute_tax_totals(self):
-        return super(AccountMove, self.with_context(linked_to_pos=bool(self.sudo().pos_order_ids)))._compute_tax_totals()
-
-
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
@@ -97,6 +85,7 @@ class AccountMoveLine(models.Model):
             price_unit = sudo_order._get_pos_anglo_saxon_price_unit(self.product_id, self.move_id.partner_id.id, self.quantity)
         return price_unit
 
-    def _compute_name(self):
-        amls = self.filtered(lambda l: not l.move_id.pos_session_ids)
-        super(AccountMoveLine, amls)._compute_name()
+    def _check_edi_line_tax_required(self):
+        if self.product_id.type == 'combo':
+            return False
+        return super()._check_edi_line_tax_required()

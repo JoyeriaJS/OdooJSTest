@@ -1,15 +1,9 @@
 .pos-receipt-container {
     direction: ltr;
+}
 
-    .order-container {
-        padding: 0;
-        pointer-events: none;
-
-        .orderline:hover {
-            background: none;
-        }
-    
-    }    
+.receipt-screen .default-view .pos-receipt-container {
+    flex-basis: 400px;
 }
 
 @page {
@@ -17,14 +11,17 @@
 }
 
 @media print {
-    .pos-receipt {
-        contain: paint;
+    body {
         background-color: transparent;
+    }
+    body * {
+        visibility: hidden;
     }
     .pos, .pos * {
         position: static !important;
     }
     .render-container .pos-receipt * {
+        visibility: visible;
         background-color: transparent !important;
         color: black !important;
     }
@@ -45,10 +42,5 @@
         position: absolute !important;
         top: 0;
         left: 0;
-    }
-    body > *:not(.o-main-components-container),
-    .o-main-components-container > *:not(.render-container-parent),
-    .render-container-parent > *:not(.render-container) {
-        display: none !important;
     }
 }

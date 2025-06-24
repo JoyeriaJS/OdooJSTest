@@ -1,34 +1,31 @@
-import { Dialog } from "@web/core/dialog/dialog";
-import { usePos } from "@point_of_sale/app/store/pos_hook";
-import { Component } from "@odoo/owl";
-import { ProductInfoBanner } from "@point_of_sale/app/components/product_info_banner/product_info_banner";
+/** @odoo-module */
 
-export class ProductInfoPopup extends Component {
+import { AbstractAwaitablePopup } from "@point_of_sale/app/popup/abstract_awaitable_popup";
+import { usePos } from "@point_of_sale/app/store/pos_hook";
+
+/**
+ * Props:
+ *  {
+ *      info: {object of data}
+ *  }
+ */
+export class ProductInfoPopup extends AbstractAwaitablePopup {
     static template = "point_of_sale.ProductInfoPopup";
-    static components = { Dialog, ProductInfoBanner };
-    static props = ["info", "product", "close"];
+    static defaultProps = { confirmKey: false };
 
     setup() {
+        super.setup();
         this.pos = usePos();
+        Object.assign(this, this.props.info);
     }
     searchProduct(productName) {
-        this.pos.setSelectedCategory(0);
+        this.pos.setSelectedCategoryId(0);
         this.pos.searchProductWord = productName;
-        this.props.close();
+        this.cancel();
     }
     _hasMarginsCostsAccessRights() {
         const isAccessibleToEveryUser = this.pos.config.is_margins_costs_accessible_to_every_user;
-        const isCashierManager = this.pos.get_cashier()._role === "manager";
+        const isCashierManager = this.pos.get_cashier().role === "manager";
         return isAccessibleToEveryUser || isCashierManager;
-    }
-    editProduct() {
-        this.pos.editProduct(this.props.product);
-        this.props.close();
-    }
-    get isVariant() {
-        return this.pos.isProductVariant(this.props.product);
-    }
-    get allowProductEdition() {
-        return true; // Overrided in pos_hr
     }
 }

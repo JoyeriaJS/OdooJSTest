@@ -1,7 +1,8 @@
+/** @odoo-module */
+
 import { HWPrinter } from "@point_of_sale/app/printer/hw_printer";
 import { EventBus, reactive } from "@odoo/owl";
 import { browser } from "@web/core/browser/browser";
-import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
 import { deduceUrl } from "@point_of_sale/utils";
 import { effect } from "@web/core/utils/reactive";
@@ -13,12 +14,15 @@ import { effect } from "@web/core/utils/reactive";
  * by using the bus for two-way communication?
  */
 export class HardwareProxy extends EventBus {
-    static serviceDependencies = [];
+    static serviceDependencies = ["rpc"];
     constructor() {
         super();
         this.setup(...arguments);
     }
-    setup() {
+    setup({ rpc }) {
+        this.rpc = rpc;
+        this.debugWeight = 0;
+        this.useDebugWeight = false;
         this.host = "";
         this.keptalive = false;
         this.connectionInfo = reactive({ status: "init", drivers: {} });
@@ -66,7 +70,7 @@ export class HardwareProxy extends EventBus {
     }
 
     connectToPrinter() {
-        this.printer = new HWPrinter({ url: this.host });
+        this.printer = new HWPrinter({ rpc: this.rpc, url: this.host });
     }
 
     /**
@@ -100,7 +104,7 @@ export class HardwareProxy extends EventBus {
             const always = () => setTimeout(status, 5000);
             const xhr = new browser.XMLHttpRequest();
             xhr.timeout = 2500;
-            rpc(`${this.host}/hw_proxy/status_json`, {}, { silent: true, xhr })
+            this.rpc(`${this.host}/hw_proxy/status_json`, {}, { silent: true, xhr })
                 .then(
                     (drivers) => this.setConnectionInfo({ status: "connected", drivers }),
                     () => {
@@ -128,7 +132,7 @@ export class HardwareProxy extends EventBus {
         if (this.connectionInfo.status === "disconnected") {
             return Promise.reject();
         }
-        return rpc(`${this.host}/hw_proxy/${name}`, params, { silent: true });
+        return this.rpc(`${this.host}/hw_proxy/${name}`, params, { silent: true });
     }
 
     /**
@@ -156,7 +160,36 @@ export class HardwareProxy extends EventBus {
         this.setConnectionInfo({ status: "disconnected" });
         return false;
     }
+    /**
+     * Returns the weight on the scale.
+     *
+     * @returns {Promise<number>}
+     */
+    readScale() {
+        if (this.useDebugWeight) {
+            return this.debugWeight;
+        }
+        return this.message("scale_read")
+            .then(({ weight }) => weight)
+            .catch(() => 0);
+    }
 
+    // sets a custom weight, ignoring the proxy returned value.
+    setDebugWeight(weight) {
+        this.useDebugWeight = true;
+        this.debugWeight = weight;
+    }
+
+    // resets the custom weight and re-enable listening to the proxy for weight values
+    resetDebugWeight() {
+        this.useDebugWeight = false;
+        this.debugWeight = 0;
+    }
+
+    // asks the proxy to log some information, as with the debug.log you can provide several arguments.
+    log() {
+        return this.message("log", { arguments: [...arguments] });
+    }
     async openCashbox(action = false) {
         if (
             this.pos.config.iface_cashdrawer &&

@@ -1,4 +1,5 @@
-import { formatCurrency as webFormatCurrency } from "@web/core/currency";
+/** @odoo-module */
+import { formatMonetary } from "@web/views/fields/formatters";
 import {
     formatFloat,
     roundDecimals,
@@ -15,10 +16,8 @@ import { parseFloat } from "@web/views/fields/parsers";
 export const contextualUtilsService = {
     dependencies: ["pos", "localization"],
     start(env, { pos, localization }) {
-        const res_currency = pos.currency;
-        const productUoMDecimals = pos.data.models["decimal.precision"].find(
-            (dp) => dp.name === "Product Unit of Measure"
-        ).digits;
+        const currency = pos.currency;
+        const productUoMDecimals = pos.dp["Product Unit of Measure"];
         const decimalPoint = localization.decimalPoint;
         const thousandsSep = localization.thousandsSep;
         // Replace the thousands separator and decimal point with regex-escaped versions
@@ -40,35 +39,37 @@ export const contextualUtilsService = {
             });
         };
 
+        const formatStrCurrency = (valueStr, hasSymbol = true) => {
+            return formatCurrency(parseFloat(valueStr), hasSymbol);
+        };
+
         const formatCurrency = (value, hasSymbol = true) => {
-            return webFormatCurrency(value, res_currency.id, {
+            return formatMonetary(value, {
+                currencyId: currency.id,
                 noSymbol: !hasSymbol,
             });
         };
         const floatIsZero = (value) => {
-            return genericFloatIsZero(value, res_currency.decimal_places);
+            return genericFloatIsZero(value, currency.decimal_places);
         };
 
         const roundCurrency = (value) => {
-            return roundDecimals(value, res_currency.decimal_places);
+            return roundDecimals(value, currency.decimal_places);
         };
 
         const isValidFloat = (inputValue) => {
             return ![decimalPoint, "-"].includes(inputValue) && floatRegex.test(inputValue);
         };
 
-        const parseValidFloat = (inputValue) => {
-            return isValidFloat(inputValue) ? parseFloat(inputValue) : 0;
-        };
-
         env.utils = {
             formatCurrency,
+            formatStrCurrency,
             roundCurrency,
             formatProductQty,
             isValidFloat,
-            parseValidFloat,
             floatIsZero,
         };
     },
 };
+
 registry.category("services").add("contextual_utils_service", contextualUtilsService);

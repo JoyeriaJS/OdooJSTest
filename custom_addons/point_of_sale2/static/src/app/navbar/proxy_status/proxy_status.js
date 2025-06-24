@@ -1,3 +1,5 @@
+/** @odoo-module */
+
 import { Component, useState } from "@odoo/owl";
 import { usePos } from "@point_of_sale/app/store/pos_hook";
 import { useService } from "@web/core/utils/hooks";
@@ -6,7 +8,6 @@ import { _t } from "@web/core/l10n/translation";
 // Previously ProxyStatusWidget
 export class ProxyStatus extends Component {
     static template = "point_of_sale.ProxyStatus";
-    static props = {};
 
     setup() {
         this.pos = usePos();

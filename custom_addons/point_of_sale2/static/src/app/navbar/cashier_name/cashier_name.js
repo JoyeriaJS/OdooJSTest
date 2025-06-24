@@ -1,3 +1,5 @@
+/** @odoo-module */
+
 import { Component, useState } from "@odoo/owl";
 import { usePos } from "@point_of_sale/app/store/pos_hook";
 import { useService } from "@web/core/utils/hooks";
@@ -5,15 +7,14 @@ import { useService } from "@web/core/utils/hooks";
 // Previously UsernameWidget
 export class CashierName extends Component {
     static template = "point_of_sale.CashierName";
-    static props = {};
 
     setup() {
         this.pos = usePos();
         this.ui = useState(useService("ui"));
     }
     get username() {
-        const cashier = this.pos.get_cashier();
-        return cashier ? cashier.name : "";
+        const { name } = this.pos.get_cashier();
+        return name ? name : "";
     }
     get avatar() {
         const user_id = this.pos.get_cashier_user_id();
@@ -21,6 +22,6 @@ export class CashierName extends Component {
         return `/web/image/res.users/${id}/avatar_128`;
     }
     get cssClass() {
-        return { "not-clickable pe-none": true };
+        return { "not-clickable": true };
     }
 }

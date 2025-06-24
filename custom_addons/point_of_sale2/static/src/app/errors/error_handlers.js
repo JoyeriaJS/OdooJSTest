@@ -1,49 +1,34 @@
+/** @odoo-module */
+
 import { registry } from "@web/core/registry";
-import { odooExceptionTitleMap, ErrorDialog } from "@web/core/errors/error_dialogs";
-import { ConnectionLostError, RPCError } from "@web/core/network/rpc";
-import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { odooExceptionTitleMap } from "@web/core/errors/error_dialogs";
+import { ConnectionLostError, RPCError } from "@web/core/network/rpc_service";
+import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
+import { ErrorTracebackPopup } from "@point_of_sale/app/errors/popups/error_traceback_popup";
+import { OfflineErrorPopup } from "@point_of_sale/app/errors/popups/offline_error_popup";
 import { _t } from "@web/core/l10n/translation";
 
-export function handleRPCError(error, dialog) {
-    const { data } = error;
-    if (odooExceptionTitleMap.has(error.exceptionName)) {
-        const title = odooExceptionTitleMap.get(error.exceptionName).toString();
-        dialog.add(AlertDialog, { title, body: data.message });
-    } else {
-        if (odoo.debug === "assets") {
-            dialog.add(ErrorDialog, {
-                traceback: data.message + "\n" + data.debug + "\n",
-            });
+function rpcErrorHandler(env, error, originalError) {
+    const rpcError = error instanceof RPCError ? error : (originalError instanceof RPCError ? originalError : null);
+    if (rpcError) {
+        const { message, data } = rpcError;
+        if (odooExceptionTitleMap.has(rpcError.exceptionName)) {
+            const title = odooExceptionTitleMap.get(rpcError.exceptionName).toString();
+            env.services.popup.add(ErrorPopup, { title, body: data.message });
         } else {
-            dialog.add(AlertDialog, {
-                title: _t("Odoo Server Error"),
-                body: data.message,
+            env.services.popup.add(ErrorTracebackPopup, {
+                title: message,
+                body: data.message + "\n" + data.debug + "\n",
             });
         }
-    }
-}
-
-function rpcErrorHandler(env, error, originalError) {
-    if (originalError instanceof RPCError) {
-        handleRPCError(originalError, env.services.dialog);
         return true;
     }
 }
 registry.category("error_handlers").add("rpcErrorHandler", rpcErrorHandler);
 
-export function offlineErrorHandler(env, error, originalError) {
-    if (originalError instanceof ConnectionLostError) {
-        if (!env.services.pos.data.network.warningTriggered) {
-            env.services.dialog.add(AlertDialog, {
-                title: _t("Connection Lost"),
-                body: _t(
-                    "Until the connection is reestablished, Odoo Point of Sale will operate with limited functionality."
-                ),
-                confirmLabel: _t("Continue with limited functionality"),
-            });
-            env.services.pos.data.network.warningTriggered = true;
-        }
-
+function offlineErrorHandler(env, error, originalError) {
+    if (error instanceof ConnectionLostError || originalError instanceof ConnectionLostError) {
+        env.services.popup.add(OfflineErrorPopup);
         return true;
     }
 }
@@ -51,11 +36,12 @@ registry.category("error_handlers").add("offlineErrorHandler", offlineErrorHandl
 
 function defaultErrorHandler(env, error, originalError) {
     if (error instanceof Error) {
-        env.services.dialog.add(ErrorDialog, {
-            traceback: error.traceback,
+        env.services.popup.add(ErrorTracebackPopup, {
+            title: `${originalError.name}: ${originalError.message}`,
+            body: error.traceback,
         });
     } else {
-        env.services.dialog.add(AlertDialog, {
+        env.services.popup.add(ErrorPopup, {
             title: _t("Unknown Error"),
             body: _t("Unable to show information about this error."),
         });

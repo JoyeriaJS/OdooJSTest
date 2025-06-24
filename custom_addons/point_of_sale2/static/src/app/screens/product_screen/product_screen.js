@@ -1,76 +1,46 @@
+/** @odoo-module */
+
+import { ControlButtonsMixin } from "@point_of_sale/app/utils/control_buttons_mixin";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { useBarcodeReader } from "@point_of_sale/app/barcode/barcode_reader_hook";
+import { parseFloat } from "@web/views/fields/parsers";
 import { _t } from "@web/core/l10n/translation";
+
+import { NumberPopup } from "@point_of_sale/app/utils/input_popups/number_popup";
+import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
+import { ControlButtonPopup } from "@point_of_sale/app/screens/product_screen/control_buttons/control_buttons_popup";
+import { ConnectionLostError } from "@web/core/network/rpc_service";
+
 import { usePos } from "@point_of_sale/app/store/pos_hook";
-import { Component, onMounted, useEffect, useState, reactive, onWillRender } from "@odoo/owl";
-import { CategorySelector } from "@point_of_sale/app/generic_components/category_selector/category_selector";
-import { Input } from "@point_of_sale/app/generic_components/inputs/input/input";
-import {
-    BACKSPACE,
-    Numpad,
-    getButtons,
-    DEFAULT_LAST_ROW,
-} from "@point_of_sale/app/generic_components/numpad/numpad";
+import { Component, onMounted, useState } from "@odoo/owl";
+import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
+
+import { Numpad } from "@point_of_sale/app/generic_components/numpad/numpad";
+import { ProductsWidget } from "@point_of_sale/app/screens/product_screen/product_list/product_list";
 import { ActionpadWidget } from "@point_of_sale/app/screens/product_screen/action_pad/action_pad";
 import { Orderline } from "@point_of_sale/app/generic_components/orderline/orderline";
 import { OrderWidget } from "@point_of_sale/app/generic_components/order_widget/order_widget";
-import { OrderSummary } from "@point_of_sale/app/screens/product_screen/order_summary/order_summary";
-import { ProductInfoPopup } from "./product_info_popup/product_info_popup";
-import { ProductCard } from "@point_of_sale/app/generic_components/product_card/product_card";
-import {
-    ControlButtons,
-    ControlButtonsPopup,
-} from "@point_of_sale/app/screens/product_screen/control_buttons/control_buttons";
-import { pick } from "@web/core/utils/objects";
-import { unaccent } from "@web/core/utils/strings";
-import { CameraBarcodeScanner } from "@point_of_sale/app/screens/product_screen/camera_barcode_scanner";
-
-export class ProductScreen extends Component {
+export class ProductScreen extends ControlButtonsMixin(Component) {
     static template = "point_of_sale.ProductScreen";
     static components = {
         ActionpadWidget,
         Numpad,
+        ProductsWidget,
         Orderline,
         OrderWidget,
-        CategorySelector,
-        Input,
-        ControlButtons,
-        OrderSummary,
-        ProductCard,
-        CameraBarcodeScanner,
     };
-    static props = {};
+    static numpadActionName = _t("Payment");
 
     setup() {
         super.setup();
         this.pos = usePos();
         this.ui = useState(useService("ui"));
-        this.dialog = useService("dialog");
-        this.notification = useService("notification");
+        this.popup = useService("popup");
+        this.orm = useService("orm");
+        this.notification = useService("pos_notification");
         this.numberBuffer = useService("number_buffer");
-        this.state = useState({
-            previousSearchWord: "",
-            currentOffset: 0,
-            quantityByProductTmplId: {},
-        });
-        this._searchTriggered = false;
-        onMounted(() => {
-            this.pos.openOpeningControl();
-            // Call `reset` when the `onMounted` callback in `numberBuffer.use` is done.
-            // We don't do this in the `mounted` lifecycle method because it is called before
-            // the callbacks in `onMounted` hook.
-            this.numberBuffer.reset();
-        });
-
-        onWillRender(() => {
-            // If its a shared order it can be paid from another POS
-            if (this.currentOrder?.state !== "draft") {
-                this.pos.add_new_order();
-            }
-        });
-
-        this.barcodeReader = useService("barcode_reader");
+        onMounted(this.onMounted);
 
         useBarcodeReader({
             product: this._barcodeProductAction,
@@ -82,101 +52,49 @@ export class ProductScreen extends Component {
             gs1: this._barcodeGS1Action,
         });
 
+        // Call `reset` when the `onMounted` callback in `numberBuffer.use` is done.
+        // We don't do this in the `mounted` lifecycle method because it is called before
+        // the callbacks in `onMounted` hook.
+        onMounted(() => this.numberBuffer.reset());
         this.numberBuffer.use({
+            triggerAtInput: (...args) => {
+                if (!this.pos.tempScreenIsShown) {
+                    this.updateSelectedOrderline(...args);
+                }
+            },
             useWithBarcode: true,
         });
-
-        useEffect(
-            () => {
-                this.state.quantityByProductTmplId = this.currentOrder?.lines?.reduce((acc, ol) => {
-                    acc[ol.product_id.raw.product_tmpl_id]
-                        ? (acc[ol.product_id.raw.product_tmpl_id] += ol.qty)
-                        : (acc[ol.product_id.raw.product_tmpl_id] = ol.qty);
-                    return acc;
-                }, {});
-            },
-            () => [this.currentOrder, this.currentOrder.totalQuantity]
-        );
     }
-    getAncestorsAndCurrent() {
-        const selectedCategory = this.pos.selectedCategory;
-        return selectedCategory
-            ? [undefined, ...selectedCategory.allParents, selectedCategory]
-            : [selectedCategory];
-    }
-    getChildCategories(selectedCategory) {
-        return selectedCategory
-            ? [...selectedCategory.child_ids]
-            : this.pos.models["pos.category"].filter((category) => !category.parent_id);
-    }
-
-    getCategoriesList(list, allParents, depth) {
-        return list.map((category) => {
-            if (category.id === allParents[depth]?.id && category.child_ids?.length) {
-                return [
-                    category,
-                    this.getCategoriesList(category.child_ids, allParents, depth + 1),
-                ];
-            }
-            return category;
-        });
-    }
-
-    getCategoriesAndSub() {
-        const { limit_categories, iface_available_categ_ids } = this.pos.config;
-        let rootCategories = this.pos.models["pos.category"].getAll();
-        if (limit_categories && iface_available_categ_ids.length > 0) {
-            rootCategories = iface_available_categ_ids;
-        }
-        rootCategories = rootCategories.filter((category) => !category.parent_id);
-        const selected = this.pos.selectedCategory ? [this.pos.selectedCategory] : [];
-        const allParents = selected.concat(this.pos.selectedCategory?.allParents || []).reverse();
-        return this.getCategoriesList(rootCategories, allParents, 0)
-            .flat(Infinity)
-            .map(this.getChildCategoriesInfo, this);
-    }
-
-    getChildCategoriesInfo(category) {
-        return {
-            ...pick(category, "id", "name", "color"),
-            imgSrc:
-                this.pos.config.show_category_images && category.has_image
-                    ? `/web/image?model=pos.category&field=image_128&id=${category.id}`
-                    : undefined,
-            isSelected: this.getAncestorsAndCurrent().includes(category),
-            isChildren: this.getChildCategories(this.pos.selectedCategory).includes(category),
-        };
+    onMounted() {
+        this.pos.openCashControl();
     }
 
     getNumpadButtons() {
-        const colorClassMap = {
-            [this.env.services.localization.decimalPoint]: "o_colorlist_item_color_transparent_6",
-            Backspace: "o_colorlist_item_color_transparent_1",
-            "-": "o_colorlist_item_color_transparent_3",
-        };
-
-        return getButtons(DEFAULT_LAST_ROW, [
+        return [
+            { value: "1" },
+            { value: "2" },
+            { value: "3" },
             { value: "quantity", text: _t("Qty") },
-            { value: "discount", text: _t("%"), disabled: !this.pos.config.manual_discount },
+            { value: "4" },
+            { value: "5" },
+            { value: "6" },
+            { value: "discount", text: _t("% Disc"), disabled: !this.pos.config.manual_discount },
+            { value: "7" },
+            { value: "8" },
+            { value: "9" },
             {
                 value: "price",
                 text: _t("Price"),
                 disabled: !this.pos.cashierHasPriceControlRights(),
             },
-            BACKSPACE,
-        ]).map((button) => ({
+            { value: "-", text: "+/-" },
+            { value: "0" },
+            { value: this.env.services.localization.decimalPoint },
+            // Unicode: https://www.compart.com/en/unicode/U+232B
+            { value: "Backspace", text: "⌫" },
+        ].map((button) => ({
             ...button,
-            class: `
-                ${colorClassMap[button.value] || ""}
-                ${this.pos.numpadMode === button.value ? "active" : ""}
-                ${button.value === "quantity" ? "numpad-qty rounded-0 rounded-top mb-0" : ""}
-                ${button.value === "price" ? "numpad-price rounded-0 rounded-bottom mt-0" : ""}
-                ${
-                    button.value === "discount"
-                        ? "numpad-discount my-0 rounded-0 border-top border-bottom"
-                        : ""
-                }
-            `,
+            class: this.pos.numpadMode === button.value ? "active border-primary" : "",
         }));
     }
     onNumpadClick(buttonValue) {
@@ -188,6 +106,20 @@ export class ProductScreen extends Component {
         }
         this.numberBuffer.sendKey(buttonValue);
     }
+
+    selectLine(orderline) {
+        this.numberBuffer.reset();
+        this.currentOrder.select_orderline(orderline);
+    }
+
+    /**
+     * To be overridden by modules that checks availability of
+     * connected scale.
+     * @see _onScaleNotAvailable
+     */
+    get partner() {
+        return this.currentOrder ? this.currentOrder.get_partner() : null;
+    }
     get currentOrder() {
         return this.pos.get_order();
     }
@@ -195,64 +127,176 @@ export class ProductScreen extends Component {
         return this.env.utils.formatCurrency(this.currentOrder?.get_total_with_tax() ?? 0);
     }
     get items() {
-        return this.env.utils.formatProductQty(
-            this.currentOrder.lines?.reduce((items, line) => items + line.qty, 0) ?? 0,
-            false
-        );
+        return this.currentOrder.orderlines?.reduce((items, line) => items + line.quantity, 0) ?? 0;
     }
-    getProductName(product) {
-        const productTmplValIds = product.attribute_line_ids
-            .map((l) => l.product_template_value_ids)
-            .flat();
-        return productTmplValIds.length > 1 ? product.name : product.display_name;
-    }
-    async _getProductByBarcode(code) {
-        let product = this.pos.models["product.product"].getBy("barcode", code.base_code);
-
-        if (!product) {
-            const productPackaging = this.pos.models["product.packaging"].getBy(
-                "barcode",
-                code.base_code
-            );
-            product = productPackaging && productPackaging.product_id;
+    handleOrderLineQuantityChange(selectedLine, buffer, currentQuantity, lastId) {
+        const parsedInput = (buffer && parseFloat(buffer)) || 0;
+        if (lastId != selectedLine.cid || parsedInput < currentQuantity) {
+            this._showDecreaseQuantityPopup();
+        } else if (currentQuantity < parsedInput) {
+            this._setValue(buffer);
         }
+    }
+    async updateSelectedOrderline({ buffer, key }) {
+        const order = this.pos.get_order();
+        const selectedLine = order.get_selected_orderline();
+        // This validation must not be affected by `disallowLineQuantityChange`
+        if (selectedLine && selectedLine.isTipLine() && this.pos.numpadMode !== "price") {
+            /**
+             * You can actually type numbers from your keyboard, while a popup is shown, causing
+             * the number buffer storage to be filled up with the data typed. So we force the
+             * clean-up of that buffer whenever we detect this illegal action.
+             */
+            this.numberBuffer.reset();
+            if (key === "Backspace") {
+                this._setValue("remove");
+            } else {
+                this.popup.add(ErrorPopup, {
+                    title: _t("Cannot modify a tip"),
+                    body: _t("Customer tips, cannot be modified directly"),
+                });
+            }
+            return;
+        }
+        if (
+            selectedLine &&
+            this.pos.numpadMode === "quantity" &&
+            this.pos.disallowLineQuantityChange()
+        ) {
+            const orderlines = order.orderlines;
+            const lastId = orderlines.length !== 0 && orderlines.at(orderlines.length - 1).cid;
+            const currentQuantity = this.pos.get_order().get_selected_orderline().get_quantity();
 
-        if (!product) {
-            const records = await this.pos.data.callRelated(
-                "pos.session",
-                "find_product_by_barcode",
-                [odoo.pos_session_id, code.base_code, this.pos.config.id]
-            );
-            await this.pos.processProductAttributes();
-
-            if (records && records["product.product"].length > 0) {
-                product = records["product.product"][0];
-                await this.pos._loadMissingPricelistItems([product]);
+            if (selectedLine.noDecrease) {
+                this.popup.add(ErrorPopup, {
+                    title: _t("Invalid action"),
+                    body: _t("You are not allowed to change this quantity"),
+                });
+                return;
+            }
+            this.handleOrderLineQuantityChange(selectedLine, buffer, currentQuantity, lastId);
+            return;
+        } else if (
+            selectedLine &&
+            this.pos.numpadMode === "discount" &&
+            this.pos.disallowLineDiscountChange()
+        ) {
+            this.numberBuffer.reset();
+            const { confirmed, payload: inputNumber } = await this.popup.add(NumberPopup, {
+                startingValue: 10,
+                title: _t("Set the new discount"),
+                isInputSelected: true,
+            });
+            if (confirmed) {
+                await this.pos.setDiscountFromUI(selectedLine, inputNumber);
+            }
+            return;
+        }
+        const val = buffer === null ? "remove" : buffer;
+        this._setValue(val);
+        if (val == "remove") {
+            this.numberBuffer.reset();
+            this.pos.numpadMode = "quantity";
+        }
+    }
+    _setValue(val) {
+        const { numpadMode } = this.pos;
+        let selectedLine = this.currentOrder.get_selected_orderline();
+        if (selectedLine) {
+            if (numpadMode === "quantity") {
+                if (selectedLine.comboParent) {
+                    selectedLine = selectedLine.comboParent;
+                }
+                if (val === "remove") {
+                    this.currentOrder.removeOrderline(selectedLine);
+                } else {
+                    const result = selectedLine.set_quantity(
+                        val,
+                        Boolean(selectedLine.comboLines?.length)
+                    );
+                    if (selectedLine.comboLines) {
+                        for (const line of selectedLine.comboLines) {
+                            line.set_quantity(val, true);
+                        }
+                    }
+                    if (!result) {
+                        this.numberBuffer.reset();
+                    }
+                }
+            } else if (numpadMode === "discount") {
+                this.pos.setDiscountFromUI(selectedLine, val);
+            } else if (numpadMode === "price") {
+                selectedLine.price_type = "manual";
+                selectedLine.set_unit_price(val);
             }
         }
-
+    }
+    async _getProductByBarcode(code) {
+        let product = this.pos.db.get_product_by_barcode(code.base_code);
+        if (!product) {
+            // find the barcode in the backend
+            const { product_id = [], packaging = [] } = await this.orm.silent.call(
+                "pos.session",
+                "find_product_by_barcode",
+                [odoo.pos_session_id, code.base_code]
+            );
+            if (product_id.length) {
+                await this.pos._addProducts(product_id, false);
+                if (packaging.length) {
+                    this.pos.db.add_packagings(packaging);
+                }
+                // assume that the result is unique.
+                product = this.pos.db.get_product_by_id(product_id[0]);
+            }
+        }
         return product;
     }
     async _barcodeProductAction(code) {
         const product = await this._getProductByBarcode(code);
-
         if (!product) {
-            this.barcodeReader.showNotFoundNotification(code);
+            return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
+        }
+        const options = await product.getAddProductOptions(code);
+        // Do not proceed on adding the product when no options is returned.
+        // This is consistent with clickProduct.
+        if (!options) {
             return;
         }
 
-        await this.pos.addLineToCurrentOrder(
-            { product_id: product },
-            { code },
-            product.needToConfigure()
-        );
+        // update the options depending on the type of the scanned code
+        if (code.type === "price") {
+            Object.assign(options, {
+                price: code.value,
+                extras: {
+                    price_type: "manual",
+                },
+            });
+        } else if (code.type === "weight" || code.type === "quantity") {
+            Object.assign(options, {
+                quantity: code.value,
+                merge: false,
+            });
+        } else if (code.type === "discount") {
+            Object.assign(options, {
+                discount: code.value,
+                merge: false,
+            });
+        }
+        this.currentOrder.add_product(product, options);
         this.numberBuffer.reset();
     }
     async _getPartnerByBarcode(code) {
-        let partner = this.pos.models["res.partner"].getBy("barcode", code.code);
+        let partner = this.pos.db.get_partner_by_barcode(code.code);
         if (!partner) {
-            partner = await this.pos.data.searchRead("res.partner", [["barcode", "=", code.code]]);
-            partner = partner.length > 0 && partner[0];
+            // find the partner in the backend by the barcode
+            const foundPartnerIds = await this.orm.search("res.partner", [
+                ["barcode", "=", code.code],
+            ]);
+            if (foundPartnerIds.length) {
+                await this.pos._loadPartners(foundPartnerIds);
+                // assume that the result is unique.
+                partner = this.pos.db.get_partner_by_id(foundPartnerIds[0]);
+            }
         }
         return partner;
     }
@@ -264,7 +308,7 @@ export class ProductScreen extends Component {
             }
             return;
         }
-        this.barcodeReader.showNotFoundNotification(code);
+        return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
     }
     _barcodeDiscountAction(code) {
         var last_orderline = this.currentOrder.get_last_orderline();
@@ -272,28 +316,110 @@ export class ProductScreen extends Component {
             this.pos.setDiscountFromUI(last_orderline, code.value);
         }
     }
+    async _parseElementsFromGS1(parsed_results) {
+        const productBarcode = parsed_results.find((element) => element.type === "product");
+        const lotBarcode = parsed_results.find((element) => element.type === "lot");
+        const product = await this._getProductByBarcode(productBarcode);
+        return { product, lotBarcode, customProductOptions: {} };
+    }
     /**
      * Add a product to the current order using the product identifier and lot number from parsed results.
      * This function retrieves the product identifier and lot number from the `parsed_results` parameter.
      * It then uses these values to retrieve the product and add it to the current order.
      */
     async _barcodeGS1Action(parsed_results) {
-        const productBarcode = parsed_results.find((element) => element.type === "product");
-        const lotBarcode = parsed_results.find((element) => element.type === "lot");
-        const product = await this._getProductByBarcode(productBarcode);
-
+        const { product, lotBarcode, customProductOptions } = await this._parseElementsFromGS1(
+            parsed_results
+        );
         if (!product) {
-            this.barcodeReader.showNotFoundNotification(
-                parsed_results.find((element) => element.type === "product")
-            );
-            return;
+            const productBarcode = parsed_results.find((element) => element.type === "product");
+            return this.popup.add(ErrorBarcodePopup, { code: productBarcode.base_code });
         }
-
-        await this.pos.addLineToCurrentOrder({ product_id: product }, { code: lotBarcode });
+        const options = await product.getAddProductOptions(lotBarcode);
+        await this.currentOrder.add_product(product, { ...options, ...customProductOptions });
         this.numberBuffer.reset();
     }
-    displayAllControlPopup() {
-        this.dialog.add(ControlButtonsPopup);
+    async displayAllControlPopup() {
+        await this.popup.add(ControlButtonPopup, {
+            controlButtons: this.controlButtons,
+        });
+    }
+    async _showDecreaseQuantityPopup() {
+        this.numberBuffer.reset();
+        const { confirmed, payload: inputNumber } = await this.popup.add(NumberPopup, {
+            startingValue: 0,
+            title: _t("Set the new quantity"),
+        });
+        if (confirmed) {
+            const newQuantity = inputNumber && inputNumber !== "" ? parseFloat(inputNumber) : null;
+            return await this.updateQuantityNumber(newQuantity);
+        }
+    }
+    async updateQuantityNumber(newQuantity) {
+        if (newQuantity !== null) {
+            const order = this.pos.get_order();
+            const selectedLine = order.get_selected_orderline();
+            const currentQuantity = selectedLine.get_quantity();
+            if (newQuantity >= currentQuantity) {
+                selectedLine.set_quantity(newQuantity);
+            } else if (newQuantity >= selectedLine.saved_quantity) {
+                await this.handleDecreaseUnsavedLine(newQuantity);
+            } else {
+                await this.handleDecreaseLine(newQuantity);
+            }
+            return true;
+        }
+        return false;
+    }
+    async handleDecreaseUnsavedLine(newQuantity) {
+        const order = this.pos.get_order();
+        const selectedLine = order.get_selected_orderline();
+        const decreaseQuantity = selectedLine.get_quantity() - newQuantity;
+        selectedLine.set_quantity(newQuantity);
+        if (newQuantity == 0) {
+            order._unlinkOrderline(selectedLine);
+        }
+        return decreaseQuantity;
+    }
+    async handleDecreaseLine(newQuantity) {
+        const order = this.pos.get_order();
+        const selectedLine = order.get_selected_orderline();
+        let current_saved_quantity = 0;
+        for (const line of order.orderlines) {
+            if (line === selectedLine) {
+                current_saved_quantity += line.saved_quantity;
+            } else if (
+                line.product.id === selectedLine.product.id &&
+                line.get_unit_price() === selectedLine.get_unit_price()
+            ) {
+                current_saved_quantity += line.quantity;
+            }
+        }
+
+        const newLine = this.getNewLine();
+        const decreasedQuantity = current_saved_quantity - newQuantity;
+        newLine.order = this.currentOrder;
+        if (decreasedQuantity != 0) {
+            if (newLine === selectedLine) {
+                selectedLine.set_quantity(newQuantity, true);
+            } else {
+                newLine.set_quantity(-decreasedQuantity, true);
+                order.add_orderline(newLine);
+            }
+        }
+        if (newLine !== selectedLine && selectedLine.saved_quantity != 0) {
+            selectedLine.set_quantity(selectedLine.saved_quantity);
+        }
+        return decreasedQuantity;
+    }
+    getNewLine() {
+        const selectedLine = this.currentOrder.get_selected_orderline();
+        let newLine = selectedLine;
+        if (selectedLine.saved_quantity != 0) {
+            newLine = selectedLine.clone();
+            newLine.refunded_orderline_id = selectedLine.refunded_orderline_id;
+        }
+        return newLine;
     }
     get selectedOrderlineQuantity() {
         return this.currentOrder.get_selected_orderline()?.get_quantity_str();
@@ -322,186 +448,42 @@ export class ProductScreen extends Component {
         ].join(",");
     }
 
-    switchPane() {
-        this.pos.scanning = false;
-        this.pos.switchPane();
+    primaryPayButton() {
+        return !this.currentOrder.is_empty();
     }
-
-    getProductPrice(product) {
-        return this.pos.getProductPriceFormatted(product);
-    }
-
-    getProductImage(product) {
-        return product.getTemplateImageUrl();
-    }
-
-    get searchWord() {
-        return this.pos.searchProductWord.trim();
-    }
-
-    get products() {
-        const { limit_categories, iface_available_categ_ids } = this.pos.config;
-        if (limit_categories && iface_available_categ_ids.length > 0) {
-            const productIds = new Set([]);
-            for (const categ of iface_available_categ_ids) {
-                const categoryProducts = this.getProductsByCategory(categ);
-                for (const p of categoryProducts) {
-                    productIds.add(p.id);
+    // FIXME POSREF this is dead code, check if we need the business logic that's left in here
+    // If we do it should be in the model.
+    async onClickPay() {
+        if (this.pos.get_order().server_id) {
+            try {
+                const isPaid = await this.orm.call("pos.order", "is_already_paid", [
+                    this.pos.get_order().server_id,
+                ]);
+                if (isPaid) {
+                    const searchDetails = {
+                        fieldName: "RECEIPT_NUMBER",
+                        searchTerm: this.pos.get_order().uid,
+                    };
+                    this.pos.showScreen("TicketScreen", {
+                        ui: { filter: "SYNCED", searchDetails },
+                    });
+                    this.notification.add(_t("The order has been already paid."), 3000);
+                    this.pos.removeOrder(this.pos.get_order(), false);
+                    this.pos.add_new_order();
+                    return;
                 }
-            }
-            return this.pos.models["product.product"].filter((p) => productIds.has(p.id));
-        }
-        return this.pos.models["product.product"].getAll();
-    }
-
-    get productsToDisplay() {
-        let list = [];
-
-        if (this.searchWord !== "") {
-            if (!this._searchTriggered) {
-                this.pos.setSelectedCategory(0);
-                this._searchTriggered = true;
-            }
-            list = this.addMainProductsToDisplay(this.getProductsBySearchWord(this.searchWord));
-        } else {
-            this._searchTriggered = false;
-            if (this.pos.selectedCategory?.id) {
-                list = this.getProductsByCategory(this.pos.selectedCategory);
-            } else {
-                list = this.products;
+            } catch (error) {
+                if (!(error instanceof ConnectionLostError)) {
+                    throw error;
+                }
+                // Reject error in a separate stack to display the offline popup, but continue the flow
+                Promise.reject(error);
             }
         }
-
-        if (!list || list.length === 0) {
-            return [];
-        }
-
-        const excludedProductIds = [
-            this.pos.config.tip_product_id?.id,
-            ...this.pos.hiddenProductIds,
-            ...this.pos.session._pos_special_products_ids,
-        ];
-
-        const filteredList = [];
-        for (const product of list) {
-            if (filteredList.length >= 100) {
-                break;
-            }
-            if (!excludedProductIds.includes(product.id) && product.canBeDisplayed) {
-                filteredList.push(product);
-            }
-        }
-
-        return this.searchWord !== ""
-            ? filteredList
-            : filteredList.sort((a, b) => a.display_name.localeCompare(b.display_name));
+        this.currentOrder.pay();
     }
-
-    getProductsBySearchWord(searchWord) {
-        const words = unaccent(searchWord.toLowerCase(), false);
-        const products = this.pos.selectedCategory?.id
-            ? this.getProductsByCategory(this.pos.selectedCategory)
-            : this.products;
-
-        const filteredProducts = products.filter((p) => unaccent(p.searchString).includes(words));
-        return filteredProducts.sort((a, b) => {
-            const nameA = unaccent(a.searchString);
-            const nameB = unaccent(b.searchString);
-            // Sort by match index, push non-matching items to the end, and use alphabetical order as a tiebreaker
-            return nameA.indexOf(words) - nameB.indexOf(words) || nameA.localeCompare(nameB);
-        });
-    }
-
-    addMainProductsToDisplay(products) {
-        const uniqueProductsMap = new Map();
-        for (const product of products) {
-            if (product.id in this.pos.mainProductVariant) {
-                const mainProduct = this.pos.mainProductVariant[product.id];
-                uniqueProductsMap.set(mainProduct.id, mainProduct);
-            } else {
-                uniqueProductsMap.set(product.id, product);
-            }
-        }
-        return Array.from(uniqueProductsMap.values());
-    }
-
-    getProductsByCategory(category) {
-        const allCategoryIds = category.getAllChildren().map((cat) => cat.id);
-        const products = allCategoryIds.flatMap(
-            (catId) => this.pos.models["product.product"].getBy("pos_categ_ids", catId) || []
-        );
-        // Remove duplicates since owl doesn't like it.
-        return Array.from(new Set(products));
-    }
-
-    async onPressEnterKey() {
-        const { searchProductWord } = this.pos;
-        if (!searchProductWord) {
-            return;
-        }
-        if (this.state.previousSearchWord !== searchProductWord) {
-            this.state.currentOffset = 0;
-        }
-        const result = await this.loadProductFromDB();
-        if (result.length === 0) {
-            this.notification.add(_t('No other products found for "%s".', searchProductWord), 3000);
-        }
-        if (this.state.previousSearchWord === searchProductWord) {
-            this.state.currentOffset += result.length;
-        } else {
-            this.state.previousSearchWord = searchProductWord;
-            this.state.currentOffset = result.length;
-        }
-    }
-
-    loadProductFromDBDomain(searchProductWord) {
-        return [
-            "|",
-            "|",
-            ["name", "ilike", searchProductWord],
-            ["default_code", "ilike", searchProductWord],
-            ["barcode", "ilike", searchProductWord],
-            ["available_in_pos", "=", true],
-            ["sale_ok", "=", true],
-        ];
-    }
-
-    async loadProductFromDB() {
-        const { searchProductWord } = this.pos;
-        if (!searchProductWord) {
-            return;
-        }
-
-        this.pos.setSelectedCategory(0);
-        const domain = this.loadProductFromDBDomain(searchProductWord);
-
-        const { limit_categories, iface_available_categ_ids } = this.pos.config;
-        if (limit_categories && iface_available_categ_ids.length > 0) {
-            const categIds = iface_available_categ_ids.map((categ) => categ.id);
-            domain.push(["pos_categ_ids", "in", categIds]);
-        }
-        const product = await this.pos.data.searchRead(
-            "product.product",
-            domain,
-            this.pos.data.fields["product.product"],
-            {
-                context: { display_default_code: false },
-                offset: this.state.currentOffset,
-                limit: 30,
-            }
-        );
-
-        await this.pos.processProductAttributes();
-        return product;
-    }
-
-    async addProductToOrder(product) {
-        await reactive(this.pos).addLineToCurrentOrder({ product_id: product }, {});
-    }
-
-    async onProductInfoClick(product) {
-        const info = await reactive(this.pos).getProductInfo(product, 1);
-        this.dialog.add(ProductInfoPopup, { info: info, product: product });
+    switchPane() {
+        this.pos.switchPane();
     }
 }
 

@@ -14,7 +14,7 @@ _logger = logging.getLogger(__name__)
 class PosController(PortalAccount):
 
     @http.route(['/pos/web', '/pos/ui'], type='http', auth='user')
-    def pos_web(self, config_id=False, from_backend=False, **k):
+    def pos_web(self, config_id=False, **k):
         """Open a pos session for the given config.
 
         The right pos session will be selected to open, if non is open yet a new session will be created.
@@ -28,8 +28,7 @@ class PosController(PortalAccount):
         :type config_id: str.
         :returns: object -- The rendered pos session.
         """
-        is_internal_user = request.env.user._is_internal()
-        pos_config = False
+        is_internal_user = request.env.user.has_group('base.group_user')
         if not is_internal_user:
             return request.not_found()
         domain = [
@@ -37,7 +36,7 @@ class PosController(PortalAccount):
                 ('user_id', '=', request.session.uid),
                 ('rescue', '=', False)
                 ]
-        if config_id and request.env['pos.config'].sudo().browse(int(config_id)).exists():
+        if config_id:
             domain = AND([domain,[('config_id', '=', int(config_id))]])
             pos_config = request.env['pos.config'].sudo().browse(int(config_id))
         pos_session = request.env['pos.session'].sudo().search(domain, limit=1)
@@ -52,28 +51,39 @@ class PosController(PortalAccount):
                 ('config_id', '=', int(config_id)),
             ]
             pos_session = request.env['pos.session'].sudo().search(domain, limit=1)
-
-        if not pos_config or not pos_config.active or pos_config.has_active_session and not pos_session:
-            return request.redirect('/odoo/action-point_of_sale.action_client_pos_menu')
-
-        if not pos_config.has_active_session:
-            pos_config.open_ui()
-            pos_session = request.env['pos.session'].sudo().search(domain, limit=1)
-
+        if not pos_session or config_id and not pos_config.active:
+            return request.redirect('/web#action=point_of_sale.action_client_pos_menu')
         # The POS only works in one company, so we enforce the one of the session in the context
-        session_info = pos_session._update_session_info(request.env['ir.http'].session_info())
+        company = pos_session.company_id
+        session_info = request.env['ir.http'].session_info()
+        session_info['user_context']['allowed_company_ids'] = company.ids
+        session_info['user_companies'] = {'current_company': company.id, 'allowed_companies': {company.id: session_info['user_companies']['allowed_companies'][company.id]}}
+        session_info['nomenclature_id'] = pos_session.company_id.nomenclature_id.id
+        session_info['fallback_nomenclature_id'] = pos_session._get_pos_fallback_nomenclature_id()
         context = {
-            'from_backend': 1 if from_backend else 0,
-            'use_pos_fake_tours': True if k.get('tours', False) else False,
             'session_info': session_info,
-            'login_number': pos_session.with_company(pos_session.company_id).login(),
+            'login_number': pos_session.login(),
             'pos_session_id': pos_session.id,
-            'pos_config_id': pos_session.config_id.id,
-            'access_token': pos_session.config_id.access_token,
         }
         response = request.render('point_of_sale.index', context)
         response.headers['Cache-Control'] = 'no-store'
         return response
+
+    @http.route('/pos/ui/tests', type='http', auth="user")
+    def test_suite(self, mod=None, **kwargs):
+        domain = [
+            ('state', '=', 'opened'),
+            ('user_id', '=', request.session.uid),
+            ('rescue', '=', False)
+        ]
+        pos_session = request.env['pos.session'].sudo().search(domain, limit=1)
+        session_info = request.env['ir.http'].session_info()
+        session_info['user_context']['allowed_company_ids'] = pos_session.company_id.ids
+        context = {
+            'session_info': session_info,
+            'pos_session_id': pos_session.id,
+        }
+        return request.render('point_of_sale.qunit_suite', qcontext=context)
 
     @http.route('/pos/sale_details_report', type='http', auth='user')
     def print_sale_details(self, date_start=False, date_stop=False, **kw):
@@ -100,7 +110,7 @@ class PosController(PortalAccount):
             else:
                 date_order = datetime(*[int(i) for i in form_values['date_order'].split('-')])
                 order = request.env['pos.order'].sudo().search([
-                    ('pos_reference', '=like', '%' + form_values['pos_reference'].strip().replace('%', r'\%').replace('_', r'\_')),
+                    ('pos_reference', '=like', '%' + form_values['pos_reference'].replace('%', r'\%').replace('_', r'\_')),
                     ('date_order', '>=', date_order - timedelta(days=1)),
                     ('date_order', '<', date_order + timedelta(days=2)),
                     ('ticket_code', '=', form_values['ticket_code']),
@@ -218,7 +228,6 @@ class PosController(PortalAccount):
             'invoice_required_fields': additional_invoice_fields,
             'partner_required_fields': additional_partner_fields,
             'access_token': access_token,
-            'invoice_sending_methods': {'email': _('by Email')},
             **form_values,
         })
 
