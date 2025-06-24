@@ -52,7 +52,7 @@ class PosController(PortalAccount):
             ]
             pos_session = request.env['pos.session'].sudo().search(domain, limit=1)
         if not pos_session or config_id and not pos_config.active:
-            return request.redirect('/web#action=point_of_sale.action_client_pos_menu')
+            return request.redirect('/web#action=point_of_sale2.action_client_pos_menu')
         # The POS only works in one company, so we enforce the one of the session in the context
         company = pos_session.company_id
         session_info = request.env['ir.http'].session_info()
@@ -65,7 +65,7 @@ class PosController(PortalAccount):
             'login_number': pos_session.login(),
             'pos_session_id': pos_session.id,
         }
-        response = request.render('point_of_sale.index', context)
+        response = request.render('point_of_sale2.index', context)
         response.headers['Cache-Control'] = 'no-store'
         return response
 
@@ -83,12 +83,12 @@ class PosController(PortalAccount):
             'session_info': session_info,
             'pos_session_id': pos_session.id,
         }
-        return request.render('point_of_sale.qunit_suite', qcontext=context)
+        return request.render('point_of_sale2.qunit_suite', qcontext=context)
 
     @http.route('/pos/sale_details_report', type='http', auth='user')
     def print_sale_details(self, date_start=False, date_stop=False, **kw):
-        r = request.env['report.point_of_sale.report_saledetails']
-        pdf, _ = request.env['ir.actions.report'].with_context(date_start=date_start, date_stop=date_stop)._render_qweb_pdf('point_of_sale.sale_details_report', r)
+        r = request.env['report.point_of_sale2.report_saledetails']
+        pdf, _ = request.env['ir.actions.report'].with_context(date_start=date_start, date_stop=date_stop)._render_qweb_pdf('point_of_sale2.sale_details_report', r)
         pdfhttpheaders = [('Content-Type', 'application/pdf'), ('Content-Length', len(pdf))]
         return request.make_response(pdf, headers=pdfhttpheaders)
 
@@ -120,7 +120,7 @@ class PosController(PortalAccount):
                 else:
                     errors['generic'] = _("No sale order found.")
 
-        return request.render("point_of_sale.ticket_request_with_code", {
+        return request.render("point_of_sale2.ticket_request_with_code", {
             'errors': errors,
             'banner_error': " ".join(errors.values()),
             'form_values': form_values,
@@ -215,7 +215,7 @@ class PosController(PortalAccount):
             else:
                 form_values['partner_address'] = partner._display_address()
 
-        return request.render("point_of_sale.ticket_validation_screen", {
+        return request.render("point_of_sale2.ticket_validation_screen", {
             'partner': partner,
             'address_url': f'/my/account?redirect=/pos/ticket/validate?access_token={access_token}',
             'user_is_connected': user_is_connected,
