@@ -8,7 +8,7 @@ class RmaPosReportWizard(models.TransientModel):
     date_end = fields.Date(string='Fecha Fin', required=True, default=fields.Date.context_today)
 
     def print_report(self):
-        return self.env.ref('pos_qr_auth.report_rma_pos').report_action(self, data={
+        return self.env.ref('pos_qr_auth.action_report_rma_pos').report_action(self, data={
             'date_start': self.date_start,
             'date_end': self.date_end,
         })
