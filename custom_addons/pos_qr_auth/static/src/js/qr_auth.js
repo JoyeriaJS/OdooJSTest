@@ -52,4 +52,3 @@ odoo.define('pos_qr_auth.qr_auth', function(require) {
             return _super_line.set_discount.call(this, discount);
         },
     });
-});
