@@ -1,6 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_pos_printer_manager,pos.printer.manager,model_pos_printer,point_of_sale.group_pos_manager,1,1,1,1
-access_pos_printer,pos.printer.user,model_pos_printer,point_of_sale.group_pos_user,1,0,0,0
+access_pos_printer_manager,pos.printer.manager,model_pos_printer,point_of_sale2.group_pos_manager,1,1,1,1
+access_pos_printer,pos.printer.user,model_pos_printer,point_of_sale2.group_pos_user,1,0,0,0
 access_pos_order,pos.order,model_pos_order,group_pos_user,1,1,1,1
 access_pos_order_line,pos.order.line,model_pos_order_line,group_pos_user,1,1,1,1
 access_pos_pack_operation_lot,pos.pack.operation.lot,model_pos_pack_operation_lot,group_pos_user,1,1,1,1
@@ -51,9 +51,9 @@ access_pos_combo_manager,pos.combo manager,model_pos_combo,group_pos_manager,1,1
 access_pos_combo_user,pos.combo user,model_pos_combo,group_pos_user,1,0,0,0
 access_pos_combo_line_manager,pos.combo.line manager,model_pos_combo_line,group_pos_manager,1,1,1,1
 access_pos_combo_line_user,pos.combo.line user,model_pos_combo_line,group_pos_user,1,0,0,0
-access_pos_details_wizard,access.pos.details.wizard,model_pos_details_wizard,point_of_sale.group_pos_manager,1,1,1,0
-access_pos_make_payment,access.pos.make.payment,model_pos_make_payment,point_of_sale.group_pos_manager,1,1,1,0
-access_pos_close_session_wizard,access.pos.close.session.wizard,model_pos_close_session_wizard,point_of_sale.group_pos_user,1,1,1,0
+access_pos_details_wizard,access.pos.details.wizard,model_pos_details_wizard,point_of_sale2.group_pos_manager,1,1,1,0
+access_pos_make_payment,access.pos.make.payment,model_pos_make_payment,point_of_sale2.group_pos_manager,1,1,1,0
+access_pos_close_session_wizard,access.pos.close.session.wizard,model_pos_close_session_wizard,point_of_sale2.group_pos_user,1,1,1,0
 access_account_cash_rounding_pos_user,account.cash.rounding pos_user,account.model_account_cash_rounding,group_pos_user,1,0,0,0
 access_pos_bill,pos.bill pos_user,model_pos_bill,group_pos_user,1,1,1,1
 access_pos_daily_sales_reports_wizard,access.pos.daily.sales.reports.wizard,model_pos_daily_sales_reports_wizard,group_pos_manager,1,1,1,0
