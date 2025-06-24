@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
-    'name': 'Point of Sale',
+    'name': 'Point of Sale2',
     'version': '1.0.2',
     'category': 'Sales/Point of Sale',
     'sequence': 40,
