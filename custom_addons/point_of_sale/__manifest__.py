@@ -7,7 +7,7 @@
     'category': 'Sales/Point of Sale',
     'sequence': 40,
     'summary': 'User-friendly PoS interface for shops and restaurants',
-    'depends': ['stock_account', 'barcodes', 'web_editor', 'digest', 'joyeria_reparaciones'],
+    'depends': ['stock_account', 'barcodes', 'web_editor', 'digest'],
     'uninstall_hook': 'uninstall_hook',
     'data': [
         'security/point_of_sale_security.xml',
@@ -45,7 +45,7 @@
         'views/pos_printer_view.xml',
         'views/pos_ticket_view.xml',
         'views/res_config_settings_views.xml',
-    , 'views/pos_qr_auth_assets.xml', 'views/pos_qr_auth_views.xml', 'views/report_rma_pos.xml'],
+    ],
     'demo': [
         'data/point_of_sale_demo.xml',
     ],

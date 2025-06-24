@@ -1,7 +1,0 @@
-<odoo>
-    <template id="assets_backend" inherit_id="point_of_sale.assets_backend" name="pos_qr_auth assets">
-        <xpath expr="." position="inside">
-            <script type="text/javascript" src="/point_of_sale/static/src/js/qr_auth.js"/>
-        </xpath>
-    </template>
-</odoo>
