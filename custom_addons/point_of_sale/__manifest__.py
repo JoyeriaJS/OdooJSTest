@@ -52,13 +52,14 @@
         'views/customer_display_index.xml',
         'views/account_move_views.xml',
         'views/pos_session_sales_details.xml'
+        
     ],
     'demo': [
         'data/demo_data.xml',
     ],
     'installable': True,
     'application': True,
-    'website': 'https://www.odoo.com/app/point-of-sale-shop',
+    'website': 'https://www.odoo.com/app/point-of-sale-shoplala',
     'assets': {
 
         # In general, you DON'T NEED to declare new assets here, just put the
