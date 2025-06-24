@@ -1,7 +1,6 @@
 odoo.define('pos_qr_auth.qr_auth', function(require) {
     'use strict';
     const models = require('point_of_sale.models');
-    const Popup = require('point_of_sale.popups');
     const _super_pos = models.PosModel.prototype;
     const _super_line = models.Orderline.prototype;
 
@@ -15,28 +14,24 @@ odoo.define('pos_qr_auth.qr_auth', function(require) {
                 body: 'Por favor escanea el QR para iniciar sesión',
                 confirmText: 'Confirmar',
             }).then(function(code) {
-                if (code && code.startsWith('VEND-')) {
-                    const vend_id = parseInt(code.replace('VEND-', ''));
-                    return self.rpc({
-                        model: 'joyeria.vendedora',
-                        method: 'search_read',
-                        args: [[['id','=',vend_id]], ['name']],
-                    }).then(function(res) {
-                        if (res.length) {
-                            self.config.vendedora_id = vend_id;
-                        } else {
-                            self.gui.show_popup('error', {
-                                title: 'QR inválido',
-                                body: 'Vendedora no encontrada',
-                            });
-                        }
-                    });
-                } else {
-                    self.gui.show_popup('error', {
-                        title: 'QR inválido',
-                        body: 'Formato de QR no reconocido',
-                    });
-                }
+                return self.rpc({
+                    model: 'joyeria.vendedora',
+                    method: 'search_read',
+                    args: [[['codigo_qr','=',code]], ['name','id']],
+                }).then(function(res) {
+                    if (res.length) {
+                        self.config.vendedora_id = res[0].id;
+                        self.gui.show_popup('confirm', {
+                            title: 'Sesión iniciada',
+                            body: 'Bienvenida ' + res[0].name,
+                        });
+                    } else {
+                        self.gui.show_popup('error', {
+                            title: 'QR inválido',
+                            body: 'Vendedora no encontrada',
+                        });
+                    }
+                });
             }).finally(function() {
                 self.chrome.setLoading(false);
             });
@@ -46,7 +41,7 @@ odoo.define('pos_qr_auth.qr_auth', function(require) {
     models.Orderline = models.Orderline.extend({
         set_discount: function(discount) {
             if (!this.pos.config.vendedora_id) {
-                this.pos.gui.show_popup('error', {
+                this.gui.show_popup('error', {
                     title: 'Descuento no permitido',
                     body: 'Debe escanear QR antes de aplicar descuentos',
                 });

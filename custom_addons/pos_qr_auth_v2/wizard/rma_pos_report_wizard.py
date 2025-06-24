@@ -31,7 +31,6 @@ class RmaPosReportWizard(models.TransientModel):
         return {
             'doc_ids': docids,
             'doc_model': 'rma.pos.report.wizard',
-            'docs': wizard,
             'rmas': rmas,
             'poses': poses,
             'totals': {'rma': total_rma, 'pos': total_pos, 'grand': total_rma + total_pos},

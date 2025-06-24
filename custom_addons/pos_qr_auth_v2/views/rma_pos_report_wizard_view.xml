@@ -15,7 +15,6 @@
       </form>
     </field>
   </record>
-
   <record id="action_rma_pos_report_wizard" model="ir.actions.act_window">
     <field name="name">Reporte RMA + POS</field>
     <field name="res_model">rma.pos.report.wizard</field>
@@ -23,7 +22,6 @@
     <field name="view_id" ref="view_rma_pos_report_wizard_form"/>
     <field name="target">new</field>
   </record>
-
   <menuitem id="menu_rma_pos_report_wizard" name="Reporte RMA+POS"
             parent="point_of_sale.menu_point_root" action="action_rma_pos_report_wizard"/>
 </odoo>
