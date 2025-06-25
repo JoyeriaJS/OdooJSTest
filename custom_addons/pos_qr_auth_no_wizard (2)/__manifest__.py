@@ -1,6 +1,6 @@
 {
-    'name': 'pos_qr_auth_no_wizard',
-    'version': '1.0',
+    'name': 'POS QR Auth - No Wizard',
+    'version': '1.1',
     'author': 'Joyería Sebastián',
     'category': 'Point of Sale',
     'license': 'AGPL-3',

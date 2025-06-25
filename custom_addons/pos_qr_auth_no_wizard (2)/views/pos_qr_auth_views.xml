@@ -1,6 +1,6 @@
 <odoo>
   <record id="view_pos_session_form_qr_auth" model="ir.ui.view">
-    <field name="name">pos.session.form.vendedora</field>
+    <field name="name">pos.session.form.qr.auth</field>
     <field name="model">pos.session</field>
     <field name="inherit_id" ref="point_of_sale.view_pos_session_form"/>
     <field name="arch" type="xml">
