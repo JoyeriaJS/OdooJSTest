@@ -3,13 +3,14 @@ from odoo import api, models, fields
 from collections import OrderedDict
 
 class ReportRmaMonthly(models.AbstractModel):
-    _name = 'report.pos_monthly_rma_report.rma_monthly_template'
+    _name = 'report.pos_monthly_rma_report_fixed2.rma_monthly_template'
     _description = 'Reporte Mensual RMA + POS'
 
     @api.model
     def _get_report_values(self, docids, data=None):
         today = fields.Date.context_today(self)
         start = today.replace(day=1)
+        # Fetch RMA and POS orders
         rmas = self.env['joyeria.reparacion'].search([
             ('fecha_recepcion', '>=', start),
             ('fecha_recepcion', '<=', today),
@@ -18,6 +19,7 @@ class ReportRmaMonthly(models.AbstractModel):
             ('date_order', '>=', f"{start} 00:00:00"),
             ('date_order', '<=', f"{today} 23:59:59"),
         ])
+        # Group by date
         groups = OrderedDict()
         for r in rmas:
             try:
