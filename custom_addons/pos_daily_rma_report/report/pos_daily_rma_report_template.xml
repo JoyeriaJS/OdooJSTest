@@ -1,0 +1,61 @@
+<odoo>
+  <report id="action_report_pos_daily_rma" model="pos.daily.rma.report.wizard"
+          string="Reporte Diario RMA + POS" report_type="qweb-pdf"
+          name="pos_daily_rma_report.template_pos_daily_rma"
+          file="pos_daily_rma_report.template_pos_daily_rma"
+          attachment_use="False"/>
+
+  <template id="template_pos_daily_rma">
+    <t t-call="web.external_layout">
+      <div class="page">
+        <h1>Reporte Diario POS + RMA</h1>
+        <p>Desde: <t t-esc="data['date_start']"/> Hasta: <t t-esc="data['date_stop']"/></p>
+        <h2>Reparaciones (RMA)</h2>
+        <table class="table table-sm">
+          <tr><th>Ref</th><th>Fecha Retiro</th><th>Cliente</th><th>Total</th></tr>
+          <t t-set="rmas" t-value="env['joyeria.reparacion'].search([
+            ('fecha_retiro','&gt;=', data['date_start']),
+            ('fecha_retiro','&lt;=', data['date_stop'])
+          ])"/>
+          <t t-foreach="rmas" t-as="r">
+            <tr>
+              <td><t t-esc="r.name"/></td>
+              <td><t t-esc="r.fecha_retiro"/></td>
+              <td><t t-esc="r.cliente_id.name"/></td>
+              <td><t t-esc="r.amount_total"/></td>
+            </tr>
+          </t>
+          <tr class="font-weight-bold">
+            <td colspan="3">Total RMA</td>
+            <td><t t-esc="sum([r.amount_total for r in rmas])"/></td>
+          </tr>
+        </table>
+
+        <h2>Ventas POS</h2>
+        <table class="table table-sm">
+          <tr><th>Ref</th><th>Fecha Order</th><th>Cliente</th><th>Total</th></tr>
+          <t t-set="poses" t-value="env['pos.order'].search([
+            ('date_order','&gt;=', data['date_start']),
+            ('date_order','&lt;=', data['date_stop']),
+            ('session_id','=', data['session_id'])
+          ])"/>
+          <t t-foreach="poses" t-as="p">
+            <tr>
+              <td><t t-esc="p.name"/></td>
+              <td><t t-esc="p.date_order"/></td>
+              <td><t t-esc="p.partner_id.name"/></td>
+              <td><t t-esc="p.amount_total"/></td>
+            </tr>
+          </t>
+          <tr class="font-weight-bold">
+            <td colspan="3">Total POS</td>
+            <td><t t-esc="sum([p.amount_total for p in poses])"/></td>
+          </tr>
+        </table>
+
+        <h2>Gran Total</h2>
+        <p><strong><t t-esc="sum([r.amount_total for r in rmas]) + sum([p.amount_total for p in poses])"/></strong></p>
+      </div>
+    </t>
+  </template>
+</odoo>
