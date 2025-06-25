@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'pos_daily_rma_report',
+    'name': 'POS Daily RMA Report',
     'version': '1.0.5',
     'author': 'Joyería Sebastián',
     'category': 'Point of Sale',

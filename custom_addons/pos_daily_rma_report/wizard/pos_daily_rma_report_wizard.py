@@ -20,7 +20,6 @@ class PosDailyRmaReportWizard(models.TransientModel):
     )
 
     def generate_report(self):
-        # Busca el reporte por report_name
         report = self.env['ir.actions.report'].search([
             ('report_name', '=', 'pos_daily_rma_report.template_pos_daily_rma')
         ], limit=1)
