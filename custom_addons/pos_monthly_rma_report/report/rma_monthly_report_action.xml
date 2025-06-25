@@ -1,0 +1,10 @@
+<odoo>
+  <record id="action_rma_monthly_report" model="ir.actions.report">
+    <field name="name">Reporte Mensual RMA + POS</field>
+    <field name="model">joyeria.reparacion</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">pos_monthly_rma_report.rma_monthly_template</field>
+    <field name="report_file">pos_monthly_rma_report.rma_monthly_template</field>
+    <field name="print_report_name">'RMA_POS_Mensual_%s' % (fields.Date.context_today(self))</field>
+  </record>
+</odoo>
