@@ -7,7 +7,7 @@
         <group>
           <field name="date_start"/>
           <field name="date_stop"/>
-          <field name="pos_session_id"/>
+          <field name="session_id"/>
         </group>
         <footer>
           <button name="generate_report" string="Imprimir" type="object" class="btn-primary"/>
