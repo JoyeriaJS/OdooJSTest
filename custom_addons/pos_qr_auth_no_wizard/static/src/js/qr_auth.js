@@ -9,17 +9,15 @@ odoo.define('pos_qr_auth.qr_auth', function(require) {
         initialize: function(session, attributes) {
             _super_pos.initialize.call(this, session, attributes);
             const self = this;
-            this.chrome.setLoading(true);
             Popup.showPopup(self, 'TextInputPopup', {
                 title: 'Escanea tu QR de vendedora',
                 body: 'Por favor escanea tu código QR',
                 confirmText: 'Confirmar',
             }).then(function(data) {
-                const code = data || '';
                 return self.rpc({
                     model: 'joyeria.vendedora',
                     method: 'search_read',
-                    args: [[['codigo_qr','=',code]], ['id','name']],
+                    args: [[['codigo_qr','=',data]], ['id','name']],
                 }).then(function(res) {
                     if (res.length) {
                         self.config.vendedora_id = res[0].id;
@@ -29,12 +27,9 @@ odoo.define('pos_qr_auth.qr_auth', function(require) {
                         });
                     } else {
                         Popup.showPopup(self, 'ErrorPopup', {
-                            title: 'QR inválido',
-                            body: 'Vendedora no encontrada',
+                            title: 'QR inválido', body: 'Vendedora no encontrada',
                         });
                     }
-                }).finally(function() {
-                    self.chrome.setLoading(false);
                 });
             });
         },
@@ -43,9 +38,8 @@ odoo.define('pos_qr_auth.qr_auth', function(require) {
     models.Orderline = models.Orderline.extend({
         set_discount: function(discount) {
             if (!this.pos.config.vendedora_id) {
-                Popup.showPopup(this, 'ErrorPopup', {
-                    title: 'Descuento no permitido',
-                    body: 'Escanea QR antes de aplicar descuento',
+                this.pos.gui.show_popup('ErrorPopup', {
+                    title: 'Descuento no permitido', body: 'Escanea QR antes de aplicar descuento',
                 });
                 return;
             }
