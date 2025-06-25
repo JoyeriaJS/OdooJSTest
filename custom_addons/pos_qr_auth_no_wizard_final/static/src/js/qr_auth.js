@@ -1,4 +1,4 @@
-odoo.define('pos_qr_auth.qr_auth', function(require) {
+odoo.define('pos_qr_auth_no_wizard.qr_auth', function(require) {
     'use strict';
     const models = require('point_of_sale.models');
     const Popup = require('point_of_sale.popups');
@@ -27,9 +27,12 @@ odoo.define('pos_qr_auth.qr_auth', function(require) {
                         });
                     } else {
                         Popup.showPopup(self, 'ErrorPopup', {
-                            title: 'QR inválido', body: 'Vendedora no encontrada',
+                            title: 'QR inválido',
+                            body: 'Vendedora no encontrada',
                         });
                     }
+                }).finally(function() {
+                    self.chrome.setLoading(false);
                 });
             });
         },
@@ -39,10 +42,12 @@ odoo.define('pos_qr_auth.qr_auth', function(require) {
         set_discount: function(discount) {
             if (!this.pos.config.vendedora_id) {
                 this.pos.gui.show_popup('ErrorPopup', {
-                    title: 'Descuento no permitido', body: 'Escanea QR antes de aplicar descuento',
+                    title: 'Descuento no permitido',
+                    body: 'Escanea QR antes de aplicar descuento',
                 });
                 return;
             }
             return _super_line.set_discount.call(this, discount);
         },
     });
+});
