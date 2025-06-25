@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Reporte Mensual RMA + POS",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "author": "Joyería Sebastián",
     "category": "Point of Sale",
     "license": "AGPL-3",
