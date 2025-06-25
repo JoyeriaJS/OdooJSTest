@@ -1,9 +1,0 @@
-<odoo>
-  <menuitem id="menu_monthly_rma_reports"
-            name="Reportes RMA/POS"
-            parent="point_of_sale.menu_point_root"/>
-  <menuitem id="menu_monthly_rma_pos"
-            name="Mensual RMA + POS"
-            parent="pos_monthly_rma_report.menu_monthly_rma_reports"
-            action="pos_monthly_rma_report.action_report_monthly_rma_pos"/>
-</odoo>

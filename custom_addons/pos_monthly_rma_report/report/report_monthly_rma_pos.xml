@@ -1,9 +1,0 @@
-<odoo>
-  <report id="action_report_monthly_rma_pos"
-          model="joyeria.reparacion"
-          string="Reporte Mensual RMA + POS"
-          report_type="qweb-pdf"
-          name="pos_monthly_rma_report.template_monthly_rma_pos"
-          file="pos_monthly_rma_report.template_monthly_rma_pos"
-          attachment_use="False"/>
-</odoo>
