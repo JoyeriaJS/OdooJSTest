@@ -1,7 +1,7 @@
 <odoo>
   <template id="rma_monthly_template">
-    <t t-call="web.external_layout">
-      <div class="page">
+    <t t-call="report.external_layout_standard">
+      <main class="page">
         <h1 style="text-align:center;">Reporte Mensual RMA + POS</h1>
         <p>Periodo: <strong><t t-esc="date_start"/> a <t t-esc="date_end"/></strong></p>
         <table class="table table-condensed">
@@ -24,7 +24,7 @@
             </t>
           </tbody>
         </table>
-      </div>
+      </main>
     </t>
   </template>
 </odoo>
