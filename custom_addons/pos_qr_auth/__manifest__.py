@@ -1,8 +1,9 @@
 {
     'name': 'POS QR Auth',
-    'version': '1.0',
+    'version': '1.3',
     'author': 'Joyería Sebastián',
     'category': 'Point of Sale',
+    'license': 'AGPL-3',
     'depends': ['point_of_sale', 'joyeria_reparaciones'],
     'data': [
         'security/ir.model.access.csv',

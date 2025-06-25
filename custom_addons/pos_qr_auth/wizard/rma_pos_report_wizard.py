@@ -8,7 +8,7 @@ class RmaPosReportWizard(models.TransientModel):
     date_end = fields.Date(string='Fecha Fin', required=True, default=fields.Date.context_today)
 
     def print_report(self):
-        return self.env.ref('pos_qr_auth.action_report_rma_pos').report_action(self, data={
+        return self.env.ref('pos_qr_auth.report_rma_pos').report_action(self, data={
             'date_start': self.date_start,
             'date_end': self.date_end,
         })
@@ -20,11 +20,11 @@ class RmaPosReportWizard(models.TransientModel):
         date_end = data.get('date_end')
         rmas = self.env['joyeria.reparacion'].search([
             ('fecha_retiro', '>=', date_start),
-            ('fecha_retiro', '<=', date_end)
+            ('fecha_retiro', '<=', date_end),
         ])
         poses = self.env['pos.order'].search([
             ('date_order', '>=', date_start),
-            ('date_order', '<=', date_end)
+            ('date_order', '<=', date_end),
         ])
         total_rma = sum(rma.amount_total for rma in rmas)
         total_pos = sum(pos.amount_total for pos in poses)
