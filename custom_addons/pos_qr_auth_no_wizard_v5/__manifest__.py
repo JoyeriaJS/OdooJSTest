@@ -1,5 +1,5 @@
 {
-    'name': 'pos_qr_auth_no_wizard',
+    'name': 'POS QR Auth - No Wizard',
     'version': '1.0',
     'author': 'Joyería Sebastián',
     'category': 'Point of Sale',
@@ -7,9 +7,8 @@
     'depends': ['point_of_sale', 'joyeria_reparaciones'],
     'data': [
         'security/ir.model.access.csv',
-        'report/report_rma_pos.xml',
         'views/pos_qr_auth_views.xml',
-        'views/pos_qr_auth_menu.xml',
+        'views/report_rma_pos.xml',
     ],
     'assets': {
         'point_of_sale.assets_backend': [
