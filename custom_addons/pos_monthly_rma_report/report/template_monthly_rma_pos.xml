@@ -2,42 +2,27 @@
   <template id="template_monthly_rma_pos">
     <t t-call="web.external_layout">
       <div class="page">
-        <h1>Reporte Mensual RMA + POS</h1>
-        <t t-set="today" t-value="fields.Date.context_today(env)"/>
-        <t t-set="start" t-value="today[:8] + '01'"/>
-        <p>Periodo: <t t-esc="start"/> - <t t-esc="today"/></p>
-        <t t-set="groups" t-value="{}"/>
-        <!-- RMA grouping -->
-        <t t-set="rmas" t-value="env['joyeria.reparacion'].search([
-            ('fecha_recepcion','>=', start),
-            ('fecha_recepcion','<=', today)
-        ])"/>
-        <t t-foreach="rmas" t-as="r">
-          <t t-set="d" t-value="r.fecha_recepcion"/>
-          <t t-set="groups[d]" t-value="groups.get(d, {'rma': 0.0, 'pos': 0.0})"/>
-          <t t-set="groups[d]['rma']" t-value="groups[d]['rma'] + (r.amount_total or 0.0)"/>
-        </t>
-        <!-- POS grouping -->
-        <t t-set="poses" t-value="env['pos.order'].search([
-            ('date_order','>=', start + ' 00:00:00'),
-            ('date_order','<=', today + ' 23:59:59')
-        ])"/>
-        <t t-foreach="poses" t-as="p">
-          <t t-set="d" t-value="p.date_order[:10]"/>
-          <t t-set="groups[d]" t-value="groups.get(d, {'rma': 0.0, 'pos': 0.0})"/>
-          <t t-set="groups[d]['pos']" t-value="groups[d]['pos'] + (p.amount_total or 0.0)"/>
-        </t>
-        <!-- Table -->
+        <h1 style="text-align:center;">Reporte Mensual RMA + POS</h1>
+        <p>Periodo: <strong><t t-esc="date_start"/> a <t t-esc="date_stop"/></strong></p>
         <table class="table table-sm">
-          <tr><th>Fecha</th><th>Total RMA</th><th>Total POS</th><th>Gran Total</th></tr>
-          <t t-foreach="sorted(groups.keys())" t-as="d">
+          <thead>
             <tr>
-              <td><t t-esc="d"/></td>
-              <td><t t-esc="groups[d]['rma']"/></td>
-              <td><t t-esc="groups[d]['pos']"/></td>
-              <td><t t-esc="groups[d]['rma'] + groups[d]['pos']"/></td>
+              <th>Fecha</th>
+              <th>Total RMA</th>
+              <th>Total POS</th>
+              <th>Gran Total</th>
             </tr>
-          </t>
+          </thead>
+          <tbody>
+            <t t-foreach="groups" t-as="grp">
+              <tr>
+                <td><t t-esc="grp['date']"/></td>
+                <td><t t-esc="grp['rma']"/></td>
+                <td><t t-esc="grp['pos']"/></td>
+                <td><t t-esc="grp['rma'] + grp['pos']"/></td>
+              </tr>
+            </t>
+          </tbody>
         </table>
       </div>
     </t>
