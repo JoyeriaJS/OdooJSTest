@@ -8,9 +8,9 @@
     <t t-call="web.external_layout">
       <div class="page">
         <h1>Diario RMA + POS</h1>
-        <p>Fecha: <t t-esc="data.get('date_start') or fields.Date.context_today(env)"/></p>
+        <p>Fecha: <t t-esc="data.get('date_start') or request.env['ir.fields'].Date.context_today(request.env.user)"/></p>
         <h2>Reparaciones (RMA) Hoy</h2>
-        <t t-set="today" t-value="data.get('date_start') or fields.Date.context_today(env)"/>
+        <t t-set="today" t-value="data.get('date_start') or request.env['ir.fields'].Date.context_today(request.env.user)"/>
         <t t-set="rmas" t-value="env['joyeria.reparacion'].search([
             ('fecha_retiro','>=', today),
             ('fecha_retiro','<=', today)
