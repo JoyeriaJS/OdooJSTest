@@ -22,17 +22,11 @@ class ReportRmaMonthly(models.AbstractModel):
         ])
         groups = OrderedDict()
         for r in rmas:
-            try:
-            d = r.fecha_recepcion.strftime('%Y-%m-%d')
-        except:
-            d = str(r.fecha_recepcion)[:10]
+            d = r.fecha_recepcion[:10]
             groups.setdefault(d, {'date': d, 'rma_total': 0.0, 'pos_total': 0.0})
             groups[d]['rma_total'] += r.subtotal or 0.0
         for p in pos_orders:
-            try:
-            d = p.date_order.strftime('%Y-%m-%d')
-        except:
-            d = str(p.date_order)[:10]
+            d = p.date_order[:10]
             groups.setdefault(d, {'date': d, 'rma_total': 0.0, 'pos_total': 0.0})
             groups[d]['pos_total'] += p.amount_total or 0.0
         # Prepare sorted list
