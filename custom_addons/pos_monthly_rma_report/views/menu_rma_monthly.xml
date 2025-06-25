@@ -5,5 +5,5 @@
   <menuitem id="menu_rma_monthly"
             name="Mensual RMA + POS"
             parent="menu_rma_monthly_root"
-            action="pos_monthly_rma_report_fix.action_rma_monthly_report"/>
+            action="pos_monthly_rma_report.action_report_rma_monthly"/>
 </odoo>
