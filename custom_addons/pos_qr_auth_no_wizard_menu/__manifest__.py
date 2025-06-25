@@ -8,7 +8,8 @@
     'data': [
         'security/ir.model.access.csv',
         'views/pos_qr_auth_views.xml',
-        'views/report_rma_pos.xml',
+        'views/pos_qr_auth_menu.xml',
+        'report/report_rma_pos.xml',
     ],
     'assets': {
         'point_of_sale.assets_backend': [

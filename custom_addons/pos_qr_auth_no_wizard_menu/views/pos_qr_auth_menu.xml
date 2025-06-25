@@ -1,0 +1,7 @@
+<odoo>
+  <menuitem id="menu_pos_qr_auth_report" name="Reportes"
+            parent="point_of_sale.menu_point_root"/>
+  <menuitem id="menu_pos_qr_auth_rma_pos" name="Diario RMA + POS"
+            parent="menu_pos_qr_auth_report"
+            action="pos_qr_auth_no_wizard.action_report_rma_pos"/>
+</odoo>
