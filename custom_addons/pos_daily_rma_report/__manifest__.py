@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'pos_daily_rma_report',
-    'version': '1.0.1',
+    'version': '1.0.2',
     'author': 'Joyería Sebastián',
     'category': 'Point of Sale',
     'license': 'AGPL-3',
