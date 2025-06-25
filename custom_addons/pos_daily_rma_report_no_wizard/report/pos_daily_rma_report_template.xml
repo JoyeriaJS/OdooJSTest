@@ -8,9 +8,9 @@
     <t t-call="web.external_layout">
       <div class="page">
         <h1>Diario RMA + POS</h1>
-        <p>Fecha: <t t-esc="data.get('date_start') or request.env['ir.fields'].Date.context_today(request.env.user)"/></p>
+        <t t-set="today" t-value="data.get('date_start') or time.strftime('%Y-%m-%d')"/>
+        <p>Fecha: <t t-esc="today"/></p>
         <h2>Reparaciones (RMA) Hoy</h2>
-        <t t-set="today" t-value="data.get('date_start') or request.env['ir.fields'].Date.context_today(request.env.user)"/>
         <t t-set="rmas" t-value="env['joyeria.reparacion'].search([
             ('fecha_retiro','>=', today),
             ('fecha_retiro','<=', today)
@@ -35,7 +35,7 @@
             ('date_order','<=', today + ' 23:59:59')
         ])"/>
         <table class="table table-condensed">
-          <tr><th>Ref</th><th>Sessión</th><th>Total</th></tr>
+          <tr><th>Ref</th><th>Sesión</th><th>Total</th></tr>
           <t t-foreach="poses" t-as="p">
             <tr>
               <td><t t-esc="p.name"/></td>
