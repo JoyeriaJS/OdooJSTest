@@ -16,6 +16,7 @@
       </form>
     </field>
   </record>
+
   <record id="action_pos_daily_rma_report_wizard" model="ir.actions.act_window">
     <field name="name">Diario RMA + POS</field>
     <field name="res_model">pos.daily.rma.report.wizard</field>
