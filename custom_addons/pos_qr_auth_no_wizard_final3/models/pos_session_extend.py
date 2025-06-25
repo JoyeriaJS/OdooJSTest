@@ -7,5 +7,4 @@ class PosSession(models.Model):
 
     def button_print_report(self):
         today = fields.Date.context_today(self)
-        return self.env.ref('pos_qr_auth_no_wizard.action_report_rma_pos').report_action(
-            self, data={'date_start': today, 'date_end': today})
+        return self.env.ref('pos_qr_auth_no_wizard.action_report_rma_pos')            .report_action(self, data={'date_start': today, 'date_end': today})
