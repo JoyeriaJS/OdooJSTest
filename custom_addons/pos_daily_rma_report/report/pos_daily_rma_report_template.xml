@@ -15,7 +15,7 @@
           <tr><th>Ref</th><th>Fecha Retiro</th><th>Cliente</th><th>Total</th></tr>
           <t t-set="rmas" t-value="env['joyeria.reparacion'].search([
             ('fecha_retiro','&gt;=', data['date_start']),
-            ('fecha_retiro','&lt;= data['date_stop'])
+            ('fecha_retiro','&lt;=', data['date_stop'])
           ])"/>
           <t t-foreach="rmas" t-as="r">
             <tr>
@@ -36,7 +36,7 @@
           <tr><th>Ref</th><th>Fecha</th><th>Cliente</th><th>Total</th></tr>
           <t t-set="poses" t-value="env['pos.order'].search([
             ('date_order','&gt;=', data['date_start']),
-            ('date_order','&lt;= data['date_stop']),
+            ('date_order','&lt;=', data['date_stop']),
             ('session_id','=', data['session_id'])
           ])"/>
           <t t-foreach="poses" t-as="p">
