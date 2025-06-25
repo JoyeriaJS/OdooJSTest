@@ -21,13 +21,11 @@ class ReportRmaMonthly(models.AbstractModel):
         groups = OrderedDict()
         for r in rmas:
             d = r.fecha_recepcion[:10]
-            if d not in groups:
-                groups[d] = {'date': d, 'rma': 0.0, 'pos': 0.0}
+            groups.setdefault(d, {'date': d, 'rma': 0.0, 'pos': 0.0})
             groups[d]['rma'] += r.subtotal or 0.0
         for p in poses:
             d = p.date_order[:10]
-            if d not in groups:
-                groups[d] = {'date': d, 'rma': 0.0, 'pos': 0.0}
+            groups.setdefault(d, {'date': d, 'rma': 0.0, 'pos': 0.0})
             groups[d]['pos'] += p.amount_total or 0.0
         sorted_data = [groups[d] for d in sorted(groups)]
         return {
