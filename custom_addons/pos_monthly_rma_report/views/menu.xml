@@ -1,5 +1,5 @@
 <odoo>
-  <menuitem id="menu_monthly_rma_reports" name="Reportes" parent="point_of_sale.menu_point_root"/>
+  <menuitem id="menu_monthly_rma_reports" name="Reportes RMA/POS" parent="point_of_sale.menu_point_root"/>
   <menuitem id="menu_monthly_rma_pos" name="Mensual RMA + POS"
             parent="menu_monthly_rma_reports"
             action="action_report_monthly_rma_pos"/>

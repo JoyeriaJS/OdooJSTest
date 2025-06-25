@@ -9,32 +9,26 @@ class ReportMonthlyRmaPos(models.AbstractModel):
     @api.model
     def _get_report_values(self, docids, data=None):
         today = fields.Date.context_today(self)
-        # First day of month
         start = today.replace(day=1)
-        # RMA records in period
         rmas = self.env['joyeria.reparacion'].search([
             ('fecha_recepcion', '>=', start),
             ('fecha_recepcion', '<=', today),
         ])
-        # POS orders in period
         poses = self.env['pos.order'].search([
             ('date_order', '>=', f"{start} 00:00:00"),
             ('date_order', '<=', f"{today} 23:59:59"),
         ])
         groups = OrderedDict()
-        # Group RMA by date
         for r in rmas:
             d = r.fecha_recepcion[:10]
             if d not in groups:
                 groups[d] = {'date': d, 'rma': 0.0, 'pos': 0.0}
             groups[d]['rma'] += r.subtotal or 0.0
-        # Group POS by date
         for p in poses:
             d = p.date_order[:10]
             if d not in groups:
                 groups[d] = {'date': d, 'rma': 0.0, 'pos': 0.0}
             groups[d]['pos'] += p.amount_total or 0.0
-        # Sort groups by date
         sorted_groups = [groups[d] for d in sorted(groups)]
         return {
             'doc_ids': docids,
