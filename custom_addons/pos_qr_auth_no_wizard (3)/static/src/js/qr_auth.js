@@ -27,8 +27,7 @@ odoo.define('pos_qr_auth_no_wizard.qr_auth', function(require) {
                         });
                     } else {
                         Popup.showPopup(self, 'ErrorPopup', {
-                            title: 'QR inválido',
-                            body: 'Vendedora no encontrada',
+                            title: 'QR inválido', body: 'Vendedora no encontrada',
                         });
                     }
                 }).finally(function() {
