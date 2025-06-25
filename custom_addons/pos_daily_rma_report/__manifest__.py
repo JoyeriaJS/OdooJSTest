@@ -8,8 +8,8 @@
     'depends': ['point_of_sale', 'joyeria_reparaciones'],
     'data': [
         'security/ir.model.access.csv',
-        'views/pos_daily_rma_report_wizard_view.xml',
         'report/pos_daily_rma_report_template.xml',
+        'views/pos_daily_rma_report_wizard_view.xml',
         'views/menu.xml',
     ],
     'installable': True,
