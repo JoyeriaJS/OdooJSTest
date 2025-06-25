@@ -28,8 +28,7 @@ class PosDailyRmaReportWizard(models.TransientModel):
         return {
             'type': 'ir.actions.report',
             'report_type': 'qweb-pdf',
-            'report_name': 'pos_daily_rma_report.template_pos_daily_rma',
-            'report_file': 'pos_daily_rma_report.template_pos_daily_rma',
+            'report_name': 'pos_daily_rma_report.action_report_pos_daily_rma',
             'data': data,
             'context': dict(self.env.context),
         }
