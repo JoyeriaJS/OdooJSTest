@@ -20,15 +20,11 @@ class PosDailyRmaReportWizard(models.TransientModel):
     )
 
     def generate_report(self):
-        data = {
-            'date_start': self.date_start.strftime('%Y-%m-%d'),
-            'date_stop': self.date_stop.strftime('%Y-%m-%d'),
+        report = self.env['ir.actions.report']._get_report_from_name(
+            'pos_daily_rma_report.template_pos_daily_rma'
+        )
+        return report.report_action(self, data={
+            'date_start': self.date_start,
+            'date_stop': self.date_stop,
             'session_id': self.session_id.id,
-        }
-        return {
-            'type': 'ir.actions.report',
-            'report_type': 'qweb-pdf',
-            'report_name': 'pos_daily_rma_report.action_report_pos_daily_rma',
-            'data': data,
-            'context': dict(self.env.context),
-        }
+        })

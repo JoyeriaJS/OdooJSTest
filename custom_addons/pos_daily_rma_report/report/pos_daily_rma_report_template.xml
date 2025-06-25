@@ -17,9 +17,16 @@
             ('fecha_retiro','&lt;=', data['date_stop'])
           ])"/>
           <t t-foreach="rmas" t-as="r">
-            <tr><td><t t-esc="r.name"/></td><td><t t-esc="r.fecha_retiro"/></td><td><t t-esc="r.cliente_id.name"/></td><td><t t-esc="r.amount_total"/></td></tr>
+            <tr>
+              <td><t t-esc="r.name"/></td>
+              <td><t t-esc="r.fecha_retiro"/></td>
+              <td><t t-esc="r.cliente_id.name"/></td>
+              <td><t t-esc="r.amount_total"/></td>
+            </tr>
           </t>
-          <tr class="font-weight-bold"><td colspan="3">Total RMA</td><td><t t-esc="sum([r.amount_total for r in rmas])"/></td></tr>
+          <tr class="font-weight-bold">
+            <td colspan="3">Total RMA</td><td><t t-esc="sum([r.amount_total for r in rmas])"/></td>
+          </tr>
         </table>
         <h2>Ventas POS</h2>
         <table class="table table-sm">
@@ -30,9 +37,16 @@
             ('session_id','=', data['session_id'])
           ])"/>
           <t t-foreach="poses" t-as="p">
-            <tr><td><t t-esc="p.name"/></td><td><t t-esc="p.date_order"/></td><td><t t-esc="p.partner_id.name"/></td><td><t t-esc="p.amount_total"/></td></tr>
+            <tr>
+              <td><t t-esc="p.name"/></td>
+              <td><t t-esc="p.date_order"/></td>
+              <td><t t-esc="p.partner_id.name"/></td>
+              <td><t t-esc="p.amount_total"/></td>
+            </tr>
           </t>
-          <tr class="font-weight-bold"><td colspan="3">Total POS</td><td><t t-esc="sum([p.amount_total for p in poses])"/></td></tr>
+          <tr class="font-weight-bold">
+            <td colspan="3">Total POS</td><td><t t-esc="sum([p.amount_total for p in poses])"/></td>
+          </tr>
         </table>
         <h2>Gran Total</h2>
         <p><strong><t t-esc="sum([r.amount_total for r in rmas]) + sum([p.amount_total for p in poses])"/></strong></p>

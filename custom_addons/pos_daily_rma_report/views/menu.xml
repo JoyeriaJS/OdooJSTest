@@ -2,5 +2,5 @@
   <menuitem id="menu_pos_rma_reports" name="Reportes" parent="point_of_sale.menu_point_root"/>
   <menuitem id="menu_pos_daily_rma" name="Diario RMA + POS"
             parent="menu_pos_rma_reports"
-            action="pos_daily_rma_report.action_pos_daily_rma_report_wizard"/>
+            action="action_pos_daily_rma_report_wizard"/>
 </odoo>
