@@ -20,9 +20,9 @@ class PosDailyRmaReportWizard(models.TransientModel):
     )
 
     def generate_report(self):
-        report = self.env['ir.actions.report'].search([
-            ('report_name', '=', 'pos_daily_rma_report.template_pos_daily_rma')
-        ], limit=1)
+        report = self.env['ir.actions.report']._get_report_from_name(
+            'pos_daily_rma_report.template_pos_daily_rma'
+        )
         return report.report_action(self, data={
             'date_start': self.date_start,
             'date_stop': self.date_stop,
