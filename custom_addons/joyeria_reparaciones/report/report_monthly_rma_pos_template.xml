@@ -1,5 +1,5 @@
 <odoo>
-  <template id="rma_monthly_template">
+  <template id="report_monthly_rma_pos_template">
     <!-- uso de web.external_layout en lugar de report.external_layout -->
     <t t-call="web.external_layout">
       <!-- dentro de aquí va TODO tu contenido, que se inyectará dentro del <main> -->
