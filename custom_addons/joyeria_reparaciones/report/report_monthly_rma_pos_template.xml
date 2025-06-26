@@ -1,32 +1,30 @@
 <odoo>
   <template id="report_monthly_rma_pos_template">
+    <!-- llama al layout de reportes -->
     <t t-call="report.external_layout">
-      <div class="page">
-        <h2 style="text-align:center;">Reporte Mensual RMA + POS Consolidado</h2>
-        <p><strong>Período:</strong>
-          <t t-esc="date_start"/> — <t t-esc="date_end"/>
-        </p>
-        <table class="table table-condensed">
-          <thead>
+      <!-- aquí va todo tu contenido, sin tags extra -->
+      <h2 class="text-center">Reporte Mensual RMA + POS</h2>
+      <p><strong>Período:</strong> <t t-esc="date_start"/> — <t t-esc="date_end"/></p>
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th>Mes</th>
+            <th>Total RMA</th>
+            <th>Total POS</th>
+            <th>Gran Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <t t-foreach="lines" t-as="l">
             <tr>
-              <th>Mes</th>
-              <th>Total RMA</th>
-              <th>Total POS</th>
-              <th>Gran Total</th>
+              <td><t t-esc="l['month_name']"/></td>
+              <td><t t-esc="l['rma_total']"/></td>
+              <td><t t-esc="l['pos_total']"/></td>
+              <td><t t-esc="l['rma_total'] + l['pos_total']"/></td>
             </tr>
-          </thead>
-          <tbody>
-            <t t-foreach="lines" t-as="l">
-              <tr>
-                <td><t t-esc="l['month_name']"/></td>
-                <td><t t-esc="l['rma_total']"/></td>
-                <td><t t-esc="l['pos_total']"/></td>
-                <td><t t-esc="l['rma_total'] + l['pos_total']"/></td>
-              </tr>
-            </t>
-          </tbody>
-        </table>
-      </div>
+          </t>
+        </tbody>
+      </table>
     </t>
   </template>
 </odoo>
