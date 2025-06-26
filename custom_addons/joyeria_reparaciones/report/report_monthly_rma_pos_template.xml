@@ -1,11 +1,13 @@
 <odoo>
   <template id="report_monthly_rma_pos_template">
-    <!-- Antes: <t t-call="report.external_layout"> -->
     <t t-call="web.external_layout">
       <main class="page">
         <h1 style="text-align:center;">Reporte Mensual RMA + POS</h1>
         <p style="text-align:center;">
-          <strong><t t-esc="date_start"/> → <t t-esc="date_end"/></strong>
+          <strong>
+            Desde <t t-esc="date_start"/>  
+            hasta <t t-esc="date_end"/>
+          </strong>
         </p>
         <table class="table table-condensed">
           <thead>
@@ -20,8 +22,8 @@
             <t t-foreach="lines" t-as="l">
               <tr>
                 <td><t t-esc="l['month_name']"/></td>
-                <td><t t-esc="l['rma_total']"/></td>
-                <td><t t-esc="l['pos_total']"/></td>
+                <td><t t-esc="l['rma_total'] or 0.0"/></td>
+                <td><t t-esc="l['pos_total'] or 0.0"/></td>
                 <td>
                   <t t-esc="(l['rma_total'] or 0.0) + (l['pos_total'] or 0.0)"/>
                 </td>

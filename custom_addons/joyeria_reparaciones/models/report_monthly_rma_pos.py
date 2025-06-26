@@ -1,6 +1,7 @@
 from odoo import models, fields, api
-from datetime import datetime
+from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
+import calendar
 from odoo.exceptions import AccessError
 
 class ReportMonthlyRmaPos(models.AbstractModel):
@@ -9,40 +10,46 @@ class ReportMonthlyRmaPos(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        # Sólo administradores
         if not self.env.user.has_group('base.group_system'):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
-        # Tomamos el año atrás hasta hoy
-        date_end = fields.Date.context_today(self)
-        date_start = date_end - relativedelta(months=12)
+        # Hoy
+        today = fields.Date.context_today(self)
+        # Primer día del mes hace 11 meses
+        start_month = (today.replace(day=1) - relativedelta(months=11))
+        # Último día del mes actual
+        last_day = calendar.monthrange(today.year, today.month)[1]
+        end_month = today.replace(day=last_day)
 
+        # Prepara agrupador
         groups = {}
-        # 1) Sumar 'saldo' de joyeria.reparacion por fecha_firma
+        # 1) Todos los RMA firmados en ese rango
         reparas = self.env['joyeria.reparacion'].search([
-            ('fecha_firma', '>=', date_start),
-            ('fecha_firma', '<=', date_end)
+            ('fecha_firma', '>=', start_month),
+            ('fecha_firma', '<=', end_month),
         ])
         for r in reparas:
-            mes = r.fecha_firma.strftime('%Y-%m')
+            dt = fields.Datetime.to_datetime(r.fecha_firma)
+            mes = dt.strftime('%Y-%m')
             groups.setdefault(mes, {'rma_total': 0.0, 'pos_total': 0.0})
             groups[mes]['rma_total'] += r.saldo
 
-        # 2) Sumar ventas POS (amount_total) por date_order
+        # 2) Todas las ventas POS en ese rango
         orders = self.env['pos.order'].search([
-            ('date_order', '>=', date_start),
-            ('date_order', '<=', date_end)
+            ('date_order', '>=', start_month),
+            ('date_order', '<=', end_month),
         ])
         for o in orders:
-            # convertimos a datetime para formateo
             dt = fields.Datetime.from_string(o.date_order)
             mes = dt.strftime('%Y-%m')
             groups.setdefault(mes, {'rma_total': 0.0, 'pos_total': 0.0})
             groups[mes]['pos_total'] += o.amount_total
 
-        # 3) Preparamos lista ordenada
+        # 3) Lista ordenada de meses
         lines = []
         for mes, vals in sorted(groups.items()):
-            year, month = mes.split('-')
-            month_name = datetime(int(year), int(month), 1).strftime('%B %Y')
+            year, month = map(int, mes.split('-'))
+            month_name = datetime(year, month, 1).strftime('%B %Y')
             lines.append({
                 'month_name': month_name,
                 'rma_total': vals['rma_total'],
@@ -50,7 +57,7 @@ class ReportMonthlyRmaPos(models.AbstractModel):
             })
 
         return {
-            'date_start': date_start,
-            'date_end': date_end,
+            'date_start': start_month,
+            'date_end': end_month,
             'lines': lines,
         }
