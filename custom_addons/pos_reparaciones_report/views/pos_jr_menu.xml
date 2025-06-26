@@ -1,16 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <!-- Nodo raíz de menú “Reportes” -->
-  <menuitem
-    id="menu_pos_reporte_root"
-    name="Reportes"
-    parent="point_of_sale.menu_point_root"
-    sequence="100"/>
-  <!-- Submenú “Ventas Reparaciones” -->
-  <menuitem
-    id="menu_pos_reparaciones_report"
-    name="Ventas Reparaciones"
-    parent="menu_pos_reporte_root"
-    action="action_pos_reparaciones_report"
-    sequence="10"/>
+  <menuitem id="menu_pos_reports_root" name="Reportes" parent="point_of_sale.menu_point_root" sequence="100"/>
+  <menuitem id="menu_pos_jr_report" name="POS &amp; RMA" parent="menu_pos_reports_root" action="action_report_pos_jr" sequence="1"/>
 </odoo>
