@@ -1,0 +1,7 @@
+<odoo>
+  <menuitem id="menu_rma_monthly_root" name="RMA + POS Reports" sequence="1000"/>
+  <menuitem id="menu_rma_monthly" name="Mensual RMA + POS"
+            parent="menu_rma_monthly_root"
+            action="action_rma_monthly_report"
+            sequence="1"/>
+</odoo>

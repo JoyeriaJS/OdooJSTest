@@ -1,0 +1,11 @@
+<odoo>
+  <report
+    id="action_rma_monthly_report"
+    model="pos.monthly.rma"
+    string="Reporte Mensual RMA + POS"
+    report_type="qweb-pdf"
+    name="pos_monthly_rma_report_fixed.rma_monthly_template"
+    file="pos_monthly_rma_report_fixed.rma_monthly_template"
+    print_report_name="'RMA_POS_Mensual_%s.pdf' % (data['date_start'])"
+  />
+</odoo>
