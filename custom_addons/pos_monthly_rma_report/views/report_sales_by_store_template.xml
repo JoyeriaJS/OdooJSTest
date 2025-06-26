@@ -1,0 +1,29 @@
+<odoo>
+  <template id="report_sales_by_store_template">
+    <t t-call="web.external_layout">
+      <div class="page">
+        <h2 style="text-align: center;">Reporte Mensual de RMA y POS</h2>
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th>Mes</th>
+              <th>Total RMA</th>
+              <th>Total POS</th>
+              <th>Gran Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <t t-foreach="groups" t-as="g">
+              <tr>
+                <td><t t-esc="g['date']"/></td>
+                <td><t t-esc="g['rma_total']"/></td>
+                <td><t t-esc="g['pos_total']"/></td>
+                <td><t t-esc="g['rma_total'] + g['pos_total']"/></td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+    </t>
+  </template>
+</odoo>
