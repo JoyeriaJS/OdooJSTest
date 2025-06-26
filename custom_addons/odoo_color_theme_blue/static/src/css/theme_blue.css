@@ -17,11 +17,11 @@ body, .o_web_client {
 /* Barra superior */
 .o_main_navbar {
     background: var(--navbar-bg) !important;
-    color: #fff !important;
+    color: #000000 !important;
     border-bottom: 2px solid var(--primary) !important;
 }
 .o_main_navbar .dropdown-toggle, .o_main_navbar .o_menu_brand {
-    color: #fff !important;
+    color: #000000 !important;
 }
 
 /* Lateral izquierdo */
@@ -44,10 +44,10 @@ body, .o_web_client {
 .o_mail_nav_panel .o_active,
 .o_mail_nav_panel .o_mail_channel_selected {
     background: var(--primary) !important;
-    color: #fff !important;
+    color: #000000 !important;
 }
 .o_mail_nav_panel .o_mail_channel_selected a {
-    color: #fff !important;
+    color: #000000 !important;
 }
 
 /* --- TICKET VERDE AGUA SOLO EN CANAL SELECCIONADO DE ODOO DISCUSS --- */
