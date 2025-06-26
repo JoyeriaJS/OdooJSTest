@@ -18,10 +18,10 @@
           <tbody>
             <t t-foreach="lines" t-as="l">
               <tr>
-                <td><t t-esc="l.month_name"/></td>
-                <td><t t-esc="l.rma_total"/></td>
-                <td><t t-esc="l.pos_total"/></td>
-                <td><t t-esc="l.rma_total + l.pos_total"/></td>
+                <td><t t-esc="l['month_name']"/></td>
+                <td><t t-esc="l['rma_total']"/></td>
+                <td><t t-esc="l['pos_total']"/></td>
+                <td><t t-esc="l['rma_total'] + l['pos_total']"/></td>
               </tr>
             </t>
           </tbody>
