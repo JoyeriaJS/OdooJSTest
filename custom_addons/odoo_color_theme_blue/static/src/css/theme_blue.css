@@ -123,9 +123,6 @@ a, a:visited, .o_mail_systray_dropdown .o_mail_channel_name, .o_mail_systray_dro
     color: var(--sidebar-text) !important;
 }
 
-
-
-
 /* Entradas y selects */
 input, textarea, select, .o_input, .o_field_widget input, .o_field_widget textarea {
     background: #f6f6f6 !important;
@@ -152,7 +149,7 @@ input:focus, textarea:focus, select:focus, .o_input:focus {
 /* Personalización launcher de apps */
 .o_appdrawer .o_app {
     border-radius: 50% !important;
-    background: #23262b !important; /* Fondo oscuro o pon el color que prefieras */
+    background: #23262b !important;
     box-shadow: 0 2px 8px #0002;
     border: 2px solid var(--primary);
     width: 64px !important;
@@ -198,7 +195,6 @@ input:focus, textarea:focus, select:focus, .o_input:focus {
     background: #17191d !important;
     padding-top: 30px !important;
 }
-
 /* Quitar fondo gris de app seleccionada */
 .o_appdrawer .o_app.o_active, 
 .o_appdrawer .o_app:focus {
@@ -206,66 +202,70 @@ input:focus, textarea:focus, select:focus, .o_input:focus {
     border-color: var(--primary-hover) !important;
     box-shadow: 0 0 0 3px #199c5955;
 }
-/* ──────── Resaltar checkboxes y radios con ticket ──────── */
-/* Soporta accent-color en navegadores modernos */
+
+
+/* ───────────────────────────────────────────────────────────
+   CUSTOM CHECKBOX & RADIO CON “TICKET” ✔
+─────────────────────────────────────────────────────────── */
+
+/* 1) Ocultamos la apariencia nativa */
 input[type="checkbox"],
 input[type="radio"] {
-  accent-color: var(--primary) !important;
-}
-
-/* Fallback para widgets booleanos de Odoo */
-.o_form_view .o_field_widget.o_field_boolean input[type="checkbox"],
-.o_form_view .o_field_widget.o_field_boolean input[type="radio"] {
-  appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  width: 16px;
-  height: 16px;
-  border: 1px solid var(--border-color);
-  background: #fff;
-  position: relative;
-  cursor: pointer;
+  appearance: none;
+  margin: 0;
   vertical-align: middle;
-  border-radius: 3px;
-  margin: 0 4px 0 0;
+  cursor: pointer;
 }
 
-/* Checkbox marcado: fondo y borde en --primary, y ✔ ticket blanco */
-.o_form_view .o_field_widget.o_field_boolean input[type="checkbox"]:checked {
-  background: var(--primary);
-  border-color: var(--primary);
+/* 2) Dibujo base: cuadro o círculo */
+input[type="checkbox"] {
+  width: 1.2em;
+  height: 1.2em;
+  border: 2px solid var(--primary) !important;
+  border-radius: 0.2em;
+  position: relative;
+  background: #fff;
 }
-.o_form_view .o_field_widget.o_field_boolean input[type="checkbox"]:checked::after {
-  content: "✔";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 12px;
+input[type="radio"] {
+  width: 1.2em;
+  height: 1.2em;
+  border: 2px solid var(--primary) !important;
+  border-radius: 50%;
+  position: relative;
+  background: #fff;
+}
+
+/* 3) Fondo cuando esté marcado */
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+
+/* 4) Dibuja la marca “✔” o punto interior */
+input[type="checkbox"]:checked::after,
+input[type="radio"]:checked::after {
+  content: '✔';
   color: #fff;
+  font-size: 0.8em;
+  font-weight: bold;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1.2em;
+  height: 1.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
 }
-
-/* Radio marcado: círculo interior blanco */
-.o_form_view .o_field_widget.o_field_boolean input[type="radio"] {
-  border-radius: 50%;
-}
-.o_form_view .o_field_widget.o_field_boolean input[type="radio"]:checked {
-  background: var(--primary);
-  border-color: var(--primary);
-}
-.o_form_view .o_field_widget.o_field_boolean input[type="radio"]:checked::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 8px;
-  height: 8px;
+/* Para el radio, sustituimos ✔ por punto más chico */
+input[type="radio"]:checked::after {
+  content: '';
+  width: 0.6em;
+  height: 0.6em;
   background: #fff;
   border-radius: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
 }
-
-
-
