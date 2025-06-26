@@ -1,6 +1,6 @@
 <odoo>
   <template id="report_monthly_rma_pos_template">
-    <t t-call="web.external_layout">
+    <t t-call="report.external_layout">
       <div class="page">
         <h2 style="text-align:center;">Reporte Mensual RMA + POS Consolidado</h2>
         <p><strong>Período:</strong>
