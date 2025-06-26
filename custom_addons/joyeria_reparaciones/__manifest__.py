@@ -4,7 +4,7 @@
     'summary': 'Gestión de órdenes de reparación de joyas',
     'author': 'DR',
     'category': 'Operations',
-    'depends': ['base', 'product', 'sale', 'contacts','point_of_sale', 'joyeria_reparaciones', 'web'],
+    'depends': ['base', 'product', 'sale', 'contacts','point_of_sale'],
     'data': [
         'security/joyeria_security.xml',
         'security/ir.model.access.csv',
