@@ -44,7 +44,7 @@ body, .o_web_client {
 .o_mail_nav_panel .o_active,
 .o_mail_nav_panel .o_mail_channel_selected {
     background: var(--primary) !important;
-    color: #000000 !important;
+    color: #fff !important;
 }
 .o_mail_nav_panel .o_mail_channel_selected a {
     color: #fff !important;
@@ -128,7 +128,7 @@ a, a:visited, .o_mail_systray_dropdown .o_mail_channel_name, .o_mail_systray_dro
 
 /* Entradas y selects */
 input, textarea, select, .o_input, .o_field_widget input, .o_field_widget textarea {
-    background: #000000 !important;
+    background: #f6f6f6 !important;
     color: #222 !important;
     border-color: var(--border-color) !important;
 }
