@@ -1,32 +1,36 @@
 <odoo>
   <template id="report_monthly_rma_pos_template">
-    <!-- uso de web.external_layout en lugar de report.external_layout -->
-    <t t-call="web.external_layout">
-      <!-- dentro de aquí va TODO tu contenido, que se inyectará dentro del <main> -->
-      <div class="page">
+    <!-- Usamos el layout estándar de reportes -->
+    <t t-call="report.external_layout">
+      <main class="page"><!-- ¡IMPORTANTE! debe haber este <main> -->
         <h1 style="text-align:center;">Reporte Mensual RMA + POS</h1>
-        <p>Periodo: <strong><t t-esc="date_start"/> a <t t-esc="date_end"/></strong></p>
+        <p style="text-align:center;">
+          <strong><t t-esc="date_start"/> → <t t-esc="date_end"/></strong>
+        </p>
         <table class="table table-condensed">
           <thead>
             <tr>
-              <th>Fecha</th>
+              <th>Mes</th>
               <th>Total RMA</th>
               <th>Total POS</th>
               <th>Gran Total</th>
             </tr>
           </thead>
           <tbody>
-            <t t-foreach="groups" t-as="grp">
+            <t t-foreach="lines" t-as="l">
               <tr>
-                <td><t t-esc="grp['date']"/></td>
-                <td><t t-esc="grp['rma_total']"/></td>
-                <td><t t-esc="grp['pos_total']"/></td>
-                <td><t t-esc="grp['rma_total'] + grp['pos_total']"/></td>
+                <!-- Aquí ya no usamos l.month_name sino l['month_name'] -->
+                <td><t t-esc="l['month_name']"/></td>
+                <td><t t-esc="l['rma_total']"/></td>
+                <td><t t-esc="l['pos_total']"/></td>
+                <td>
+                  <t t-esc="(l['rma_total'] or 0.0) + (l['pos_total'] or 0.0)"/>
+                </td>
               </tr>
             </t>
           </tbody>
         </table>
-      </div>
+      </main>
     </t>
   </template>
 </odoo>
