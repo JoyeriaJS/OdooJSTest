@@ -1,6 +1,7 @@
 from odoo import models, fields, api
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from odoo.exceptions import AccessError
 
 class ReportMonthlyRmaPos(models.AbstractModel):
     _name = 'report.joyeria_reparaciones.report_monthly_rma_pos_template'
@@ -8,6 +9,8 @@ class ReportMonthlyRmaPos(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        if not self.env.user.has_group('base.group_system'):
+            raise AccessError("Sólo los administradores pueden generar este reporte.")
         # Tomamos el año atrás hasta hoy
         date_end = fields.Date.context_today(self)
         date_start = date_end - relativedelta(months=12)
