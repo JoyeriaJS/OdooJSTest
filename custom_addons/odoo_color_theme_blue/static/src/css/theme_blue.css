@@ -21,7 +21,7 @@ body, .o_web_client {
     border-bottom: 2px solid var(--primary) !important;
 }
 .o_main_navbar .dropdown-toggle, .o_main_navbar .o_menu_brand {
-    color: #fff !important;
+    color: #000000 !important;
 }
 
 /* Lateral izquierdo */
@@ -44,7 +44,7 @@ body, .o_web_client {
 .o_mail_nav_panel .o_active,
 .o_mail_nav_panel .o_mail_channel_selected {
     background: var(--primary) !important;
-    color: #fff !important;
+    color: #000000 !important;
 }
 .o_mail_nav_panel .o_mail_channel_selected a {
     color: #fff !important;
@@ -128,7 +128,7 @@ a, a:visited, .o_mail_systray_dropdown .o_mail_channel_name, .o_mail_systray_dro
 
 /* Entradas y selects */
 input, textarea, select, .o_input, .o_field_widget input, .o_field_widget textarea {
-    background: #f6f6f6 !important;
+    background: #000000 !important;
     color: #222 !important;
     border-color: var(--border-color) !important;
 }
