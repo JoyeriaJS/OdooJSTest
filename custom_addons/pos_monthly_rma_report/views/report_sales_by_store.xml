@@ -1,0 +1,10 @@
+<odoo>
+  <report
+    id="action_report_sales_by_store"
+    string="Reporte Mensual RMA + POS"
+    model="ir.actions.act_window"
+    report_type="qweb-pdf"
+    name="pos_monthly_rma_report.report_sales_by_store_template"
+    file="pos_monthly_rma_report.report_sales_by_store_template"
+    attachment_use="False"/>
+</odoo>

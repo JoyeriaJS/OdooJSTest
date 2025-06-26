@@ -1,0 +1,30 @@
+<odoo>
+  <template id="report_sales_by_store_template">
+    <t t-call="web.external_layout">
+      <div class="page">
+        <h2 style="text-align:center;">Reporte Mensual RMA + POS</h2>
+        <p style="text-align:center;">Periodo: <strong><t t-esc="data['date_start']"/> a <t t-esc="data['date_end']"/></strong></p>
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th>Mes</th>
+              <th>Total RMA</th>
+              <th>Total POS</th>
+              <th>Gran Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <t t-foreach="groups" t-as="grp">
+              <tr>
+                <td><t t-esc="grp['date']"/></td>
+                <td><t t-esc="grp['rma_total']"/></td>
+                <td><t t-esc="grp['pos_total']"/></td>
+                <td><t t-esc="grp['grand_total']"/></td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+    </t>
+  </template>
+</odoo>
