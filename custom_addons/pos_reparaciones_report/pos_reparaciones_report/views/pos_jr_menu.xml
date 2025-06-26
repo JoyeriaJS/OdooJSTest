@@ -1,4 +1,0 @@
-<odoo>
-  <menuitem id="menu_pos_reports_root" name="Reportes" parent="point_of_sale.menu_point_root" sequence="100"/>
-  <menuitem id="menu_pos_jr_report" name="POS & RMA" parent="menu_pos_reports_root" action="action_report_pos_jr" sequence="1"/>
-</odoo>
