@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
   <!-- template del reporte -->
-  <template id="stock_transfer_report_template">
+  <template id="report_stock_transfer_document">
     <!-- usamos el layout estándar de Odoo -->
     <t t-call="web.external_layout">
       <main class="page">
