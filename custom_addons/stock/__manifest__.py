@@ -42,6 +42,8 @@
         'report/product_templates.xml',
         'report/product_packaging.xml',
         'report/report_return_slip.xml',
+        'report/stock_transfer_report.xml',
+        'report/stock_transfer_report_template.xml',
         'data/mail_template_data.xml',
 
         'views/stock_menu_views.xml',
@@ -90,8 +92,7 @@
         'views/stock_forecasted.xml',
         #'views/import_product_excel_view.xml',
         #'views/product_template_import_btn.xml',
-        'report/stock_transfer_report.xml',
-        'report/stock_transfer_report_template.xml',
+        
         
     ],
     'installable': True,
