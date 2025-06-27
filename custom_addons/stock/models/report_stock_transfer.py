@@ -2,7 +2,7 @@
 from odoo import models, api
 
 class ReportStockTransfer(models.AbstractModel):
-    _name = 'report.stock.report_stock_transfer_document'
+    _name = 'stock.report_stock_transfer_document'
     _description = 'Cargos entre Locales por Traspasos'
 
     @api.model
