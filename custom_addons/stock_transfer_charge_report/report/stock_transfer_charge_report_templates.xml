@@ -1,9 +1,10 @@
 
 <odoo>
+<!-- Plantilla QWeb -->
     <template id="stock_transfer_charge_report_template">
       <t t-call="web.external_layout">
         <main class="page">
-          <h2 style="text-align:center;">Reporte de Cargos entre Locales</h2>
+          <h1 style="text-align:center;">Reporte Mensual Cargos entre Locales</h1>
           <p style="text-align:center;">
             <strong><t t-esc="date_start"/> → <t t-esc="date_end"/></strong>
           </p>
@@ -14,7 +15,7 @@
                 <th>Local Origen</th>
                 <th>Local Destino</th>
                 <th>Producto</th>
-                <th>Valor</th>
+                <th>Total Valorado</th>
               </tr>
             </thead>
             <tbody>
@@ -24,7 +25,7 @@
                   <td><t t-esc="l['origin']"/></td>
                   <td><t t-esc="l['destination']"/></td>
                   <td><t t-esc="l['product']"/></td>
-                  <td><t t-esc="l['amount']"/></td>
+                  <td><t t-esc="l['total']"/></td>
                 </tr>
               </t>
             </tbody>
@@ -32,4 +33,5 @@
         </main>
       </t>
     </template>
+  </data>
 </odoo>
