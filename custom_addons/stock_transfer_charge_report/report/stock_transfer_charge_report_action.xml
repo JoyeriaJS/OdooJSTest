@@ -7,11 +7,4 @@
         name="stock_transfer_charge_report.stock_transfer_charge_report_template"
         file="stock_transfer_charge_report.stock_transfer_charge_report_template"
     />
-    <menuitem
-        id="menu_stock_transfer_charge"
-        name="Cargos entre Locales"
-        parent="stock.menu_stock_root"
-        action="action_stock_transfer_charge_report"
-        sequence="20"
-    />
 </odoo>
