@@ -1,0 +1,29 @@
+<odoo>
+  <template id="stock_transfer_report_template">
+    <t t-call="web.external_layout">
+      <main class="page">
+        <h2 style="text-align: center;">Reporte de Cargos entre Locales</h2>
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th>Local Origen</th>
+              <th>Local Destino</th>
+              <th style="text-align: right;">Total Cobrar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <t t-foreach="lines" t-as="l">
+              <tr>
+                <td><t t-esc="l.origin"/></td>
+                <td><t t-esc="l.destination"/></td>
+                <td style="text-align: right;">
+                  <t t-esc="l.total"/>
+                </td>
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </main>
+    </t>
+  </template>
+</odoo>
