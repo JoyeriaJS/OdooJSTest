@@ -1,5 +1,5 @@
 <odoo>
-  <data>
+
     <!-- Acción de informe -->
     <record id="action_stock_transfer_charge_report" model="ir.actions.report">
       <field name="name">Cargos entre Locales</field>
@@ -10,6 +10,4 @@
       <field name="report_file"><module_name>.stock_transfer_charge_report_template</field>
       <field name="print_report_name">"'Cargos entre Locales - %s' % (object.name,)"</field>
     </record>
-
-  </data>
 </odoo>
