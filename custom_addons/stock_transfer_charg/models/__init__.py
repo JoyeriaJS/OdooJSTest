@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-from . import report_stock_transfer
+from . import report_stock_transfer_charge
