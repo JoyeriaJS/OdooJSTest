@@ -2,15 +2,18 @@
 from odoo import models, api
 
 class ReportStockTransfer(models.AbstractModel):
-    _name = 'report.stock_transfer_charge.stock_transfer_report_template'
-    _description = 'Reporte de Cargos entre Locales por Traspasos'
+    _name = 'report.stock.report_stock_transfer_document'
+    _description = 'Cargos entre Locales por Traspasos'
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        pickings = self.env['stock.picking'].search([
-            ('picking_type_code', '=', 'internal'),
-            ('state', '=', 'done')
-        ])
+        # Si viene una lista de picking_ids desde la llamada, úsala; 
+        # si no, muéstrelo todo
+        pickings = self.env['stock.picking'].browse(docids) \
+            or self.env['stock.picking'].search([
+                ('picking_type_code', '=', 'internal'),
+                ('state', '=', 'done')
+            ])
         groups = {}
         for p in pickings:
             origin = p.location_id.display_name
@@ -28,5 +31,6 @@ class ReportStockTransfer(models.AbstractModel):
                 groups[key]['total'] += amount
 
         return {
+            'docs': pickings,
             'lines': list(groups.values()),
         }

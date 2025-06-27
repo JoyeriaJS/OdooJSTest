@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <template id="report_stock_transfer_document">
+    <!-- Usamos el layout estándar Web -->
+    <t t-call="web.external_layout">
+      <main class="page">
+        <h2 style="text-align:center;">Cargos entre Locales</h2>
+        <p><strong>Fecha generación:</strong>
+           <t t-esc="time.strftime('%Y-%m-%d %H:%M:%S')"/>
+        </p>
+        <table class="table table-sm mt16">
+          <thead>
+            <tr>
+              <th>Origen</th>
+              <th>Destino</th>
+              <th>Producto</th>
+              <th class="text-right">Cant.</th>
+              <th class="text-right">P. Unit.</th>
+              <th class="text-right">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- docs es la lista de stock.picking seleccionados -->
+            <t t-foreach="docs" t-as="pick">
+              <t t-foreach="pick.move_lines" t-as="line">
+                <tr>
+                  <td><t t-esc="pick.location_id.name"/></td>
+                  <td><t t-esc="pick.location_dest_id.name"/></td>
+                  <td><t t-esc="line.product_id.display_name"/></td>
+                  <td class="text-right"><t t-esc="line.product_uom_qty"/></td>
+                  <td class="text-right">
+                    <t t-esc="'{:,.2f}'.format(line.price_unit)"/>
+                  </td>
+                  <td class="text-right">
+                    <t t-esc="'{:,.2f}'.format(line.product_uom_qty * line.price_unit)"/>
+                  </td>
+                </tr>
+              </t>
+            </t>
+          </tbody>
+        </table>
+        <div style="text-align:right; font-weight:bold;" class="mt16">
+          Total general: 
+          <t t-esc="'{:,.2f}'.format(sum(
+             line.product_uom_qty * line.price_unit 
+             for pick in docs for line in pick.move_lines
+          ))"/>
+        </div>
+      </main>
+    </t>
+  </template>
+</odoo>

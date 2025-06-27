@@ -42,8 +42,8 @@
         'report/product_templates.xml',
         'report/product_packaging.xml',
         'report/report_return_slip.xml',
-        'report/stock_transfer_report.xml',
-        'report/stock_transfer_report_template.xml',
+        'report/stock_transfer_report_action.xml',
+        'report/stock_transfer_report_templates.xml',
         'data/mail_template_data.xml',
 
         'views/stock_menu_views.xml',

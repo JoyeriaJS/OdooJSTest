@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Acción que enlaza el template con stock.picking -->
+  <report
+    id="action_stock_transfer_report"
+    model="stock.picking"
+    string="Cargos entre Locales"
+    report_type="qweb-pdf"
+    name="stock.report_stock_transfer_document"
+    file="stock.report_stock_transfer_document"
+    attachment_use="False"
+  />
+</odoo>
