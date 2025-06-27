@@ -1,5 +1,6 @@
+
 <odoo>
-  <template id="stock_transfer_charge_report_template">
+    <template id="stock_transfer_charge_report_template">
       <t t-call="web.external_layout">
         <main class="page">
           <h2 style="text-align:center;">Reporte de Cargos entre Locales</h2>
@@ -31,7 +32,6 @@
         </main>
       </t>
     </template>
-
 
 
 
