@@ -10,12 +10,4 @@
     attachment_use="False"
   />
 
-  <!-- Menú bajo Inventario > Informes -->
-  <menuitem
-    id="menu_stock_reports_charges"
-    name="Cargos entre Locales"
-    parent="stock.menu_stock_report"
-    action="action_stock_transfer_report"
-    sequence="20"
-  />
 </odoo>
