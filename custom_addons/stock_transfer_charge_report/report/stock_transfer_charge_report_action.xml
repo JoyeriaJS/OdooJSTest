@@ -1,19 +1,17 @@
 <odoo>
-  <data>
-    <record id="action_transfer_charge_report" model="ir.actions.report">
-      <field name="name">Cargos entre Locales</field>
-      <field name="model">stock.picking</field>
-      <field name="report_type">qweb-pdf</field>
-      <field name="report_name">stock_transfer_charge_report.transfer_charge_report_template</field>
-      <field name="report_file">stock_transfer_charge_report.transfer_charge_report_template</field>
-    </record>
-
-    <menuitem
-      id="menu_stock_transfer_charge"
-      name="Cargos entre Locales"
-      parent="stock.menu_stock_report"
-      action="stock_transfer_charge_report.action_transfer_charge_report"
-      sequence="20"
+    <report
+        id="action_stock_transfer_charge_report"
+        model="stock.picking"
+        string="Cargos entre Locales"
+        report_type="qweb-pdf"
+        name="stock_transfer_charge_report.stock_transfer_charge_report_template"
+        file="stock_transfer_charge_report.stock_transfer_charge_report_template"
     />
-  </data>
+    <menuitem
+        id="menu_stock_transfer_charge"
+        name="Cargos entre Locales"
+        parent="stock.menu_stock_root"
+        action="action_stock_transfer_charge_report"
+        sequence="20"
+    />
 </odoo>

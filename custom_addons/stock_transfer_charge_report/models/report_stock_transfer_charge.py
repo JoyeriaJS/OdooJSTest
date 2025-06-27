@@ -2,7 +2,7 @@
 from odoo import models, api
 
 class ReportStockTransferCharge(models.AbstractModel):
-    _name = 'report.stock_transfer_charge_report.transfer_charge_report_template'
+    _name = 'report.stock_transfer_charge_report.stock_transfer_charge_report_template'
     _description = 'Reporte de Cargos entre Locales por Traspasos'
 
     @api.model
@@ -20,11 +20,12 @@ class ReportStockTransferCharge(models.AbstractModel):
                 qty = move.quantity_done or 0.0
                 price = move.product_id.standard_price or 0.0
                 amount = qty * price
-                groups.setdefault(key, {
-                    'origin': origin,
-                    'destination': dest,
-                    'total': 0.0,
-                })
+                if key not in groups:
+                    groups[key] = {
+                        'origin': origin,
+                        'destination': dest,
+                        'total': 0.0,
+                    }
                 groups[key]['total'] += amount
 
         return {
