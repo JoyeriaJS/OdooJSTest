@@ -1,10 +1,9 @@
-<!-- stock_transfer_charge_report_template -->
 <odoo>
   <template id="stock_transfer_charge_report_template">
     <t t-call="web.external_layout">
       <main class="page">
         <h2 style="text-align:center;">Reporte de Cargos entre Locales</h2>
-        <t t-if="months">
+        <t t-if="months and months|length > 0">
           <t t-foreach="months" t-as="month_data">
             <h3><t t-esc="month_data['month']"/></h3>
             <table class="table table-sm">
@@ -33,7 +32,7 @@
             </table>
           </t>
         </t>
-        <t t-if="not months">
+        <t t-if="not months or months|length == 0">
           <p style="text-align:center; font-style:italic;">No se encontraron traspasos realizados.</p>
         </t>
       </main>
