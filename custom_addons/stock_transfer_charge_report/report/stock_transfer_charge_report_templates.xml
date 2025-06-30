@@ -2,48 +2,40 @@
   <template id="stock_transfer_charge_report_template">
     <t t-call="web.external_layout">
       <main class="page">
-        <h1 style="text-align:center;">Reporte mensual de cargos entre locales</h1>
+        <h2 style="text-align:center;">Reporte de Cargos entre Locales</h2>
 
-        <t t-if="data_by_month">
-          <t t-foreach="data_by_month.items()" t-as="group">
-            <h2>Mes: <t t-esc="group[0]"/></h2>
-            <table class="table table-sm">
-              <thead>
+        <t t-foreach="data_by_month.items()" t-as="group">
+          <h4 style="margin-top:20px;">Mes: <t t-esc="group[0]"/></h4>
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Local Origen</th>
+                <th>Local Destino</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <t t-set="mes_total" t-value="0"/>
+              <t t-foreach="group[1]" t-as="line">
                 <tr>
-                  <th>Fecha</th>
-                  <th>Origen</th>
-                  <th>Destino</th>
-                  <th>Producto</th>
-                  <th>Precio</th>
-                  <th>Cantidad</th>
-                  <th>Total</th>
+                  <td><t t-esc="line['origin']"/></td>
+                  <td><t t-esc="line['destination']"/></td>
+                  <td><t t-esc="line['product']"/></td>
+                  <td><t t-esc="line['qty']"/></td>
+                  <td><t t-esc="line['price']"/></td>
+                  <td><t t-esc="line['total']"/></td>
                 </tr>
-              </thead>
-              <tbody>
-                <t t-set="mes_total" t-value="0"/>
-                <t t-foreach="group[1]" t-as="line">
-                  <tr>
-                    <td><t t-esc="line['date']"/></td>
-                    <td><t t-esc="line['origin']"/></td>
-                    <td><t t-esc="line['destination']"/></td>
-                    <td><t t-esc="line['product']"/></td>
-                    <td><t t-esc="line['price']"/></td>
-                    <td><t t-esc="line['quantity']"/></td>
-                    <td><t t-esc="line['total']"/></td>
-                  </tr>
-                  <t t-set="mes_total" t-value="mes_total + line['total']"/>
-                </t>
-                <tr>
-                  <td colspan="6" style="text-align:right;"><strong>Total del mes</strong></td>
-                  <td><strong><t t-esc="mes_total"/></strong></td>
-                </tr>
-              </tbody>
-            </table>
-            <br/>
-          </t>
-        </t>
-        <t t-if="not data_by_month">
-          <p>No se encontraron movimientos de traspasos internos para mostrar.</p>
+                <t t-set="mes_total" t-value="mes_total + line['total']"/>
+              </t>
+              <tr>
+                <td colspan="5" style="text-align:right; font-weight:bold;">Total Mes</td>
+                <td style="font-weight:bold;"><t t-esc="mes_total"/></td>
+              </tr>
+            </tbody>
+          </table>
         </t>
       </main>
     </t>
