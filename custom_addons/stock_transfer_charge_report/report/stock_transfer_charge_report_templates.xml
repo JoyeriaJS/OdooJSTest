@@ -3,7 +3,6 @@
     <t t-call="web.external_layout">
       <main class="page">
         <h2 style="text-align:center;">Reporte Mensual de Cargos entre Locales</h2>
-
         <t t-foreach="data_by_month.items()" t-as="group">
           <h3><t t-esc="group[0]"/></h3>
           <table class="table table-sm table-bordered">
@@ -26,7 +25,6 @@
               </t>
             </tbody>
           </table>
-          <br/>
         </t>
       </main>
     </t>
