@@ -1,6 +1,6 @@
-from odoo import models, api
+# -*- coding: utf-8 -*-
+from odoo import api, models
 from collections import defaultdict
-from datetime import datetime
 
 class ReportStockTransferCharge(models.AbstractModel):
     _name = 'report.stock_transfer_charge_report.stock_transfer_charge_report_template'
@@ -8,32 +8,45 @@ class ReportStockTransferCharge(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        pickings = self.env['stock.picking'].search([])  # sin filtro para test
+        # 1) Tomamos sólo los pickings internos DONE pasados al reporte
+        pickings = self.env['stock.picking'].browse(docids).\
+            filtered(lambda p: p.picking_type_code == 'internal' and p.state == 'done')
 
+        # 2) Agrupamos por mes, origen y destino
         data_by_month = defaultdict(list)
+        for pick in pickings:
+            # Mes en formato "YYYY-MM"
+            month = pick.date_done.strftime('%Y-%m') if pick.date_done else 'Sin fecha'
+            origin = pick.location_id.display_name
+            dest   = pick.location_dest_id.display_name
 
-        for picking in pickings:
-            if not picking.move_line_ids:
-                continue
-            for line in picking.move_line_ids:
-                if not line.product_id or not line.qty_done:
-                    continue
-                date = picking.date_done or picking.date or datetime.now()
-                month_key = date.strftime('%B %Y')
-                data_by_month[month_key].append({
-                    'origin': picking.location_id.display_name,
-                    'destination': picking.location_dest_id.display_name,
-                    'product': line.product_id.display_name,
-                    'quantity': line.qty_done,
-                    'price_unit': line.product_id.standard_price,
-                    'subtotal': line.qty_done * line.product_id.standard_price,
+            # Recorremos cada movimiento (no move_line_ids, sino move_ids, para qty_done)
+            for move in pick.move_ids.filtered(lambda m: m.state == 'done'):
+                qty  = move.quantity_done or 0.0
+                price = move.product_id.standard_price or 0.0
+                data_by_month[(month, origin, dest)].append({
+                    'origin':     origin,
+                    'dest':       dest,
+                    'product':    move.product_id.display_name,
+                    'quantity':   qty,
+                    'price_unit': price,
+                    'subtotal':   qty * price,
                 })
 
-        months = [{'month': k, 'lines': v} for k, v in data_by_month.items()]
-        if not months:
-            # Log en consola del servidor para detectar que está vacío
-            print("❌ [REPORTE TRASPASOS] No se encontraron movimientos con qty_done")
+        # 3) Construimos la lista de meses y lineas
+        months = []
+        for (month, origin, dest), lines in sorted(data_by_month.items()):
+            months.append({
+                'month': month,
+                'origin': origin,
+                'dest': dest,
+                'lines': lines,
+            })
 
+        # 4) Si no hay datos, el template mostrará el mensaje por defecto
         return {
-            'months': months,
+            'doc_ids':   docids,
+            'doc_model': 'stock.picking',
+            'docs':      pickings,
+            'months':    months,
         }
