@@ -8,8 +8,7 @@
         <t t-if="months">
           <t t-foreach="months" t-as="mdata">
             <h3>Mes: <t t-esc="mdata['month']"/></h3>
-            <p><strong>Origen:</strong> <t t-esc="mdata['origin']"/>
-               &nbsp; <strong>Destino:</strong> <t t-esc="mdata['dest']"/></p>
+            <p><strong>Origen:</strong> <t t-esc="mdata['origin']"/>  <strong>Destino:</strong> <t t-esc="mdata['dest']"/></p>
             <table class="table table-sm">
               <thead>
                 <tr>
