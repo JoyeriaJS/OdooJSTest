@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
+
 from odoo import models, api
 from collections import defaultdict
-from datetime import datetime
 
 class ReportStockTransferCharge(models.AbstractModel):
     _name = 'report.stock_transfer_charge_report.stock_transfer_charge_report_template'
@@ -16,25 +15,20 @@ class ReportStockTransferCharge(models.AbstractModel):
         ])
 
         data_by_month = defaultdict(list)
-
-        for p in pickings:
-            date = p.date_done
-            month_key = date.strftime('%Y-%m')  # Ej: "2025-06"
-            for move in p.move_lines:
+        for picking in pickings:
+            month = picking.date_done.strftime('%Y-%m')
+            for move in picking.move_lines:
                 qty = move.quantity_done or 0.0
-                price = move.product_id.standard_price or 0.0
-                amount = qty * price
                 if qty == 0:
                     continue
-                data_by_month[month_key].append({
-                    'origin': p.location_id.display_name,
-                    'destination': p.location_dest_id.display_name,
+                price = move.product_id.standard_price or 0.0
+                total = qty * price
+                data_by_month[month].append({
+                    'origin': picking.location_id.display_name,
+                    'destination': picking.location_dest_id.display_name,
                     'product': move.product_id.display_name,
                     'quantity': qty,
                     'price': price,
-                    'total': amount,
+                    'total': total,
                 })
-
-        return {
-            'data_by_month': dict(data_by_month),
-        }
+        return {'data_by_month': dict(data_by_month)}
