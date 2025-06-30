@@ -8,31 +8,32 @@ class ReportStockTransferCharge(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # Elimina filtros para forzar que entregue todo
-        pickings = self.env['stock.picking'].search([
-            ('picking_type_code', '=', 'internal'),
-        ])
+        pickings = self.env['stock.picking'].search([])  # sin filtro para test
 
         data_by_month = defaultdict(list)
 
         for picking in pickings:
-            # Usamos move_line_ids, no move_lines
+            if not picking.move_line_ids:
+                continue
             for line in picking.move_line_ids:
-                product = line.product_id
-                quantity = line.qty_done or 0.0
-                price = product.standard_price or 0.0
-                subtotal = quantity * price
-                date = picking.date_done or picking.scheduled_date or picking.date or datetime.now()
+                if not line.product_id or not line.qty_done:
+                    continue
+                date = picking.date_done or picking.date or datetime.now()
                 month_key = date.strftime('%B %Y')
                 data_by_month[month_key].append({
                     'origin': picking.location_id.display_name,
                     'destination': picking.location_dest_id.display_name,
-                    'product': product.display_name,
-                    'quantity': quantity,
-                    'price_unit': price,
-                    'subtotal': subtotal,
+                    'product': line.product_id.display_name,
+                    'quantity': line.qty_done,
+                    'price_unit': line.product_id.standard_price,
+                    'subtotal': line.qty_done * line.product_id.standard_price,
                 })
 
+        months = [{'month': k, 'lines': v} for k, v in data_by_month.items()]
+        if not months:
+            # Log en consola del servidor para detectar que está vacío
+            print("❌ [REPORTE TRASPASOS] No se encontraron movimientos con qty_done")
+
         return {
-            'months': [{'month': m, 'lines': l} for m, l in data_by_month.items()],
+            'months': months,
         }
