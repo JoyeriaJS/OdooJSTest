@@ -1,36 +1,31 @@
-
 <odoo>
-<!-- Plantilla QWeb -->
-    <template id="stock_transfer_charge_report_template">
-      <t t-call="web.external_layout">
-        <main class="page">
-          <h1 style="text-align:center;">Reporte Mensual Cargos entre Locales</h1>
-          <p style="text-align:center;">
-            <strong><t t-esc="date_start"/> → <t t-esc="date_end"/></strong>
-          </p>
-          <table class="table table-condensed">
-            <thead>
+  <template id="report_monthly_transfer_charges_template">
+    <t t-call="web.external_layout">
+      <main class="page">
+        <h2 style="text-align:center;">Reporte Mensual Cargos entre Locales</h2>
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Mes</th>
+              <th>Local Origen</th>
+              <th>Local Destino</th>
+              <th>Producto</th>
+              <th>Total Valorado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <t t-foreach="lines" t-as="l">
               <tr>
-                <th>Mes</th>
-                <th>Local Origen</th>
-                <th>Local Destino</th>
-                <th>Producto</th>
-                <th>Total Valorado</th>
+                <td><t t-esc="l['month']"/></td>
+                <td><t t-esc="l['origin']"/></td>
+                <td><t t-esc="l['destination']"/></td>
+                <td><t t-esc="l['product']"/></td>
+                <td><t t-esc="'$ %.2f' % l['total']"/></td>
               </tr>
-            </thead>
-            <tbody>
-              <t t-foreach="lines" t-as="l">
-                <tr>
-                  <td><t t-esc="l['month_name']"/></td>
-                  <td><t t-esc="l['origin']"/></td>
-                  <td><t t-esc="l['destination']"/></td>
-                  <td><t t-esc="l['product']"/></td>
-                  <td><t t-esc="l['total']"/></td>
-                </tr>
-              </t>
-            </tbody>
-          </table>
-        </main>
-      </t>
-    </template>
+            </t>
+          </tbody>
+        </table>
+      </main>
+    </t>
+  </template>
 </odoo>
