@@ -33,9 +33,8 @@
             </table>
           </t>
         </t>
-
         <t t-if="not months">
-          <p style="text-align:center; font-style:italic;">No se encontraron traspasos internos realizados.</p>
+          <p style="text-align:center; font-style:italic;">No se encontraron traspasos realizados.</p>
         </t>
       </main>
     </t>
