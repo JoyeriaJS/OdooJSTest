@@ -35,8 +35,6 @@
         'report/report_monthly_rma_pos_action.xml',
         'report/report_monthly_rma_pos_template.xml',
 
-        'report/stock_transfer_charge_report_action.xml',
-        'report/stock_transfer_charge_report_templates.xml',
 
         
 
