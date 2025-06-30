@@ -3,10 +3,12 @@
     <t t-call="web.external_layout">
       <main class="page">
         <h2 style="text-align:center;">Reporte de Cargos entre Locales</h2>
-
-        <t t-foreach="data_by_month.items()" t-as="group">
-          <h4 style="margin-top:20px;">Mes: <t t-esc="group[0]"/></h4>
-          <table class="table table-sm">
+        <t t-set="months" t-value="sorted(data_by_month.items())"/>
+        <t t-foreach="months" t-as="month_data">
+          <h3>
+            Mes: <t t-esc="month_data[0]"/>
+          </h3>
+          <table class="table table-condensed" style="width:100%; margin-bottom: 40px;">
             <thead>
               <tr>
                 <th>Local Origen</th>
@@ -18,22 +20,17 @@
               </tr>
             </thead>
             <tbody>
-              <t t-set="mes_total" t-value="0"/>
-              <t t-foreach="group[1]" t-as="line">
+              <t t-set="subtotal" t-value="0"/>
+              <t t-foreach="month_data[1]" t-as="line">
                 <tr>
                   <td><t t-esc="line['origin']"/></td>
                   <td><t t-esc="line['destination']"/></td>
                   <td><t t-esc="line['product']"/></td>
-                  <td><t t-esc="line['qty']"/></td>
+                  <td><t t-esc="line['quantity']"/></td>
                   <td><t t-esc="line['price']"/></td>
                   <td><t t-esc="line['total']"/></td>
                 </tr>
-                <t t-set="mes_total" t-value="mes_total + line['total']"/>
               </t>
-              <tr>
-                <td colspan="5" style="text-align:right; font-weight:bold;">Total Mes</td>
-                <td style="font-weight:bold;"><t t-esc="mes_total"/></td>
-              </tr>
             </tbody>
           </table>
         </t>
