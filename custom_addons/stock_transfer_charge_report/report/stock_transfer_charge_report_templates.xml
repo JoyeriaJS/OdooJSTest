@@ -3,11 +3,10 @@
     <t t-call="web.external_layout">
       <main class="page">
         <h2 style="text-align:center;">Reporte de Cargos entre Locales</h2>
-
-        <t t-if="months">
-          <t t-foreach="months" t-as="month_data">
-            <h3 style="margin-top:30px;"><t t-esc="month_data['month']"/></h3>
-            <table class="table table-sm" style="width: 100%; border: 1px solid #000;">
+        <t t-if="data_by_month">
+          <t t-foreach="data_by_month.items()" t-as="month_data">
+            <h3><t t-esc="month_data[0]"/></h3>
+            <table class="table table-sm table-bordered">
               <thead>
                 <tr>
                   <th>Local Origen</th>
@@ -19,33 +18,22 @@
                 </tr>
               </thead>
               <tbody>
-                <t t-set="total_month" t-value="0"/>
-                <t t-foreach="month_data['lines']" t-as="line">
+                <t t-foreach="month_data[1]" t-as="line">
                   <tr>
                     <td><t t-esc="line['origin']"/></td>
                     <td><t t-esc="line['destination']"/></td>
                     <td><t t-esc="line['product']"/></td>
                     <td><t t-esc="line['quantity']"/></td>
                     <td><t t-esc="line['price_unit']"/></td>
-                    <td>
-                      <t t-esc="line['subtotal']"/>
-                      <t t-set="total_month" t-value="total_month + line['subtotal']"/>
-                    </td>
+                    <td><t t-esc="line['subtotal']"/></td>
                   </tr>
                 </t>
-                <tr style="font-weight: bold;">
-                  <td colspan="5" style="text-align:right;">Total del Mes:</td>
-                  <td><t t-esc="total_month"/></td>
-                </tr>
               </tbody>
             </table>
           </t>
         </t>
-
-        <t t-if="not months">
-          <p style="text-align:center; font-style:italic; margin-top:30px;">
-            No se encontraron traspasos internos realizados.
-          </p>
+        <t t-if="not data_by_month">
+          <p style="text-align:center;">No se encontraron traspasos realizados.</p>
         </t>
       </main>
     </t>

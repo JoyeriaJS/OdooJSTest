@@ -1,45 +1,42 @@
-# -*- coding: utf-8 -*-
 from odoo import models, api
 from collections import defaultdict
+from datetime import datetime
 
 class ReportStockTransferCharge(models.AbstractModel):
     _name = 'report.stock_transfer_charge_report.stock_transfer_charge_report_template'
-    _description = 'Reporte de Cargos entre Locales por Traspasos Internos'
+    _description = 'Reporte de Cargos entre Locales por Traspasos'
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # Buscar traslados internos que estén en estado 'done'
         pickings = self.env['stock.picking'].search([
             ('picking_type_code', '=', 'internal'),
-            ('state', '=', 'done'),
+            ('state', '=', 'done')
         ])
 
         data_by_month = defaultdict(list)
 
         for picking in pickings:
-            if not picking.move_lines:
+            date_done = picking.date_done or picking.scheduled_date
+            if not date_done:
                 continue
+            month_key = date_done.strftime('%B %Y')
+            origin = picking.location_id.display_name
+            destination = picking.location_dest_id.display_name
 
-            if not picking.date_done:
-                continue  # ignorar sin fecha efectiva
-
-            month_key = picking.date_done.strftime('%B %Y')
-
-            for move in picking.move_lines:
-                product = move.product_id
+            for move in picking.move_ids.filtered(lambda m: m.state == 'done'):
                 qty = move.quantity_done
-                price = product.standard_price or 0.0
-                subtotal = qty * price
+                price_unit = move.product_id.standard_price
+                subtotal = qty * price_unit
 
                 data_by_month[month_key].append({
-                    'origin': picking.location_id.display_name,
-                    'destination': picking.location_dest_id.display_name,
-                    'product': product.display_name,
+                    'origin': origin,
+                    'destination': destination,
+                    'product': move.product_id.display_name,
                     'quantity': qty,
-                    'price_unit': price,
+                    'price_unit': price_unit,
                     'subtotal': subtotal,
                 })
 
         return {
-            'months': [{'month': m, 'lines': lines} for m, lines in sorted(data_by_month.items())],
+            'data_by_month': dict(data_by_month)
         }
