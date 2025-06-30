@@ -8,36 +8,31 @@ class ReportMonthlyTransferCharges(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        pickings = self.env['stock.picking'].search([
-            ('picking_type_code', '=', 'internal'),
-            ('state', '=', 'done')
+        moves = self.env['stock.move'].search([
+            ('picking_id.picking_type_code', '=', 'internal'),
+            ('state', '=', 'done'),
         ])
 
-        lines_by_month = defaultdict(list)
+        grupos = defaultdict(list)
 
-        for picking in pickings:
-            fecha = picking.scheduled_date or picking.date_done or picking.create_date
-            mes_key = fecha.strftime('%Y-%m')
-            for move in picking.move_ids_without_package:
-                qty = move.quantity_done
-                if qty <= 0:
-                    continue
-                price = move.product_id.standard_price or 0.0
-                total = qty * price
+        for move in moves:
+            if move.picking_id.date_done:
+                fecha = fields.Datetime.context_timestamp(self, move.picking_id.date_done)
+                mes = fecha.strftime('%B %Y')
+                origen = move.location_id.display_name
+                destino = move.location_dest_id.display_name
+                producto = move.product_id.display_name
+                costo = move.product_id.standard_price or 0.0
+                qty = move.quantity_done or 0.0
+                total = costo * qty
 
-                lines_by_month[mes_key].append({
-                    'month': fecha.strftime('%B %Y'),
-                    'origin': picking.location_id.display_name,
-                    'destination': picking.location_dest_id.display_name,
-                    'product': move.product_id.display_name,
-                    'total': total
+                grupos[mes].append({
+                    'origin': origen,
+                    'destination': destino,
+                    'product': producto,
+                    'total': total,
                 })
 
-        result_lines = []
-        for mes, lines in sorted(lines_by_month.items()):
-            for line in lines:
-                result_lines.append(line)
-
         return {
-            'lines': result_lines,
+            'data_by_month': grupos,
         }

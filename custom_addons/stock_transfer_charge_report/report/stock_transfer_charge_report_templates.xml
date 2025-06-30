@@ -2,29 +2,31 @@
   <template id="stock_transfer_charge_report_template">
     <t t-call="web.external_layout">
       <main class="page">
-        <h2 style="text-align:center;">Reporte Mensual Cargos entre Locales</h2>
-        <table class="table table-sm">
-          <thead>
-            <tr>
-              <th>Mes</th>
-              <th>Local Origen</th>
-              <th>Local Destino</th>
-              <th>Producto</th>
-              <th>Total Valorado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <t t-foreach="lines" t-as="l">
+        <h2 style="text-align: center;">Reporte Mensual Cargos entre Locales</h2>
+        <t t-foreach="data_by_month.items()" t-as="group">
+          <h4><strong>Mes: <t t-esc="group[0]"/></strong></h4>
+          <table class="table table-sm table-bordered">
+            <thead>
               <tr>
-                <td><t t-esc="l['month']"/></td>
-                <td><t t-esc="l['origin']"/></td>
-                <td><t t-esc="l['destination']"/></td>
-                <td><t t-esc="l['product']"/></td>
-                <td><t t-esc="'$ %.2f' % l['total']"/></td>
+                <th>Local Origen</th>
+                <th>Local Destino</th>
+                <th>Producto</th>
+                <th>Total Valorado</th>
               </tr>
-            </t>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <t t-foreach="group[1]" t-as="line">
+                <tr>
+                  <td><t t-esc="line['origin']"/></td>
+                  <td><t t-esc="line['destination']"/></td>
+                  <td><t t-esc="line['product']"/></td>
+                  <td><t t-esc="line['total']"/></td>
+                </tr>
+              </t>
+            </tbody>
+          </table>
+          <br/>
+        </t>
       </main>
     </t>
   </template>
