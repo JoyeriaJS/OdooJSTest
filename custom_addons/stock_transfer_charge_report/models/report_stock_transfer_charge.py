@@ -13,26 +13,25 @@ class ReportMonthlyTransferCharges(models.AbstractModel):
             ('state', '=', 'done'),
         ])
 
-        grupos = defaultdict(list)
+        data_by_month = defaultdict(list)
 
         for move in moves:
-            if move.picking_id.date_done:
-                fecha = fields.Datetime.context_timestamp(self, move.picking_id.date_done)
-                mes = fecha.strftime('%B %Y')
-                origen = move.location_id.display_name
-                destino = move.location_dest_id.display_name
-                producto = move.product_id.display_name
-                costo = move.product_id.standard_price or 0.0
-                qty = move.quantity_done or 0.0
-                total = costo * qty
+            picking = move.picking_id
+            if not picking or not picking.date_done:
+                continue
 
-                grupos[mes].append({
-                    'origin': origen,
-                    'destination': destino,
-                    'product': producto,
-                    'total': total,
-                })
+            fecha = fields.Datetime.context_timestamp(self, picking.date_done)
+            mes = fecha.strftime('%B %Y')
+
+            data_by_month[mes].append({
+                'origin': move.location_id.display_name or '',
+                'destination': move.location_dest_id.display_name or '',
+                'product': move.product_id.display_name or '',
+                'total': (move.quantity_done or 0.0) * (move.product_id.standard_price or 0.0),
+            })
 
         return {
-            'data_by_month': grupos,
+            'doc_ids': docids,
+            'doc_model': 'stock.move',
+            'data_by_month': dict(data_by_month),  # <--- Asegúrate que exista
         }
