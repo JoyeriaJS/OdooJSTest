@@ -1,14 +1,15 @@
+
 {
-    'name': "Cargos entre Locales por Traspasos",
-    'version': '1.0',
-    'depends': ['stock', 'base', 'product'],
-    'author': "Tu Empresa",
-    'category': 'Inventory',
-    'description': 'Reporte de cargos entre locales a través de traspasos internos',
-    'data': [
-        'report/stock_transfer_charge_report_action.xml',
-        'report/stock_transfer_charge_report_templates.xml',
+    "name": "Stock Transfer Charge Report",
+    "version": "1.0",
+    "summary": "Reporte de cargos entre locales basado en traspasos internos.",
+    "category": "Inventory",
+    "depends": ["stock"],
+    "data": [
+        "report/stock_transfer_charge_report_templates.xml",
+        "report/report_action.xml"
     ],
-    'installable': True,
-    'application': False,
+    "installable": True,
+    "auto_install": False,
+    "application": False
 }
