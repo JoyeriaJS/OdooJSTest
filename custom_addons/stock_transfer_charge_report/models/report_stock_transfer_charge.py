@@ -1,10 +1,9 @@
-from odoo import models, fields, api
-from collections import defaultdict
+from odoo import models, api
 from datetime import datetime
 
-class ReportMonthlyTransferCharges(models.AbstractModel):
-    _name = 'report.stock.report_monthly_transfer_charges_template'
-    _description = 'Reporte mensual de cargos entre locales por traspasos internos'
+class ReportStockTransferCharge(models.AbstractModel):
+    _name = 'report.stock_transfer_charge_report.stock_transfer_charge_report_template'
+    _description = 'Reporte de Cargos entre Locales por Traspasos'
 
     @api.model
     def _get_report_values(self, docids, data=None):
