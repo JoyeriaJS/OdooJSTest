@@ -3,7 +3,6 @@
     <t t-call="web.external_layout">
       <main class="page">
         <h2 style="text-align:center;">Reporte de Cargos entre Locales</h2>
-
         <t t-if="months">
           <t t-foreach="months" t-as="month_data">
             <h3><t t-esc="month_data['month']"/></h3>
