@@ -8,33 +8,38 @@ class ReportMonthlyTransferCharges(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        moves = self.env['stock.move'].search([
-            ('picking_id.picking_type_code', '=', 'internal'),
-            ('state', '=', 'done'),
-            ('quantity_done', '>', 0),
+        pickings = self.env['stock.picking'].search([
+            ('picking_type_code', '=', 'internal'),
+            ('state', '=', 'done')
         ])
 
-        data_by_month = defaultdict(list)
-
-        for move in moves:
-            picking = move.picking_id
-            if not picking or not picking.date_done:
+        grouped = {}
+        for picking in pickings:
+            date = picking.date_done.date() if picking.date_done else None
+            if not date:
                 continue
+            year_month = date.strftime('%Y-%m')
 
-            fecha = fields.Datetime.context_timestamp(self, picking.date_done)
-            mes = fecha.strftime('%B %Y')
+            for move in picking.move_lines:
+                qty = move.quantity_done or 0.0
+                price = move.product_id.standard_price or 0.0
+                amount = qty * price
 
-            total = move.quantity_done * (move.product_id.standard_price or 0.0)
+                origin = picking.location_id.display_name
+                destination = picking.location_dest_id.display_name
+                product_name = move.product_id.display_name
 
-            data_by_month[mes].append({
-                'origin': move.location_id.display_name or '',
-                'destination': move.location_dest_id.display_name or '',
-                'product': move.product_id.display_name or '',
-                'total': total,
-            })
+                grouped.setdefault(year_month, [])
+                grouped[year_month].append({
+                    'origin': origin,
+                    'destination': destination,
+                    'product': product_name,
+                    'amount': amount,
+                    'qty': qty,
+                    'unit_price': price,
+                    'date': date.strftime('%d/%m/%Y'),
+                })
 
         return {
-            'doc_ids': docids,
-            'doc_model': 'stock.move',
-            'data_by_month': dict(data_by_month),
+            'data_by_month': grouped
         }

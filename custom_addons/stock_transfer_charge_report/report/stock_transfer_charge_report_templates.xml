@@ -2,29 +2,42 @@
   <template id="stock_transfer_charge_report_template">
     <t t-call="web.external_layout">
       <main class="page">
-        <h2 style="text-align:center;">Reporte Mensual de Cargos entre Locales</h2>
+        <h1 style="text-align:center;">Reporte de Cargos entre Locales</h1>
         <t t-foreach="data_by_month.items()" t-as="group">
           <h3><t t-esc="group[0]"/></h3>
-          <table class="table table-sm table-bordered">
+          <table class="table table-condensed">
             <thead>
               <tr>
+                <th>Fecha</th>
                 <th>Local Origen</th>
                 <th>Local Destino</th>
                 <th>Producto</th>
-                <th>Valor Total</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Total</th>
               </tr>
             </thead>
             <tbody>
+              <t t-set="month_total" t-value="0"/>
               <t t-foreach="group[1]" t-as="line">
                 <tr>
+                  <td><t t-esc="line['date']"/></td>
                   <td><t t-esc="line['origin']"/></td>
                   <td><t t-esc="line['destination']"/></td>
                   <td><t t-esc="line['product']"/></td>
-                  <td><t t-esc="line['total']"/></td>
+                  <td><t t-esc="line['qty']"/></td>
+                  <td><t t-esc="line['unit_price']"/></td>
+                  <td><t t-esc="line['amount']"/></td>
                 </tr>
+                <t t-set="month_total" t-value="month_total + line['amount']"/>
               </t>
+              <tr>
+                <td colspan="6" style="text-align:right;"><strong>Total del Mes</strong></td>
+                <td><strong><t t-esc="month_total"/></strong></td>
+              </tr>
             </tbody>
           </table>
+          <br/>
         </t>
       </main>
     </t>
