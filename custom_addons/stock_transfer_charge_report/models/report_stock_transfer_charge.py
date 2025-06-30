@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import models, api
 from collections import defaultdict
 
@@ -16,19 +17,17 @@ class ReportStockTransferCharge(models.AbstractModel):
         data_by_month = defaultdict(list)
 
         for picking in pickings:
+            month_key = picking.date_done.strftime('%B %Y')
             for move in picking.move_lines:
-                qty = move.quantity_done or 0.0
-                price = move.product_id.standard_price or 0.0
-                if qty <= 0.0 or price <= 0.0:
+                if not move.product_id:
                     continue
-                month_key = picking.date_done.strftime('%B %Y')
                 data_by_month[month_key].append({
                     'origin': picking.location_id.display_name,
                     'destination': picking.location_dest_id.display_name,
                     'product': move.product_id.display_name,
-                    'quantity': qty,
-                    'price_unit': round(price, 2),
-                    'subtotal': round(qty * price, 2),
+                    'quantity': move.quantity_done,
+                    'price_unit': move.product_id.standard_price,
+                    'subtotal': move.quantity_done * move.product_id.standard_price,
                 })
 
         return {
