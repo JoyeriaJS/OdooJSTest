@@ -2,41 +2,38 @@
   <template id="stock_transfer_charge_report_template">
     <t t-call="web.external_layout">
       <main class="page">
-        <h2 style="text-align: center;">Reporte de Cargos entre Locales</h2>
-        
-        <!-- Si hay meses con datos -->
+        <h2 style="text-align:center;">Reporte de Cargos entre Locales</h2>
         <t t-if="months">
-          <t t-foreach="months" t-as="mdata">
-            <h3>Mes: <t t-esc="mdata['month']"/></h3>
-            <p><strong>Origen:</strong> <t t-esc="mdata['origin']"/>  <strong>Destino:</strong> <t t-esc="mdata['dest']"/></p>
+          <t t-foreach="months" t-as="month_data">
+            <h3><t t-esc="month_data['month']"/></h3>
             <table class="table table-sm">
               <thead>
                 <tr>
+                  <th>Local Origen</th>
+                  <th>Local Destino</th>
                   <th>Producto</th>
-                  <th class="text-center">Cantidad</th>
-                  <th class="text-right">Precio Unitario</th>
-                  <th class="text-right">Subtotal</th>
+                  <th>Cantidad</th>
+                  <th>Precio Unitario</th>
+                  <th>Subtotal</th>
                 </tr>
               </thead>
               <tbody>
-                <t t-foreach="mdata['lines']" t-as="line">
+                <t t-foreach="month_data['lines']" t-as="line">
                   <tr>
+                    <td><t t-esc="line['origin']"/></td>
+                    <td><t t-esc="line['destination']"/></td>
                     <td><t t-esc="line['product']"/></td>
-                    <td class="text-center"><t t-esc="line['quantity']"/></td>
-                    <td class="text-right"><t t-esc="'%.2f' % line['price_unit']"/></td>
-                    <td class="text-right"><t t-esc="'%.2f' % line['subtotal']"/></td>
+                    <td><t t-esc="line['quantity']"/></td>
+                    <td><t t-esc="line['price_unit']"/></td>
+                    <td><t t-esc="line['subtotal']"/></td>
                   </tr>
                 </t>
               </tbody>
             </table>
           </t>
         </t>
-
-        <!-- Si no hay meses, mostramos mensaje -->
         <t t-if="not months">
-          <p style="text-align: center; font-style: italic;">
-            No se encontraron traspasos realizados.
-          </p>
+          <p style="text-align:center; font-style:italic;">No se encontraron traspasos realizados.</p>
         </t>
       </main>
     </t>
