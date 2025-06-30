@@ -1,37 +1,40 @@
-from odoo import models, fields, api
+from odoo import models, api
 from collections import defaultdict
 from datetime import datetime
 
 class ReportStockTransferCharge(models.AbstractModel):
     _name = 'report.stock_transfer_charge_report.stock_transfer_charge_report_template'
-    _description = 'Reporte de cargos entre locales agrupado por mes'
+    _description = 'Reporte de Cargos entre Locales'
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        data_by_month = defaultdict(list)
+
         pickings = self.env['stock.picking'].search([
             ('picking_type_code', '=', 'internal'),
             ('state', '=', 'done'),
+            ('date_done', '!=', False),
         ])
 
-        data_by_month = defaultdict(list)
         for picking in pickings:
-            date = picking.date_done
-            if not date:
-                continue
-            month_key = date.strftime('%Y-%m')
+            date_done = picking.date_done
+            month = date_done.strftime('%Y-%m')
+
             for move in picking.move_ids_without_package:
-                data_by_month[month_key].append({
-                    'date': date.strftime('%d/%m/%Y'),
+                price = move.product_id.standard_price or 0.0
+                qty = move.quantity_done or 0.0
+                total = qty * price
+
+                data_by_month[month].append({
+                    'date': date_done.strftime('%d/%m/%Y'),
                     'origin': picking.location_id.display_name,
                     'destination': picking.location_dest_id.display_name,
                     'product': move.product_id.display_name,
-                    'quantity': move.quantity_done,
-                    'price': move.product_id.standard_price,
-                    'total': move.quantity_done * move.product_id.standard_price,
+                    'quantity': qty,
+                    'price': price,
+                    'total': total,
                 })
 
-        # Ordenamos por mes
-        sorted_data = dict(sorted(data_by_month.items()))
         return {
-            'data_by_month': sorted_data,
+            'data_by_month': dict(data_by_month),  # 👈🏼 ESTA VARIABLE ES LA CLAVE
         }

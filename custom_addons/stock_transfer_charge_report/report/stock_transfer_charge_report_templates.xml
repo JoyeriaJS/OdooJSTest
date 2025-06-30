@@ -2,9 +2,9 @@
   <template id="stock_transfer_charge_report_template">
     <t t-call="web.external_layout">
       <main class="page">
-        <h1 style="text-align:center;">Cargos entre Locales - Reporte Mensual</h1>
+        <h1 style="text-align:center;">Reporte Mensual de Cargos entre Locales</h1>
         <t t-foreach="data_by_month.items()" t-as="group">
-          <h2 style="margin-top:20px;"><t t-esc="group[0]"/></h2>
+          <h2>Mes: <t t-esc="group[0]"/></h2>
           <table class="table table-condensed">
             <thead>
               <tr>
@@ -12,7 +12,7 @@
                 <th>Origen</th>
                 <th>Destino</th>
                 <th>Producto</th>
-                <th>Precio Unitario</th>
+                <th>Precio</th>
                 <th>Cantidad</th>
                 <th>Total</th>
               </tr>
@@ -32,11 +32,12 @@
                 <t t-set="total_mes" t-value="total_mes + line['total']"/>
               </t>
               <tr>
-                <td colspan="6" style="text-align:right;"><strong>Total del mes</strong></td>
+                <td colspan="6" style="text-align:right;"><strong>Total del Mes</strong></td>
                 <td><strong><t t-esc="total_mes"/></strong></td>
               </tr>
             </tbody>
           </table>
+          <br/>
         </t>
       </main>
     </t>
