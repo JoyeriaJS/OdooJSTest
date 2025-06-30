@@ -1,5 +1,5 @@
 <odoo>
-  <template id="report_monthly_transfer_charges_template">
+  <template id="stock_transfer_charge_report_template">
     <t t-call="web.external_layout">
       <main class="page">
         <h2 style="text-align:center;">Reporte Mensual Cargos entre Locales</h2>
