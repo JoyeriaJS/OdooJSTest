@@ -36,3 +36,4 @@ class ReportStockTransferCharge(models.AbstractModel):
         return {
             'months': [{'month': m, 'lines': l} for m, l in data_by_month.items()],
         }
+
