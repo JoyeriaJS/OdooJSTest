@@ -4,7 +4,7 @@
       <main class="page">
         <h1 style="text-align:center;">Reporte de Cargos entre Locales</h1>
         <t t-foreach="data_by_month.items()" t-as="group">
-          <h3><t t-esc="group[0]"/></h3>
+          <h3 style="margin-top:20px;"><t t-esc="group[0]"/></h3>
           <table class="table table-condensed">
             <thead>
               <tr>
@@ -18,7 +18,7 @@
               </tr>
             </thead>
             <tbody>
-              <t t-set="month_total" t-value="0"/>
+              <t t-set="total_mes" t-value="0"/>
               <t t-foreach="group[1]" t-as="line">
                 <tr>
                   <td><t t-esc="line['date']"/></td>
@@ -27,17 +27,16 @@
                   <td><t t-esc="line['product']"/></td>
                   <td><t t-esc="line['qty']"/></td>
                   <td><t t-esc="line['unit_price']"/></td>
-                  <td><t t-esc="line['amount']"/></td>
+                  <td><t t-esc="line['total']"/></td>
                 </tr>
-                <t t-set="month_total" t-value="month_total + line['amount']"/>
+                <t t-set="total_mes" t-value="total_mes + line['total']"/>
               </t>
               <tr>
-                <td colspan="6" style="text-align:right;"><strong>Total del Mes</strong></td>
-                <td><strong><t t-esc="month_total"/></strong></td>
+                <td colspan="6" style="text-align:right;"><strong>Total del Mes:</strong></td>
+                <td><strong><t t-esc="total_mes"/></strong></td>
               </tr>
             </tbody>
           </table>
-          <br/>
         </t>
       </main>
     </t>
