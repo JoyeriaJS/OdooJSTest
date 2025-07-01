@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
   <!-- Heredamos todo el bucle que define 'o' -->
-  <template id="stock_transfer_charge_report_template">
-
+  <template id="stock_transfer_charge_report_template"
+            inherit_id="stock.report_deliveryslip">
     <!-- Insertamos tras cada picking -->
     <xpath expr="//t[@t-call='stock.report_delivery_document']" position="after">
       <div class="page break-after mt32">
