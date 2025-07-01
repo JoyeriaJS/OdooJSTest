@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <!-- Este es tu template standalone -->
-  <template id="stock_transfer_charge_report_template"
+  <!--  
+    Un template standalone:
+    - `id` es tu xmlid interno.
+    - `t-name` debe coincidir exactamente con el atributo `name` de tu <report>.
+  -->
+  <template id="report_stock_transfer_charge" 
             t-name="stock_transfer_charge_report.stock_transfer_charge_report_template">
-    <!-- Llama al contenedor HTML y layout external -->
+    <!-- Llamamos al layout estándar de Odoo -->
     <t t-call="web.html_container">
       <t t-call="web.external_layout">
-        <!-- Iteramos sobre los pickings que recibe la acción -->
+        <!-- Iteramos sobre los pickings seleccionados -->
         <t t-foreach="docs" t-as="o">
           <main class="page">
-            <!-- Encabezado con la secuencia del picking -->
             <h2 style="text-align: center;">
               Cargos entre Talleres — <small><t t-esc="o.name"/></small>
             </h2>
@@ -37,12 +40,9 @@
                 </tbody>
               </table>
             </t>
-
-            <!-- Mensaje si no hay cargos -->
+            <!-- Si no hay cargos, mensaje -->
             <t t-if="not charge_lines">
-              <p class="text-center">
-                <em>No hay cargos internos para mostrar en este picking.</em>
-              </p>
+              <p class="text-center"><em>No hay cargos para mostrar en este picking.</em></p>
             </t>
           </main>
         </t>
