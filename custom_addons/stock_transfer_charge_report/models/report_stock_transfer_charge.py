@@ -1,23 +1,27 @@
 from odoo import models, api
 
-class ReportStockTransferCharge(models.AbstractModel):
+class ReportPickingTransfer(models.AbstractModel):
     _name = 'report.stock_transfer_charge_report.stock_transfer_charge_report_template'
-    _description = 'Reporte Debug de Traspasos'
+    _description = 'Reporte personalizado de traspasos'
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # ¡No filtra nada, trae todo!
-        pickings = self.env['stock.picking'].search([], limit=50)  # Limita a 50 por seguridad
-
+        # Solo los docids seleccionados
+        pickings = self.env['stock.picking'].browse(docids)
         lines = []
         for picking in pickings:
-            lines.append({
-                'name': picking.name,
-                'state': picking.state,
-                'picking_type_code': getattr(picking, 'picking_type_code', 'N/A'),
-                'origin': picking.location_id.display_name if picking.location_id else '',
-                'destination': picking.location_dest_id.display_name if picking.location_dest_id else '',
-                'date': picking.date_done or picking.scheduled_date or picking.date,
-            })
-
-        return {'lines': lines}
+            for move in picking.move_ids_without_package:
+                lines.append({
+                    'picking_name': picking.name,
+                    'origin': picking.location_id.display_name,
+                    'destination': picking.location_dest_id.display_name,
+                    'product': move.product_id.display_name,
+                    'quantity': move.product_uom_qty,
+                    'price_unit': move.product_id.standard_price,
+                    'subtotal': move.product_uom_qty * (move.product_id.standard_price or 0.0),
+                    'state': picking.state,
+                    'type': picking.picking_type_code,
+                })
+        return {
+            'lines': lines,
+        }
