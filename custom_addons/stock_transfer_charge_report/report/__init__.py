@@ -1,1 +1,0 @@
-from . import stock_transfer_charge_report_templates

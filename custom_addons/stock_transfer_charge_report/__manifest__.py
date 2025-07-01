@@ -1,10 +1,9 @@
 {
-    'name': "Cargos entre Locales por Traspasos",
+    'name': 'Stock Transfer Charge Report Fixed',
     'version': '1.0',
-    'depends': ['stock', 'base', 'product', 'sale', 'contacts'],
-    'author': "Tu Empresa",
-    'category': 'Inventory',
-    'description': 'Reporte de cargos entre locales a través de traspasos internos',
+    'category': 'Stock',
+    'summary': 'Reporte de cobros entre locales',
+    'depends': ['stock'],
     'data': [
         'report/stock_transfer_charge_report_action.xml',
         'report/stock_transfer_charge_report_templates.xml',
