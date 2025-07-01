@@ -5,21 +5,33 @@
         <t t-call="web.external_layout">
           <div class="page">
             <h2 style="text-align:center;">Traspaso: <t t-esc="o.name"/></h2>
+            <p><strong>Origen:</strong> <t t-esc="o.location_id.display_name"/></p>
+            <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
+            <p><strong>Estado:</strong> <t t-esc="o.state"/></p>
+            <p><strong>Tipo:</strong> <t t-esc="o.picking_type_code"/></p>
             <table class="table table-sm" t-if="o.move_line_ids_without_package">
               <thead>
                 <tr>
                   <th>Producto</th>
                   <th>Cantidad</th>
+                  <th>UoM</th>
+                  <th>Precio Unitario</th>
+                  <th>Subtotal</th>
                 </tr>
               </thead>
               <tbody>
                 <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
                   <td><t t-esc="ml.product_id.display_name"/></td>
                   <td><t t-esc="ml.quantity"/></td>
-                  <!-- cambia solo este campo -->
+                  <td><t t-esc="ml.product_uom_id.name"/></td>
+                  <td><t t-esc="ml.product_id.standard_price"/></td>
+                  <td><t t-esc="ml.quantity * (ml.product_id.standard_price or 0.0)"/></td>
                 </tr>
               </tbody>
             </table>
+            <t t-if="not o.move_line_ids_without_package">
+              <p>No hay movimientos de productos en este traspaso.</p>
+            </t>
           </div>
         </t>
       </t>
