@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <template id="stock_transfer_charge_report_template">
+  <!-- Plantilla QWeb independiente para el reporte de Cargos entre Locales -->
+  <template
+      id="stock_transfer_charge_report_template"
+      t-name="stock_transfer_charge_report.stock_transfer_charge_report_template">
+    <!-- Usamos el layout de reportes de Odoo -->
     <t t-call="web.external_layout">
       <main class="page">
         <h2 style="text-align:center;">Cargos entre Locales (Agrupado Mensual)</h2>
 
-        <!-- Cuando hay datos agrupados -->
+        <!-- Si hay datos agrupados -->
         <t t-if="months">
           <t t-foreach="months" t-as="m">
             <div class="mt32">
@@ -30,7 +34,7 @@
           </t>
         </t>
 
-        <!-- Cuando NO hay datos -->
+        <!-- Si no hay datos -->
         <t t-if="not months">
           <p style="text-align:center;"><em>No se encontraron transferencias internas finalizadas.</em></p>
         </t>
