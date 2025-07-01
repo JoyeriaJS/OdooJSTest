@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <!-- Hereda el documento de guía de despacho -->
+  <!-- Hereda el documento de Guía de Despacho -->
   <template id="stock_transfer_charge_report_template"
             inherit_id="stock.report_delivery_document">
     <!-- Inserta tus cargos tras cada <div class="page"> -->
@@ -30,7 +30,7 @@
           </table>
         </t>
         <t t-if="not charge_lines">
-          <p class="text-center"><em>No se encontraron transferencias internas.</em></p>
+          <p class="text-center"><em>No se encontraron transferencias internas finalizadas.</em></p>
         </t>
       </div>
     </xpath>

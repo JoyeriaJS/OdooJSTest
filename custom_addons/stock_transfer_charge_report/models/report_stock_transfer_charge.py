@@ -7,23 +7,25 @@ class ReportDeliverySlipCharge(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # Llamamos al padre para mantener todo lo original
-        res = super()._get_report_values(docids, data)
-        # Filtramos solo transfers internos hechos
-        pickings = self.env['stock.picking'].browse(docids).filtered(
-            lambda p: p.picking_type_code == 'internal' and p.state == 'done'
+        # 1) Llamamos al padre para mantener toda la lógica original
+        res = super(ReportDeliverySlipCharge, self)._get_report_values(docids, data)
+        # 2) Filtramos sólo los pickings internos finalizados
+        pickings = (
+            self.env['stock.picking']
+            .browse(docids)
+            .filtered(lambda p: p.picking_type_id.code == 'internal' and p.state == 'done')
         )
+        # 3) Agrupamos por (mes, origen, destino)
         grouped = defaultdict(float)
-        for pick in pickings:
-            month = pick.date_done.strftime('%Y-%m') if pick.date_done else 'Sin Fecha'
-            origin = pick.location_id.display_name
-            dest = pick.location_dest_id.display_name
-            # Usamos move_ids con product_uom_qty
-            for mv in pick.move_ids.filtered(lambda m: m.state == 'done' and m.product_uom_qty > 0):
+        for p in pickings:
+            month = p.date_done.strftime('%Y-%m') if p.date_done else 'Sin Fecha'
+            origin = p.location_id.display_name
+            dest = p.location_dest_id.display_name
+            for mv in p.move_ids.filtered(lambda m: m.state == 'done' and m.product_uom_qty):
                 grouped[(month, origin, dest)] += mv.product_uom_qty * (mv.product_id.standard_price or 0.0)
-        # Construimos lista ordenada
+        # 4) Construimos la lista para el QWeb
         res['charge_lines'] = [
-            {'picking_id': pick.id, 'month': m, 'origin': o, 'dest': d, 'amount': amt}
+            {'month': m, 'origin': o, 'dest': d, 'amount': amt}
             for (m, o, d), amt in sorted(grouped.items())
         ]
         return res
