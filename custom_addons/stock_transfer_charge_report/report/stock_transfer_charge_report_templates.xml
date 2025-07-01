@@ -1,8 +1,8 @@
 <odoo>
-<p><t t-esc="test_text"/></p>
   <template id="stock_transfer_charge_report_template">
     <t t-call="web.external_layout">
       <main class="page">
+        <p><t t-esc="test_text"/></p>
         <h2 style="text-align:center;">Traspasos seleccionados</h2>
         <t t-if="lines">
           <table class="table table-sm">
