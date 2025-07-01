@@ -6,7 +6,7 @@
       <main class="page">
         <h2 style="text-align: center;">Cargos entre Locales (Agrupado Mensual)</h2>
 
-        <!-- Tabla si hay datos -->
+        <!-- Si hay datos de cargos -->
         <t t-if="months">
           <table class="table table-sm mt16">
             <thead>
@@ -30,11 +30,10 @@
           </table>
         </t>
 
-        <!-- Mensaje si no hay datos -->
+        <!-- Mensaje si NO hay datos -->
         <t t-if="not months">
           <p class="text-center"><em>No se encontraron traspasos internos finalizados.</em></p>
         </t>
-
       </main>
     </t>
   </template>
