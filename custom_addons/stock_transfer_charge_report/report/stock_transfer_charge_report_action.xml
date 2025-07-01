@@ -1,7 +1,7 @@
 <odoo>
     <report
         id="action_stock_transfer_charge_report"
-        model="stock.picking"
+        model="stock.move"
         string="Cargos entre Locales"
         report_type="qweb-pdf"
         name="stock_transfer_charge_report.stock_transfer_charge_report_template"

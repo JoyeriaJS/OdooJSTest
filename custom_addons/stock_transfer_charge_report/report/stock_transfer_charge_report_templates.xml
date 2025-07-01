@@ -2,13 +2,12 @@
   <template id="stock_transfer_charge_report_template">
     <t t-call="web.external_layout">
       <main class="page">
-        <p><t t-esc="test_text"/></p>
-        <h2 style="text-align:center;">Traspasos seleccionados</h2>
+        <h2 style="text-align:center;">Traspasos de Productos</h2>
         <t t-if="lines">
           <table class="table table-sm">
             <thead>
               <tr>
-                <th>Nombre Picking</th>
+                <th>Picking</th>
                 <th>Origen</th>
                 <th>Destino</th>
                 <th>Producto</th>
@@ -37,7 +36,7 @@
           </table>
         </t>
         <t t-if="not lines">
-          <p style="text-align:center; font-style:italic;">No hay traspasos en los seleccionados</p>
+          <p style="text-align:center; font-style:italic;">No hay traspasos de productos.</p>
         </t>
       </main>
     </t>
