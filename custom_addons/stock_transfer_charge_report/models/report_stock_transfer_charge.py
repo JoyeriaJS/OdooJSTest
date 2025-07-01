@@ -1,31 +1,39 @@
-# -*- coding: utf-8 -*-
-from odoo import api, models
+from odoo import models, api
 from collections import defaultdict
-import calendar
+from datetime import datetime
 
-class ReportDeliverySlipCharge(models.AbstractModel):
-    _inherit = 'report.stock.report_deliveryslip'
+class ReportStockTransferCharge(models.AbstractModel):
+    _name = 'report.stock_transfer_charge_report.stock_transfer_charge_report_template'
+    _description = 'Reporte de Cargos entre Locales por Traspasos'
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        res = super(ReportDeliverySlipCharge, self)._get_report_values(docids, data)
-        pickings = self.env['stock.picking'].browse(docids).filtered(
-            lambda p: p.picking_type_code == 'internal' and p.state == 'done'
-        )
-        grouped = defaultdict(float)
-        for pick in pickings:
-            if pick.date_done:
-                year = pick.date_done.year
-                month_num = pick.date_done.month
-                month = f"{calendar.month_name[month_num]} {year}"
-            else:
-                month = 'Sin Fecha'
-            origin = pick.location_id.display_name
-            dest = pick.location_dest_id.display_name
-            for mv in pick.move_ids.filtered(lambda m: m.state == 'done' and m.product_uom_qty):
-                grouped[(month, origin, dest)] += mv.product_uom_qty * (mv.product_id.standard_price or 0.0)
-        res['charge_lines'] = [
-            {'month': m, 'origin': o, 'dest': d, 'amount': amt}
-            for (m, o, d), amt in sorted(grouped.items())
-        ]
-        return res
+        # Elimina filtros para forzar que entregue todo
+        pickings = self.env['stock.picking'].search([
+            ('picking_type_code', '=', 'internal'),
+        ])
+
+        data_by_month = defaultdict(list)
+
+        for picking in pickings:
+            # Usamos move_line_ids, no move_lines
+            for line in picking.move_line_ids:
+                product = line.product_id
+                quantity = line.qty_done or 0.0
+                price = product.standard_price or 0.0
+                subtotal = quantity * price
+                date = picking.date_done or picking.scheduled_date or picking.date or datetime.now()
+                month_key = date.strftime('%B %Y')
+                data_by_month[month_key].append({
+                    'origin': picking.location_id.display_name,
+                    'destination': picking.location_dest_id.display_name,
+                    'product': product.display_name,
+                    'quantity': quantity,
+                    'price_unit': price,
+                    'subtotal': subtotal,
+                })
+
+        return {
+            'months': [{'month': m, 'lines': l} for m, l in data_by_month.items()],
+        }
+
