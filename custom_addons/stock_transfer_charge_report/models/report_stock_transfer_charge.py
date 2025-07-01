@@ -7,15 +7,15 @@ class ReportDeliverySlipCharge(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # 1) Llamamos al padre para mantener toda la lógica original
+        # Llamamos al padre para conservar toda la lógica original
         res = super(ReportDeliverySlipCharge, self)._get_report_values(docids, data)
-        # 2) Filtramos sólo los pickings internos finalizados
+        # Filtramos sólo los pickings internos 'done'
         pickings = (
             self.env['stock.picking']
             .browse(docids)
             .filtered(lambda p: p.picking_type_id.code == 'internal' and p.state == 'done')
         )
-        # 3) Agrupamos por (mes, origen, destino)
+        # Agrupamos por mes, origen y destino
         grouped = defaultdict(float)
         for p in pickings:
             month = p.date_done.strftime('%Y-%m') if p.date_done else 'Sin Fecha'
@@ -23,9 +23,9 @@ class ReportDeliverySlipCharge(models.AbstractModel):
             dest = p.location_dest_id.display_name
             for mv in p.move_ids.filtered(lambda m: m.state == 'done' and m.product_uom_qty):
                 grouped[(month, origin, dest)] += mv.product_uom_qty * (mv.product_id.standard_price or 0.0)
-        # 4) Construimos la lista para el QWeb
+        # Generamos la lista para QWeb
         res['charge_lines'] = [
-            {'month': m, 'origin': o, 'dest': d, 'amount': amt}
-            for (m, o, d), amt in sorted(grouped.items())
+            {'month': month, 'origin': o, 'dest': d, 'amount': amt}
+            for (month, o, d), amt in sorted(grouped.items())
         ]
         return res
