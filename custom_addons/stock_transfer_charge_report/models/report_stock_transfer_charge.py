@@ -1,31 +1,23 @@
 from odoo import models, api
-from collections import defaultdict
 
 class ReportStockTransferCharge(models.AbstractModel):
     _name = 'report.stock_transfer_charge_report.stock_transfer_charge_report_template'
-    _description = 'Reporte General de Traspasos entre Locales'
+    _description = 'Reporte Debug de Traspasos'
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        pickings = self.env['stock.picking'].search([
-            ('picking_type_code', '=', 'internal'),
-        ], order='date_done desc')
+        # ¡No filtra nada, trae todo!
+        pickings = self.env['stock.picking'].search([], limit=50)  # Limita a 50 por seguridad
 
-        transfers = []
+        lines = []
         for picking in pickings:
-            for move in picking.move_ids:
-                product = move.product_id
-                transfers.append({
-                    'date': picking.date_done or picking.scheduled_date or picking.date,
-                    'state': picking.state,
-                    'origin': picking.location_id.display_name,
-                    'destination': picking.location_dest_id.display_name,
-                    'product': product.display_name,
-                    'quantity': move.product_uom_qty,
-                    'price_unit': product.standard_price,
-                    'subtotal': move.product_uom_qty * (product.standard_price or 0.0),
-                })
+            lines.append({
+                'name': picking.name,
+                'state': picking.state,
+                'picking_type_code': getattr(picking, 'picking_type_code', 'N/A'),
+                'origin': picking.location_id.display_name if picking.location_id else '',
+                'destination': picking.location_dest_id.display_name if picking.location_dest_id else '',
+                'date': picking.date_done or picking.scheduled_date or picking.date,
+            })
 
-        return {
-            'transfers': transfers
-        }
+        return {'lines': lines}
