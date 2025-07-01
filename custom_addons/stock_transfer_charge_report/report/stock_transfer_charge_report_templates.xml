@@ -18,11 +18,11 @@
               </tr>
             </thead>
             <tbody>
-              <t t-foreach="charge_lines" t-as="c">
+              <t t-foreach="charge_lines" t-as="o">
                 <tr>
-                  <td><t t-esc="c.month"/></td>
+                  <td><t t-esc="o.month"/></td>
                   <p t-field="o.origin" class="m-0">S0001</p>
-                  <td><t t-esc="c.dest"/></td>
+                  <td><t t-esc="o.dest"/></td>
                   <td class="text-right"><t t-esc="'%.2f' % o.amount"/></td>
                 </tr>
               </t>
