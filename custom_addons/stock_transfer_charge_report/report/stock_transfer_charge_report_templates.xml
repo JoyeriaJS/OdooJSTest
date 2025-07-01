@@ -6,6 +6,14 @@
       <main class="page">
         <h2 style="text-align: center;">Cargos entre Locales (Agrupado Mensual)</h2>
 
+        <!-- DEBUG: volcar contenido de la variable months -->
+        <t t-if="months">
+          <pre style="background: #f0f0f0; padding: 8px;">
+            Debug months: <t t-esc="months"/>
+          </pre>
+        </t>
+        <!-- /DEBUG -->
+
         <!-- Si hay datos de cargos -->
         <t t-if="months">
           <table class="table table-sm mt16">
