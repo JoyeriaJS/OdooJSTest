@@ -9,6 +9,18 @@
             <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
             <p><strong>Estado:</strong> <t t-esc="o.state"/></p>
             <p><strong>Tipo:</strong> <t t-esc="o.picking_type_code"/></p>
+
+            <!-- SOLUCIÓN 2: DEBUG -->
+            <t t-if="o.move_line_ids_without_package">
+              <div style="font-size:10px;color:#888;">
+                <strong>Campos disponibles en ml:</strong>
+                <t t-foreach="o.move_line_ids_without_package" t-as="ml">
+                  <div><t t-esc="ml._fields.keys()"/></div>
+                </t>
+              </div>
+            </t>
+            <!-- FIN DEBUG -->
+
             <table class="table table-sm" t-if="o.move_line_ids_without_package">
               <thead>
                 <tr>
@@ -22,10 +34,15 @@
               <tbody>
                 <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
                   <td><t t-esc="ml.product_id.display_name"/></td>
-                  <td><t t-esc="ml.quantity_done"/></td>
+                  <!-- AJUSTA AQUÍ el campo de cantidad según el debug -->
+                  <td>
+                    <t t-esc="ml.quantity_done"/>
+                  </td>
                   <td><t t-esc="ml.product_uom_id.name"/></td>
                   <td><t t-esc="ml.product_id.standard_price"/></td>
-                  <td><t t-esc="ml.qty_done * (ml.product_id.standard_price or 0.0)"/></td>
+                  <td>
+                    <t t-esc="ml.quantity_done * (ml.product_id.standard_price or 0.0)"/>
+                  </td>
                 </tr>
               </tbody>
             </table>
