@@ -6,13 +6,10 @@
       <main class="page">
         <h2 style="text-align: center;">Cargos entre Locales (Agrupado Mensual)</h2>
 
-        <!-- DEBUG: volcar contenido de la variable months -->
-        <t t-if="months">
-          <pre style="background: #f0f0f0; padding: 8px;">
-            Debug months: <t t-esc="months"/>
-          </pre>
-        </t>
-        <!-- /DEBUG -->
+        <!-- DEBUG INCONDICIONAL: siempre muestra el contenido de months -->
+        <pre style="background: #f0f0f0; padding: 8px; font-size:0.8em;">
+          Debug months: <t t-esc="months"/>
+        </pre>
 
         <!-- Si hay datos de cargos -->
         <t t-if="months">
@@ -42,6 +39,7 @@
         <t t-if="not months">
           <p class="text-center"><em>No se encontraron traspasos internos finalizados.</em></p>
         </t>
+
       </main>
     </t>
   </template>
