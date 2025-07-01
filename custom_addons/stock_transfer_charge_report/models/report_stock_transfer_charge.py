@@ -24,4 +24,5 @@ class ReportPickingTransfer(models.AbstractModel):
                 })
         return {
             'lines': lines,
+            'test_text': "ESTE ES EL REPORTE DE TRASPASOS"  # Solo para probar
         }
