@@ -15,7 +15,8 @@
               <tbody>
                 <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
                   <td><t t-esc="ml.product_id.display_name"/></td>
-                  <td><t t-esc="ml.qty_done"/></td>
+                  <td><t t-esc="ml.product_uom_qty"/></td>
+                  <!-- cambia solo este campo -->
                 </tr>
               </tbody>
             </table>
