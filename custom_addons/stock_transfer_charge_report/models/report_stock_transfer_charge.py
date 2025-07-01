@@ -1,39 +1,47 @@
-from odoo import models, api
+# -*- coding: utf-8 -*-
+from odoo import api, models
 from collections import defaultdict
-from datetime import datetime
 
 class ReportStockTransferCharge(models.AbstractModel):
     _name = 'report.stock_transfer_charge_report.stock_transfer_charge_report_template'
     _description = 'Reporte de Cargos entre Locales por Traspasos'
+    _inherit = 'report.stock.report_delivery_document'
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # Elimina filtros para forzar que entregue todo
-        pickings = self.env['stock.picking'].search([
-            ('picking_type_code', '=', 'internal'),
-        ])
+        # Obtener pickings internos 'done'
+        pickings = self.env['stock.picking'].browse(docids).filtered(
+            lambda p: p.picking_type_id.code == 'internal' and p.state == 'done')
 
-        data_by_month = defaultdict(list)
-
-        for picking in pickings:
-            # Usamos move_line_ids, no move_lines
-            for line in picking.move_line_ids:
-                product = line.product_id
-                quantity = line.qty_done or 0.0
-                price = product.standard_price or 0.0
-                subtotal = quantity * price
-                date = picking.date_done or picking.scheduled_date or picking.date or datetime.now()
-                month_key = date.strftime('%B %Y')
-                data_by_month[month_key].append({
-                    'origin': picking.location_id.display_name,
-                    'destination': picking.location_dest_id.display_name,
-                    'product': product.display_name,
-                    'quantity': quantity,
+        # Agrupar por mes, origen, destino
+        grouped = defaultdict(list)
+        for pick in pickings:
+            month = (pick.date_done or pick.scheduled_date).strftime('%Y-%m')
+            origin = pick.location_id.display_name
+            dest = pick.location_dest_id.display_name
+            for move in pick.move_ids.filtered(lambda m: m.state == 'done'):
+                qty = move.quantity_done or 0.0
+                price = move.product_id.standard_price or 0.0
+                grouped[(month, origin, dest)].append({
+                    'product': move.product_id.display_name,
+                    'quantity': qty,
                     'price_unit': price,
-                    'subtotal': subtotal,
+                    'subtotal': qty * price,
                 })
 
-        return {
-            'months': [{'month': m, 'lines': l} for m, l in data_by_month.items()],
-        }
+        months = []
+        for (month, origin, dest), lines in sorted(grouped.items()):
+            months.append({
+                'month': month,
+                'origin': origin,
+                'destination': dest,
+                'lines': lines,
+            })
 
+        # context for QWeb
+        return {
+            'doc_ids': docids,
+            'doc_model': 'stock.picking',
+            'docs': pickings,
+            'months': months,
+        }

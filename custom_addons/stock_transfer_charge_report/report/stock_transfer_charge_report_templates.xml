@@ -1,41 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <template id="stock_transfer_charge_report_template">
+  <template id="stock_transfer_charge_report_template" t-name="stock_transfer_charge_report.stock_transfer_charge_report_template">
     <t t-call="web.external_layout">
-      <main class="page">
-        <h2 style="text-align:center;">Reporte de Cargos entre Locales</h2>
+      <div class="page">
+        <h2 style="text-align: center;">Cargos Entre Locales (Agrupado Mensual)</h2>
         <t t-if="months">
-          <t t-foreach="months" t-as="month_data">
-            <h3><t t-esc="month_data['month']"/></h3>
-            <table class="table table-sm">
-              <thead>
-                <tr>
-                  <th>Local Origen</th>
-                  <th>Local Destino</th>
-                  <th>Producto</th>
-                  <th>Cantidad</th>
-                  <th>Precio Unitario</th>
-                  <th>Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                <t t-foreach="month_data['lines']" t-as="line">
+          <t t-foreach="months" t-as="grp">
+            <div class="mt16 mb16">
+              <h3><t t-esc="grp['month']"/></h3>
+              <p><strong>Origen:</strong> <t t-esc="grp['origin']"/>
+                 <strong>Destino:</strong> <t t-esc="grp['destination']"/></p>
+              <table class="table table-sm mt8">
+                <thead>
                   <tr>
-                    <td><t t-esc="line['origin']"/></td>
-                    <td><t t-esc="line['destination']"/></td>
-                    <td><t t-esc="line['product']"/></td>
-                    <td><t t-esc="line['quantity']"/></td>
-                    <td><t t-esc="line['price_unit']"/></td>
-                    <td><t t-esc="line['subtotal']"/></td>
+                    <th>Producto</th>
+                    <th class="text-center">Cantidad</th>
+                    <th class="text-right">Precio Unitario</th>
+                    <th class="text-right">Subtotal</th>
                   </tr>
-                </t>
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  <t t-foreach="grp['lines']" t-as="line">
+                    <tr>
+                      <td><t t-esc="line['product']"/></td>
+                      <td class="text-center"><t t-esc="line['quantity']"/></td>
+                      <td class="text-right"><t t-esc="'%.2f' % line['price_unit']"/></td>
+                      <td class="text-right"><t t-esc="'%.2f' % line['subtotal']"/></td>
+                    </tr>
+                  </t>
+                </tbody>
+              </table>
+            </div>
           </t>
         </t>
         <t t-if="not months">
-          <p style="text-align:center; font-style:italic;">No se encontraron traspasos realizados.</p>
+          <p class="text-center"><em>No se encontraron traspasos internos finalizados.</em></p>
         </t>
-      </main>
+      </div>
     </t>
   </template>
 </odoo>
