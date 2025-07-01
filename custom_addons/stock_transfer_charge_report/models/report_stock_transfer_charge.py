@@ -23,7 +23,7 @@ class ReportDeliverySlipCharge(models.AbstractModel):
                 grouped[(month, origin, dest)] += mv.product_uom_qty * (mv.product_id.standard_price or 0.0)
         # Construimos lista ordenada
         res['charge_lines'] = [
-            {'month': m, 'origin': o, 'dest': d, 'amount': amt}
+            {'picking_id': pick.id, 'month': m, 'origin': o, 'dest': d, 'amount': amt}
             for (m, o, d), amt in sorted(grouped.items())
         ]
         return res
