@@ -14,16 +14,16 @@
                 <th>Mes</th>
                 <th>Origen</th>
                 <th>Destino</th>
-                <th class="text-right">Total (CLP)</th>
+                <th name="th_sm_product"><strong>Total (CLP)</strong></th>
               </tr>
             </thead>
             <tbody>
               <t t-foreach="charge_lines" t-as="c">
                 <tr>
                   <td><t t-esc="c.month"/></td>
-                  <td><t t-esc="c.origin"/></td>
+                  <p t-field="o.origin" class="m-0">S0001</p>
                   <td><t t-esc="c.dest"/></td>
-                  <td class="text-right"><t t-esc="'%.2f' % c.amount"/></td>
+                  <td class="text-right"><t t-esc="'%.2f' % o.amount"/></td>
                 </tr>
               </t>
             </tbody>
