@@ -1,36 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+  <!-- Heredamos la plantilla original de la Guía de Despacho -->
   <template id="stock_transfer_charge_report_template"
-            t-name="stock_transfer_charge_report.stock_transfer_charge_report_template">
-    <t t-call="web.external_layout">
-      <main class="page">
-        <h2 style="text-align: center;">Resumen de Traspasos Internos</h2>
-
-        <!-- Siempre mostramos la tabla de lines -->
-        <table class="table table-sm mt16" t-if="lines">
-          <thead>
-            <tr>
-              <th>Secuencia</th>
-              <th>Origen</th>
-              <th>Destino</th>
-            </tr>
-          </thead>
-          <tbody>
-            <t t-foreach="lines" t-as="l">
+            inherit_id="stock.report_delivery_document">
+    <!-- Después de la sección principal, añadimos una nueva página -->
+    <xpath expr="//div[@class='page']" position="after">
+      <div class="page break-after mt32">
+        <h2 style="text-align:center;">Cargos entre Locales (Datos Básicos)</h2>
+        <!-- Recorremos los pickings pasados al reporte -->
+        <t t-foreach="docs" t-as="o">
+          <table class="table table-sm mt16">
+            <thead>
               <tr>
-                <td><t t-esc="l['sequence']"/></td>
-                <td><t t-esc="l['origin']"/></td>
-                <td><t t-esc="l['destination']"/></td>
+                <th>Secuencia</th>
+                <th>Origen</th>
+                <th>Destino</th>
               </tr>
-            </t>
-          </tbody>
-        </table>
-
-        <!-- Mensaje si no hubiera lines (no debería pasar) -->
-        <t t-if="not lines">
-          <p class="text-center"><em>No hay registros para mostrar.</em></p>
+            </thead>
+            <tbody>
+              <tr>
+                <td><t t-esc="o.name"/></td>
+                <td><t t-esc="o.location_id.display_name"/></td>
+                <td><t t-esc="o.location_dest_id.display_name"/></td>
+              </tr>
+            </tbody>
+          </table>
         </t>
-      </main>
-    </t>
+      </div>
+    </xpath>
   </template>
 </odoo>
