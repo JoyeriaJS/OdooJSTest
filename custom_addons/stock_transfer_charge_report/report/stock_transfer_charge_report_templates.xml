@@ -5,7 +5,7 @@
     - `id` es tu xmlid interno.
     - `t-name` debe coincidir exactamente con el atributo `name` de tu <report>.
   -->
-  <template id="report_stock_transfer_charge" 
+  <template id="report_stock_transfer_charge_template" 
             t-name="stock_transfer_charge_report.stock_transfer_charge_report_template">
     <!-- Llamamos al layout estándar de Odoo -->
     <t t-call="web.html_container">
