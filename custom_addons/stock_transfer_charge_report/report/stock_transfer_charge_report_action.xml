@@ -5,5 +5,7 @@
         string="Cargos entre Locales"
         report_type="qweb-pdf"
         name="stock_transfer_charge_report.stock_transfer_charge_report_template"
+        file="stock_transfer_charge_report.stock_transfer_charge_report_template"
+        print_report_name="'CargosLocales-'+time.strftime('%%Y%%m')"
     />
 </odoo>

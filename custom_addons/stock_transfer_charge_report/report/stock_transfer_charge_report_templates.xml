@@ -1,38 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <!-- Hereda el documento de guía de despacho -->
-  <template id="stock_transfer_charge_report_template"
-            inherit_id="stock.report_delivery_document">
-    <!-- Inserta tus cargos tras cada <div class="page"> -->
-    <xpath expr="//div[@class='page']" position="after">
-      <div class="page break-after mt32">
-        <h2 class="text-center">Cargos entre Locales (Agrupado Mensual)</h2>
-        <t t-if="charge_lines">
-          <table class="table table-sm mt16">
-            <thead>
-              <tr>
-                <th>Mes</th>
-                <th>Origen</th>
-                <th>Destino</th>
-                <th class="text-right">Total (CLP)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <t t-foreach="charge_lines" t-as="c">
-                <tr>
-                  <td><t t-esc="c['month']"/></td>
-                  <td><t t-esc="c['origin']"/></td>
-                  <td><t t-esc="c['dest']"/></td>
-                  <td class="text-right"><t t-esc="'%.2f' % c['amount']"/></td>
-                </tr>
-              </t>
-            </tbody>
-          </table>
+  <template id="stock_transfer_charge_report_template">
+    <t t-call="web.external_layout">
+      <main class="page">
+        <h2 style="text-align:center;">Cargos entre Locales (Agrupado Mensual)</h2>
+
+        <!-- Cuando hay datos agrupados -->
+        <t t-if="months">
+          <t t-foreach="months" t-as="m">
+            <div class="mt32">
+              <h3>Mes: <t t-esc="m['month']"/></h3>
+              <table class="table table-sm mt16">
+                <thead>
+                  <tr>
+                    <th>Taller Origen</th>
+                    <th>Taller Destino</th>
+                    <th class="text-right">Total (CLP)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><t t-esc="m['origin']"/></td>
+                    <td><t t-esc="m['dest']"/></td>
+                    <td class="text-right"><t t-esc="'%.2f' % m['total']"/></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </t>
         </t>
-        <t t-if="not charge_lines">
-          <p class="text-center"><em>No se encontraron transferencias internas.</em></p>
+
+        <!-- Cuando NO hay datos -->
+        <t t-if="not months">
+          <p style="text-align:center;"><em>No se encontraron transferencias internas finalizadas.</em></p>
         </t>
-      </div>
-    </xpath>
+      </main>
+    </t>
   </template>
 </odoo>
