@@ -9,34 +9,32 @@ class ReportStockTransferCharge(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # Sólo tomamos las pickings seleccionadas y que sean internas y hechas
-        pickings = self.env['stock.picking'].browse(docids).filtered(
-            lambda p: p.picking_type_code == 'internal' and p.state == 'done'
-        )
+        # Buscamos TODOS los traspasos internos hechos
+        pickings = self.env['stock.picking'].search([
+            ('picking_type_code', '=', 'internal'),
+            ('state', '=', 'done'),
+        ])
         data_by_month = defaultdict(list)
         for picking in pickings:
-            # Fecha para agrupar por mes
             date = picking.date_done or picking.scheduled_date or picking.date or datetime.now()
             month_key = date.strftime('%B %Y')
-            for move in picking.move_ids.filtered(lambda m: m.state=='done' and m.product_uom_qty):
+            for move in picking.move_ids.filtered(lambda m: m.state == 'done' and m.product_uom_qty):
                 qty = move.product_uom_qty
                 price = move.product_id.standard_price or 0.0
-                subtotal = qty * price
                 data_by_month[month_key].append({
-                    'origin': picking.location_id.display_name,
+                    'origin':      picking.location_id.display_name,
                     'destination': picking.location_dest_id.display_name,
-                    'product': move.product_id.display_name,
-                    'quantity': qty,
-                    'price_unit': price,
-                    'subtotal': subtotal,
+                    'product':     move.product_id.display_name,
+                    'quantity':    qty,
+                    'price_unit':  price,
+                    'subtotal':    qty * price,
                 })
-        # Construimos la lista final
         months = [
             {'month': m, 'lines': lines}
             for m, lines in sorted(data_by_month.items())
         ]
         return {
-            'doc_ids': docids,
-            'doc_model': 'stock.picking',
-            'months': months,
+            'doc_ids':    pickings.ids,
+            'doc_model':  'stock.picking',
+            'months':     months,
         }

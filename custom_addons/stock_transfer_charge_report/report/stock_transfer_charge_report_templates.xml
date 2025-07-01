@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <!-- Este t-name debe coincidir con report_name de tu ir.actions.report -->
   <template id="stock_transfer_charge_report_template"
             t-name="stock_transfer_charge_report.stock_transfer_charge_report_template">
     <t t-call="web.external_layout">
@@ -8,36 +6,35 @@
         <h2 class="text-center">Reporte de Cargos entre Locales</h2>
         <t t-if="months">
           <t t-foreach="months" t-as="month_data">
-            <h3><t t-esc="month_data.month"/></h3>
+            <h3><t t-esc="month_data['month']"/></h3>
             <table class="table table-sm">
               <thead>
                 <tr>
                   <th>Local Origen</th>
                   <th>Local Destino</th>
                   <th>Producto</th>
-                  <th class="text-center">Cantidad</th>
+                  <th class="text-right">Cantidad</th>
                   <th class="text-right">Precio Unitario</th>
                   <th class="text-right">Subtotal</th>
                 </tr>
               </thead>
               <tbody>
-                <t t-foreach="month_data.lines" t-as="line">
+                <t t-foreach="month_data['lines']" t-as="line">
                   <tr>
-                    <td><t t-esc="line.origin"/></td>
-                    <td><t t-esc="line.destination"/></td>
-                    <td><t t-esc="line.product"/></td>
-                    <td class="text-center"><t t-esc="line.quantity"/></td>
-                    <td class="text-right"><t t-esc="line.price_unit"/></td>
-                    <td class="text-right"><t t-esc="line.subtotal"/></td>
+                    <td><t t-esc="line['origin']"/></td>
+                    <td><t t-esc="line['destination']"/></td>
+                    <td><t t-esc="line['product']"/></td>
+                    <td class="text-right"><t t-esc="line['quantity']"/></td>
+                    <td class="text-right"><t t-esc="'%.2f' % line['price_unit']"/></td>
+                    <td class="text-right"><t t-esc="'%.2f' % line['subtotal']"/></td>
                   </tr>
                 </t>
               </tbody>
             </table>
-            <div class="page-break"/>
           </t>
         </t>
         <t t-if="not months">
-          <p class="text-center fst-italic">No se encontraron traspasos internos realizados.</p>
+          <p class="text-center"><em>No se encontraron traspasos internos realizados.</em></p>
         </t>
       </main>
     </t>
