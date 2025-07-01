@@ -7,13 +7,11 @@ class ReportStockTransferCharge(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # 1) Solo pickings tipo internal y estado done
-        picks = self.env['stock.picking'].browse(docids).filtered(
-            lambda p: p.picking_type_code == 'internal' and p.state == 'done'
-        )
-        # 2) Preparamos líneas sencillas
+        # Cargamos exactamente los pickings que te llegan en docids
+        picks = self.env['stock.picking'].browse(docids)
         lines = []
         for p in picks:
+            # Independientemente de si tienen movimientos, devolvemos algo
             lines.append({
                 'sequence':    p.name,
                 'origin':      p.location_id.display_name,
