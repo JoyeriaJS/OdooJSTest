@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <template id="stock_transfer_charge_report_template" t-name="stock_transfer_charge_report_fixed.stock_transfer_charge_report_template">
+  <template id="stock_transfer_charge_report_template"
+            t-name="stock_transfer_charge_report.stock_transfer_charge_report_template">
     <t t-call="web.external_layout">
       <main class="page">
-        <h2 style="text-align: center;">Cargos Entre Locales (Agrupado Mensual)</h2>
+        <h2 style="text-align: center;">Cargos entre Locales (Agrupado Mensual)</h2>
+        <!-- Tabla si hay datos -->
         <t t-if="months">
           <table class="table table-sm mt16">
             <thead>
@@ -11,7 +13,7 @@
                 <th>Mes</th>
                 <th>Taller Origen</th>
                 <th>Taller Destino</th>
-                <th class="text-right">Total</th>
+                <th class="text-right">Total ({% raw %}CLP{% endraw %})</th>
               </tr>
             </thead>
             <tbody>
@@ -26,6 +28,7 @@
             </tbody>
           </table>
         </t>
+        <!-- Mensaje si no hay datos -->
         <t t-if="not months">
           <p class="text-center"><em>No se encontraron traspasos internos finalizados.</em></p>
         </t>
