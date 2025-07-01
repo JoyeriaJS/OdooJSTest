@@ -35,9 +35,6 @@
                 <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
                   <td><t t-esc="ml.product_id.display_name"/></td>
                   <!-- AJUSTA AQUÍ el campo de cantidad según el debug -->
-                  <td>
-                    <t t-esc="ml.quantity_done"/>
-                  </td>
                   <td><t t-esc="ml.product_uom_id.name"/></td>
                   <td><t t-esc="ml.product_id.standard_price"/></td>
                   <td>
