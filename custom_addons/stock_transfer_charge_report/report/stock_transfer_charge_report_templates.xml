@@ -2,8 +2,8 @@
 <odoo>
 
   <!-- QWeb template independiente -->
-  <template id="stock_transfer_charge_report_template">
-            <t-name="stock_transfer_charge_report.report_stock_transfer_charge">
+  <template id="stock_transfer_charge_report_template"
+            t-name="stock_transfer_charge_report.report_stock_transfer_charge">
     <t t-call="web.html_container">
       <t t-call="web.external_layout">
         <div class="page">
