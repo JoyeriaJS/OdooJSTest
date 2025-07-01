@@ -1,38 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <!-- Hereda el wrapper de Delivery Slip -->
-  <template id="stock_transfer_charge_report_template"
-            inherit_id="stock.report_deliveryslip">
-    <!-- Tras cada ciclo de docs (cada <t t-foreach="docs" t-as="o">) -->
-    <xpath expr="//t[@t-foreach='docs']" position="after">
-      <div class="page break-after mt32">
-        <h2 class="text-center">Cargos entre Locales (Agrupado Mensual)</h2>
-        <t t-if="charge_lines">
-          <table class="table table-sm mt16">
-            <thead>
-              <tr>
-                <th>Mes</th>
-                <th>Origen</th>
-                <th>Destino</th>
-                <th class="text-right">Total (CLP)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <t t-foreach="charge_lines" t-as="c">
-                <tr>
-                  <td><t t-esc="c['month']"/></td>
-                  <td><t t-esc="c['origin']"/></td>
-                  <td><t t-esc="c['dest']"/></td>
-                  <td class="text-right"><t t-esc="'%.2f' % c['amount']"/></td>
-                </tr>
-              </t>
-            </tbody>
-          </table>
+    <template id="report_delivery_document">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <!-- mantiene todas las variables y bloques originales -->
+                <t t-set="o" t-value="o.with_context(lang=o._get_report_lang())"/>
+                <t t-set="partner" t-value="o.partner_id or (o.move_ids and o.move_ids[0].partner_id) or False"/>
+                <t t-set="address"> ... tu bloque de address original ... </t>
+                <t t-set="information_block"> ... tu bloque de information_block original ... </t>
+
+                <!-- == INICIO: contenido estándar de la primera página == -->
+                <div class="page">
+                    <!-- TODO: aquí va TODO el contenido que Odoo ya tenía: encabezados, tablas de líneas, backorders, firmas... -->
+                </div>
+                <div class="page break-after mt32">
+                  <h2 class="text-center">Cargos entre Locales (Agrupado Mensual)</h2>
+                  <t t-if="charge_lines">
+                    <table class="table table-sm mt16">
+                      <thead>
+                        <tr>
+                          <th>Mes</th>
+                          <th>Origen</th>
+                          <th>Destino</th>
+                          <th class="text-right">Total (CLP)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <t t-foreach="charge_lines" t-as="c">
+                          <tr>
+                            <td><t t-esc="c.month"/></td>
+                            <td><t t-esc="c.origin"/></td>
+                            <td><t t-esc="c.dest"/></td>
+                            <td class="text-right">
+                              <t t-esc="'%.2f' % c.amount"/>
+                            </td>
+                          </tr>
+                        </t>
+                      </tbody>
+                    </table>
+                  </t>
+                  <t t-if="not charge_lines">
+                    <p class="text-center"><em>No se encontraron transferencias internas.</em></p>
+                  </t>
+                </div>
+            </t>
         </t>
-        <t t-if="not charge_lines">
-          <p class="text-center"><em>No se encontraron transferencias internas finalizadas.</em></p>
-        </t>
-      </div>
-    </xpath>
-  </template>
+    </template>
 </odoo>
