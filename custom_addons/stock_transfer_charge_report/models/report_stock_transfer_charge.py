@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+import logging
 from odoo import api, models
 from collections import defaultdict
+
+_logger = logging.getLogger(__name__)
 
 class ReportStockTransferCharge(models.AbstractModel):
     """Reporte de Cargos entre Locales por Traspasos."""
@@ -9,12 +12,12 @@ class ReportStockTransferCharge(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # 1) Sólo internal transfers DONE
+        # 1) Cargar pickings internos DONE
         picks = self.env['stock.picking'].browse(docids).filtered(
             lambda p: p.picking_type_id.code == 'internal' and p.state == 'done'
         )
+        _logger.info("[DEBUG] Picks seleccionados (ids): %s", picks.ids)
 
-        # 2) Agrupar por mes/origen/destino
         grouped = defaultdict(float)
         for pick in picks:
             date = pick.date_done or pick.scheduled_date
@@ -22,37 +25,37 @@ class ReportStockTransferCharge(models.AbstractModel):
             origin = pick.location_id.display_name
             destination = pick.location_dest_id.display_name
 
-            # Priorizar move_line_ids si existen con quantity>0
-            ml_lines = pick.move_line_ids.filtered(lambda ml: ml.quantity > 0)
-            if ml_lines:
-                for ml in ml_lines:
-                    qty = ml.quantity
-                    price = ml.product_id.standard_price or 0.0
-                    grouped[(month, origin, destination)] += qty * price
+            # debug líneas
+            ml = pick.move_line_ids
+            mv = pick.move_ids
+            _logger.info("[DEBUG] picking %s move_line_ids quantities: %s", pick.id, ml.mapped('quantity'))
+            _logger.info("[DEBUG] picking %s move_ids quantity_done: %s", pick.id, mv.mapped('quantity_done'))
+
+            # Priorizar move_line_ids si existen
+            if any(l.quantity > 0 for l in ml):
+                for l in ml.filtered(lambda l: l.quantity > 0):
+                    grouped[(month, origin, destination)] += l.quantity * (l.product_id.standard_price or 0.0)
             else:
                 # fallback a move_ids
-                mv_lines = pick.move_ids.filtered(
-                    lambda m: (getattr(m, 'quantity_done', 0) or getattr(m, 'product_uom_qty', 0)) > 0
-                )
-                for mv in mv_lines:
-                    qty = getattr(mv, 'quantity_done', 0) or mv.product_uom_qty
-                    # precio, si hay price_unit en move, sino estándar
-                    price = getattr(mv, 'price_unit', 0.0) or mv.product_id.standard_price or 0.0
+                for m in mv.filtered(lambda m: (m.quantity_done or m.product_uom_qty) > 0):
+                    qty = m.quantity_done or m.product_uom_qty
+                    price = (getattr(m, 'price_unit', 0.0) or m.product_id.standard_price or 0.0)
                     grouped[(month, origin, destination)] += qty * price
 
-        # 3) Construir lista ordenada
-        months = []
-        for (month, origin, destination), total in sorted(grouped.items()):
-            months.append({
-                'month': month,
-                'origin': origin,
-                'destination': destination,
-                'total': total,
-            })
+        _logger.info("[DEBUG] grouped keys: %s", list(grouped.keys()))
+
+        months = [{
+            'month': m,
+            'origin': o,
+            'destination': d,
+            'total': total,
+        } for (m, o, d), total in sorted(grouped.items())]
+
+        _logger.info("[DEBUG] months result: %s", months)
 
         return {
-            'doc_ids':   docids,
+            'doc_ids': docids,
             'doc_model': 'stock.picking',
-            'docs':      picks,
-            'months':    months,
+            'docs': picks,
+            'months': months,
         }
