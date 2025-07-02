@@ -1,7 +1,12 @@
 <odoo>
   <template id="stock_transfer_charge_report_template">
     <t t-call="web.html_container">
-      <!-- NO NECESITAS t-set aquí para precios_interno ni docs -->
+      <t t-if="not precios_interno">
+        <div style="color:red;font-size:18px;">
+          ERROR: Variable <b>precios_interno</b> no disponible en el contexto.<br/>
+          Contacte a su administrador.<br/>
+        </div>
+      </t>
       <t t-foreach="docs" t-as="o">
         <t t-call="web.external_layout">
           <div class="page">
@@ -11,7 +16,7 @@
             <p><strong>Estado:</strong> <t t-esc="o.state"/></p>
             <p><strong>Tipo:</strong> <t t-esc="o.picking_type_code"/></p>
             <p><strong>Fecha efectiva:</strong> <t t-esc="o.date_done and o.date_done.strftime('%d/%m/%Y %H:%M:%S') or ''"/></p>
-            <table class="table table-sm" t-if="o.move_line_ids_without_package">
+            <table class="table table-sm" t-if="o.move_line_ids_without_package and precios_interno">
               <thead>
                 <tr>
                   <th>Producto</th>
@@ -28,13 +33,13 @@
                   <td><t t-esc="ml.quantity"/></td>
                   <td><t t-esc="ml.product_uom_id.name"/></td>
                   <td>
-                    <t t-esc="precios_interno.get(ml.product_id.id, 0.0)"/>
+                    <t t-esc="precios_interno.get(ml.product_id.id, 0.0) if precios_interno else 0.0"/>
                   </td>
                   <td>
                     <t t-esc="ml.product_id.weight or 0.0"/>
                   </td>
                   <td>
-                    <t t-set="precio_interno" t-value="precios_interno.get(ml.product_id.id, 0.0)"/>
+                    <t t-set="precio_interno" t-value="precios_interno.get(ml.product_id.id, 0.0) if precios_interno else 0.0"/>
                     <t t-set="peso" t-value="ml.product_id.weight or 0.0"/>
                     <t t-esc="ml.quantity * (precio_interno + peso)"/>
                   </td>
@@ -47,7 +52,6 @@
           </div>
         </t>
       </t>
-
       <!-- RESUMEN MENSUAL POR LOCAL DE ORIGEN -->
       <div class="page">
         <h2 style="text-align:center;">Resumen mensual por local de origen</h2>
