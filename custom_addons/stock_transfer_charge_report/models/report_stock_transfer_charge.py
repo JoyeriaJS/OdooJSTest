@@ -9,24 +9,24 @@ class ReportStockTransferCharge(models.AbstractModel):
     def _get_report_values(self, docids, data=None):
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
 
-        # Agrupar por mes y por local ORIGEN
+        # Agrupar por mes y por destino (local que recibe)
         resumen = defaultdict(lambda: defaultdict(float))
         for picking in pickings:
             fecha = picking.date_done
             if not fecha:
                 continue
             mes = fecha.strftime('%B %Y')  # Ejemplo: "July 2025"
-            origen = picking.location_id.display_name   # Local que presta
+            destino = picking.location_dest_id.display_name
             for ml in picking.move_line_ids_without_package:
                 subtotal = ml.quantity * (ml.product_id.standard_price or 0.0)
-                resumen[mes][origen] += subtotal
+                resumen[mes][destino] += subtotal
 
         resumen_listo = []
-        for mes, origenes in sorted(resumen.items()):
-            for origen, total in origenes.items():
+        for mes, destinos in sorted(resumen.items()):
+            for destino, total in destinos.items():
                 resumen_listo.append({
                     'mes': mes,
-                    'origen': origen,
+                    'destino': destino,
                     'total': round(total, 2),
                 })
 

@@ -37,21 +37,21 @@
         </t>
       </t>
 
-      <!-- RESUMEN MENSUAL POR LOCAL DE ORIGEN -->
+      <!-- RESUMEN MENSUAL POR LOCAL -->
       <div class="page">
-        <h2 style="text-align:center;">Resumen mensual por local de origen</h2>
+        <h2 style="text-align:center;">Resumen mensual por destino</h2>
         <table class="table table-sm" t-if="resumen_mensual">
           <thead>
             <tr>
               <th>Mes</th>
-              <th>Local Origen</th>
+              <th>Destino</th>
               <th>Total (CLP)</th>
             </tr>
           </thead>
           <tbody>
             <tr t-foreach="resumen_mensual" t-as="r">
               <td><t t-esc="r['mes']"/></td>
-              <td><t t-esc="r['origen']"/></td>
+              <td><t t-esc="r['destino']"/></td>
               <td><t t-esc="r['total']"/></td>
             </tr>
           </tbody>
