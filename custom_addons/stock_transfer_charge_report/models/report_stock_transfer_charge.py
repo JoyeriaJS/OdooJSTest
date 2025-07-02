@@ -10,12 +10,11 @@ class ReportStockTransferCharge(models.AbstractModel):
     def _get_report_values(self, docids, data=None):
         if not self.env.user.has_group('base.group_system'):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
-        # Siempre retorna un recordset (vacío si no hay)
+
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
         pickings = pickings or self.env['stock.picking']
 
-        # ... (resto igual, el código que tú tenías)
-        # (NO CAMBIES NADA AQUÍ ABAJO)
+        # Buscar la pricelist "Interno"
         pricelist = self.env['product.pricelist'].search([('name', '=', 'Interno')], limit=1)
         productos_precio_interno = {}
         for picking in pickings:
@@ -30,13 +29,14 @@ class ReportStockTransferCharge(models.AbstractModel):
                     item = self.env['product.pricelist.item'].search([
                         ('pricelist_id', '=', pricelist.id),
                         ('product_tmpl_id', '=', product.product_tmpl_id.id),
+                        ('applied_on', '=', '1_product'),
                     ], limit=1)
                     if item:
                         precio_interno = item.fixed_price
                 productos_precio_interno[product.id] = precio_interno
 
+        # Agrupación para el resumen mensual
         resumen = defaultdict(lambda: defaultdict(float))
-        
         for picking in pickings:
             fecha = picking.date_done
             if not fecha:
@@ -58,10 +58,13 @@ class ReportStockTransferCharge(models.AbstractModel):
                     'total': round(total, 2),
                 })
 
+        # Para debug, puedes imprimir los productos_precio_interno aquí
+        # print('DEBUG precios_interno:', productos_precio_interno)
+
         return {
             'doc_ids': pickings.ids,
             'doc_model': 'stock.picking',
-            'docs': pickings,  # <-- SIEMPRE debe ser recordset/list
+            'docs': pickings,
             'resumen_mensual': resumen_listo,
             'precios_interno': productos_precio_interno,
         }

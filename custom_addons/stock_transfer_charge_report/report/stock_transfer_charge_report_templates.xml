@@ -35,7 +35,7 @@
                       <t t-esc="ml.product_id.weight or 0.0"/>
                     </td>
                     <td>
-                      <t t-set="precio_interno" t-value="precios_interno.get(ml.product_id.id, 0.0)"/>
+                      <t t-esc="precios_interno.get(ml.product_id.id, 0.0)"/>
                       <t t-set="peso" t-value="ml.product_id.weight or 0.0"/>
                       <t t-esc="ml.quantity * (precio_interno + peso)"/>
                     </td>
