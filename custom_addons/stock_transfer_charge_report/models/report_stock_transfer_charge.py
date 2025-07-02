@@ -12,6 +12,29 @@ class ReportStockTransferCharge(models.AbstractModel):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
 
+        # Busca la lista de precios 'Interno'
+        pricelist = self.env['product.pricelist'].search([('name', '=', 'Interno')], limit=1)
+        productos_precio_interno = {}
+
+        # Precalcula el precio interno para cada producto en todos los pickings
+        for picking in pickings:
+            for ml in picking.move_line_ids_without_package:
+                product = ml.product_id
+                if not product:
+                    continue
+                if product.id in productos_precio_interno:
+                    continue
+                precio_interno = 0.0
+                if pricelist:
+                    item = self.env['product.pricelist.item'].search([
+                        ('pricelist_id', '=', pricelist.id),
+                        ('product_tmpl_id', '=', product.product_tmpl_id.id),
+                    ], limit=1)
+                    if item:
+                        precio_interno = item.fixed_price
+                productos_precio_interno[product.id] = precio_interno
+
+        # Agrupar por mes y local de origen para el resumen
         resumen = defaultdict(lambda: defaultdict(float))
         for picking in pickings:
             fecha = picking.date_done
@@ -20,8 +43,8 @@ class ReportStockTransferCharge(models.AbstractModel):
             mes = fecha.strftime('%B %Y')
             origen = picking.location_id.display_name
             for ml in picking.move_line_ids_without_package:
-                precio_interno = getattr(ml.product_id, 'costo_interno', 0.0)
-                peso = getattr(ml.product_id, 'weight', 0.0)
+                precio_interno = productos_precio_interno.get(ml.product_id.id, 0.0)
+                peso = ml.product_id.weight or 0.0
                 subtotal = ml.quantity * (precio_interno + peso)
                 resumen[mes][origen] += subtotal
 
@@ -39,4 +62,5 @@ class ReportStockTransferCharge(models.AbstractModel):
             'doc_model': 'stock.picking',
             'docs': pickings,
             'resumen_mensual': resumen_listo,
+            'precios_interno': productos_precio_interno,  # Nuevo: para usar en el template
         }
