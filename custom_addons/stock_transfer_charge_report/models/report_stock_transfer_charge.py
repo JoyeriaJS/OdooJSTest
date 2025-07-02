@@ -8,17 +8,16 @@ class ReportStockTransferCharge(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # Seguridad (opcional)
         if not self.env.user.has_group('base.group_system'):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
-
+        # Siempre retorna un recordset (vacío si no hay)
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
+        pickings = pickings or self.env['stock.picking']
 
-        # Busca la lista de precios 'Interno'
+        # ... (resto igual, el código que tú tenías)
+        # (NO CAMBIES NADA AQUÍ ABAJO)
         pricelist = self.env['product.pricelist'].search([('name', '=', 'Interno')], limit=1)
         productos_precio_interno = {}
-
-        # Precalcula el precio interno para cada producto en todos los pickings
         for picking in pickings:
             for ml in picking.move_line_ids_without_package:
                 product = ml.product_id
@@ -36,7 +35,6 @@ class ReportStockTransferCharge(models.AbstractModel):
                         precio_interno = item.fixed_price
                 productos_precio_interno[product.id] = precio_interno
 
-        # Agrupar por mes y local de origen para el resumen
         resumen = defaultdict(lambda: defaultdict(float))
         for picking in pickings:
             fecha = picking.date_done
@@ -62,7 +60,7 @@ class ReportStockTransferCharge(models.AbstractModel):
         return {
             'doc_ids': pickings.ids,
             'doc_model': 'stock.picking',
-            'docs': pickings,
+            'docs': pickings,  # <-- SIEMPRE debe ser recordset/list
             'resumen_mensual': resumen_listo,
             'precios_interno': productos_precio_interno,
         }
