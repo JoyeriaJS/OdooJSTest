@@ -46,7 +46,6 @@ class ImportarProductosWizard(models.TransientModel):
         duplicates = []
         imported = 0
 
-        # Columnas de tarifas por nombre de lista
         price_lists = {
             'Pública': 5,
             'Mayorista': 6,
@@ -54,7 +53,6 @@ class ImportarProductosWizard(models.TransientModel):
             'Interno': 8,
         }
 
-        # Asegurar listas de precio existentes
         for pl_name in price_lists:
             PrList.search([('name', '=', pl_name)], limit=1) or PrList.create({
                 'name': pl_name,
@@ -62,14 +60,26 @@ class ImportarProductosWizard(models.TransientModel):
             })
 
         for row in range(3, sheet.nrows):
-            code = str(sheet.cell(row, 9).value).strip()
+            code = str(sheet.cell(row, 9).value).strip().upper()
             name = str(sheet.cell(row, 1).value).strip()
             weight = self.safe_float(sheet.cell(row, 3).value)
-            cost = self.safe_float(sheet.cell(row, 4).value)
+            cost_interno = self.safe_float(sheet.cell(row, 8).value)  # "Interno"
+            cost = cost_interno
             barcode = str(sheet.cell(row, 15).value).strip()
             img_url = str(sheet.cell(row, 16).value).strip()
             attr_name = str(sheet.cell(row, 17).value).strip()
             attr_vals = str(sheet.cell(row, 18).value).strip()
+
+            # Prefijo del código
+            code_prefix = code[:2]
+            if not code:
+                continue  # No crear productos vacíos
+
+            # Calcular el costo según prefijo
+            if code_prefix in ['AU', 'OA', 'OB']:
+                cost = cost_interno + weight
+            else:
+                cost = cost_interno
 
             # Categoría compuesta
             metal = str(sheet.cell(row, 10).value).strip()
@@ -112,34 +122,35 @@ class ImportarProductosWizard(models.TransientModel):
 
             # Leer tarifas desde Excel
             tarifas = {pl_name: self.safe_float(sheet.cell(row, idx).value)
-                       for pl_name, idx in price_lists.items()}
+                    for pl_name, idx in price_lists.items()}
 
-            # Crear plantilla
-            tmpl = Product.create({
-                'default_code': code or f"CODE%05d" % (Product.search_count([])+1),
-                'name': name,
-                'categ_id': categ.id,
-                'type': 'product',
-                'barcode': barcode,
-                'list_price': tarifas.get('Pública', 0.0),
-                'standard_price': cost,
-                'weight': weight,
-                'image_1920': img_data,
-                'attribute_line_ids': attr_lines or False,
-            })
-            imported += 1
+            # Crear plantilla SOLO si el código existe (nunca CODEXXXX ni vacío)
+            if code:
+                tmpl = Product.create({
+                    'default_code': code,
+                    'name': name,
+                    'categ_id': categ.id,
+                    'type': 'product',
+                    'barcode': barcode,
+                    'list_price': tarifas.get('Pública', 0.0),
+                    'standard_price': cost,
+                    'weight': weight,
+                    'image_1920': img_data,
+                    'attribute_line_ids': attr_lines or False,
+                })
+                imported += 1
 
-            # Crear reglas de precio
-            for pl_name, price in tarifas.items():
-                if price > 0:
-                    pl = PrList.search([('name','=',pl_name)], limit=1)
-                    PrItem.create({
-                        'pricelist_id':     pl.id,
-                        'product_tmpl_id':  tmpl.id,
-                        'applied_on':       '1_product',
-                        'compute_price':    'fixed',
-                        'fixed_price':      price,
-                    })
+                # Crear reglas de precio
+                for pl_name, price in tarifas.items():
+                    if price > 0:
+                        pl = PrList.search([('name','=',pl_name)], limit=1)
+                        PrItem.create({
+                            'pricelist_id':     pl.id,
+                            'product_tmpl_id':  tmpl.id,
+                            'applied_on':       '1_product',
+                            'compute_price':    'fixed',
+                            'fixed_price':      price,
+                        })
 
         # Notificación al usuario
         msg = f"{imported} productos importados."
