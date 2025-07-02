@@ -1,5 +1,6 @@
 from odoo import models, api
 from collections import defaultdict
+from odoo.exceptions import AccessError
 
 class ReportStockTransferCharge(models.AbstractModel):
     _name = 'report.stock_transfer_charge_report.stock_transfer_charge_report_template'
@@ -7,6 +8,8 @@ class ReportStockTransferCharge(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        if not self.env.user.has_group('base.group_system'):
+            raise AccessError("Sólo los administradores pueden generar este reporte.")
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
 
         # Agrupar por mes y por local ORIGEN
