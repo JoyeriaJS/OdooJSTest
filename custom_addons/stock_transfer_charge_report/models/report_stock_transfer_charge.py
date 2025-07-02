@@ -8,8 +8,10 @@ class ReportStockTransferCharge(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        # Seguridad (opcional)
         if not self.env.user.has_group('base.group_system'):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
+
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
 
         # Busca la lista de precios 'Interno'
@@ -62,5 +64,5 @@ class ReportStockTransferCharge(models.AbstractModel):
             'doc_model': 'stock.picking',
             'docs': pickings,
             'resumen_mensual': resumen_listo,
-            'precios_interno': productos_precio_interno,  # Nuevo: para usar en el template
+            'precios_interno': productos_precio_interno,
         }
