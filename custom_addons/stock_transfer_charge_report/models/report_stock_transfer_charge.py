@@ -36,6 +36,7 @@ class ReportStockTransferCharge(models.AbstractModel):
                 productos_precio_interno[product.id] = precio_interno
 
         resumen = defaultdict(lambda: defaultdict(float))
+        
         for picking in pickings:
             fecha = picking.date_done
             if not fecha:
