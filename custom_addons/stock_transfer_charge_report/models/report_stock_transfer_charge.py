@@ -12,16 +12,17 @@ class ReportStockTransferCharge(models.AbstractModel):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
 
-        # Agrupar por mes y por local ORIGEN
         resumen = defaultdict(lambda: defaultdict(float))
         for picking in pickings:
             fecha = picking.date_done
             if not fecha:
                 continue
-            mes = fecha.strftime('%B %Y')  # Ejemplo: "July 2025"
-            origen = picking.location_id.display_name   # Local que presta
+            mes = fecha.strftime('%B %Y')
+            origen = picking.location_id.display_name
             for ml in picking.move_line_ids_without_package:
-                subtotal = ml.quantity * (ml.product_id.standard_price or 0.0)
+                precio_interno = getattr(ml.product_id, 'costo_interno', 0.0)
+                peso = getattr(ml.product_id, 'weight', 0.0)
+                subtotal = ml.quantity * (precio_interno + peso)
                 resumen[mes][origen] += subtotal
 
         resumen_listo = []
