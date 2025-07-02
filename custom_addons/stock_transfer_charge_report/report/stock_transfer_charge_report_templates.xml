@@ -1,16 +1,14 @@
 <odoo>
   <template id="stock_transfer_charge_report_template">
     <t t-call="web.html_container">
-      <t t-foreach="docs" t-as="o">
+      <!-- Agrupa por mes y local de origen -->
+      <t t-foreach="resumen" t-as="grupo">
         <t t-call="web.external_layout">
           <div class="page">
-            <h2 style="text-align:center;">Traspaso: <t t-esc="o.name"/></h2>
-            <p><strong>Origen:</strong> <t t-esc="o.location_id.display_name"/></p>
-            <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
-            <p><strong>Estado:</strong> <t t-esc="o.state"/></p>
-            <p><strong>Tipo:</strong> <t t-esc="o.picking_type_code"/></p>
-            <p><strong>Fecha efectiva:</strong> <t t-esc="o.date_done and o.date_done.strftime('%d/%m/%Y %H:%M:%S') or ''"/></p>
-            <table class="table table-sm" t-if="o.move_line_ids_without_package">
+            <h2 style="text-align:center;">
+              Traspasos - <t t-esc="grupo['origen']"/> | <t t-esc="grupo['mes']"/>
+            </h2>
+            <table class="table table-sm">
               <thead>
                 <tr>
                   <th>Producto</th>
@@ -18,48 +16,31 @@
                   <th>UoM</th>
                   <th>Precio Unitario</th>
                   <th>Subtotal</th>
+                  <th>Destino</th>
+                  <th>Fecha efectiva</th>
                 </tr>
               </thead>
               <tbody>
-                <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
-                  <td><t t-esc="ml.product_id.display_name"/></td>
-                  <td><t t-esc="ml.quantity"/></td>
-                  <td><t t-esc="ml.product_uom_id.name"/></td>
-                  <td><t t-esc="ml.product_id.standard_price"/></td>
-                  <td><t t-esc="ml.quantity * (ml.product_id.standard_price or 0.0)"/></td>
+                <tr t-foreach="grupo['detalles']" t-as="line">
+                  <td><t t-esc="line['producto']"/></td>
+                  <td><t t-esc="line['cantidad']"/></td>
+                  <td><t t-esc="line['uom']"/></td>
+                  <td><t t-esc="line['precio_unitario']"/></td>
+                  <td><t t-esc="line['subtotal']"/></td>
+                  <td><t t-esc="line['destino']"/></td>
+                  <td><t t-esc="line['fecha']"/></td>
                 </tr>
               </tbody>
             </table>
-            <t t-if="not o.move_line_ids_without_package">
-              <p>No hay movimientos de productos en este traspaso.</p>
-            </t>
+            <h4 style="text-align:right;">
+              Total mes <t t-esc="grupo['mes']"/> (<t t-esc="grupo['origen']"/>): <t t-esc="grupo['total']"/>
+            </h4>
           </div>
         </t>
       </t>
-
-      <!-- RESUMEN MENSUAL POR LOCAL DE ORIGEN -->
-      <div class="page">
-        <h2 style="text-align:center;">Resumen mensual por local de origen</h2>
-        <table class="table table-sm" t-if="resumen_mensual">
-          <thead>
-            <tr>
-              <th>Mes</th>
-              <th>Local Origen</th>
-              <th>Total (CLP)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr t-foreach="resumen_mensual" t-as="r">
-              <td><t t-esc="r['mes']"/></td>
-              <td><t t-esc="r['origen']"/></td>
-              <td><t t-esc="r['total']"/></td>
-            </tr>
-          </tbody>
-        </table>
-        <t t-if="not resumen_mensual">
-          <p>No hay traspasos efectivos este mes.</p>
-        </t>
-      </div>
+      <t t-if="not resumen">
+        <div class="page"><h3>No hay traspasos para mostrar.</h3></div>
+      </t>
     </t>
   </template>
 </odoo>
