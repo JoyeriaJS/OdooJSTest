@@ -39,6 +39,7 @@
                   <td><t t-esc="rec.name"/></td>
                   <td><t t-esc="rec.metal_utilizado or ''"/></td>
                   <td><t t-esc="rec.peso_valor     or 0.0"/></td>
+                  <td><t t-esc="rec.metales_extra  or 0.0"/></td>
                   <td><t t-esc="rec.cobro_interno  or 0.0"/></td>
                   <td><t t-esc="rec.hechura        or 0.0"/></td>
                   <td><t t-esc="rec.cobros_extras  or 0.0"/></td>
