@@ -9,15 +9,12 @@ class ReportStockTransferCharge(models.AbstractModel):
     def _get_report_values(self, docids, data=None):
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
         
-        # Buscar pricelist "Interno (CLP)" o similar
         pricelist = self.env['product.pricelist'].search([('name', 'ilike', 'Interno')], limit=1)
-        # Agrupación por mes
         traspasos_por_mes = defaultdict(list)
 
         for picking in pickings:
             mes = picking.date_done.strftime('%B %Y') if picking.date_done else 'Sin Fecha'
             for ml in picking.move_line_ids_without_package:
-                # Buscar precio interno CLP
                 precio_interno = 0.0
                 if pricelist:
                     item = self.env['product.pricelist.item'].search([
@@ -41,6 +38,9 @@ class ReportStockTransferCharge(models.AbstractModel):
                     'precio_interno': precio_interno,
                     'subtotal_interno': subtotal,
                 })
+
+        # DEBUG: Esto imprime en el log de Odoo
+        # print("DEBUG traspasos_por_mes", traspasos_por_mes)
 
         return {
             'traspasos_por_mes': traspasos_por_mes,
