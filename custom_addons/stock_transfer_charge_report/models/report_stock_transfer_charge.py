@@ -12,62 +12,79 @@ class ReportStockTransferCharge(models.AbstractModel):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
 
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
-        if not pickings:
-            pickings = self.env['stock.picking'].search([('id', '=', 0)])  # recordset vacío
+        pickings = pickings or self.env['stock.picking']
 
-        # Buscar la pricelist "Interno (CLP)"
-        pricelist = self.env['product.pricelist'].search([('name', '=', 'Interno (CLP)')], limit=1)
+        # Buscar la pricelist "Interno (CLP)" o "Interno"
+        pricelist = self.env['product.pricelist'].search([
+            ('name', 'ilike', 'Interno')
+        ], limit=1)
         productos_precio_interno = {}
-        if pricelist:
-            for picking in pickings:
-                for ml in picking.move_line_ids_without_package:
-                    product = ml.product_id
-                    if not product or product.id in productos_precio_interno:
-                        continue
-                    # Busca el precio de la lista "Interno" para ese producto
+        for picking in pickings:
+            for ml in picking.move_line_ids_without_package:
+                product = ml.product_id
+                if not product:
+                    continue
+                if product.id in productos_precio_interno:
+                    continue
+                precio_interno = 0.0
+                if pricelist:
                     item = self.env['product.pricelist.item'].search([
                         ('pricelist_id', '=', pricelist.id),
                         ('product_tmpl_id', '=', product.product_tmpl_id.id),
                         ('applied_on', '=', '1_product'),
                     ], limit=1)
                     if item:
-                        productos_precio_interno[product.id] = item.fixed_price
-                    else:
-                        productos_precio_interno[product.id] = 0.0
-        else:
-            # Si no hay lista, igual define el diccionario vacío
-            productos_precio_interno = {}
+                        precio_interno = item.fixed_price
+                productos_precio_interno[product.id] = precio_interno
 
-        # Agrupación para el resumen mensual
-        resumen = defaultdict(lambda: defaultdict(float))
+        # Agrupar para el resumen
+        resumen = defaultdict(lambda: defaultdict(lambda: {'total': 0.0, 'traspasos': []}))
         for picking in pickings:
             fecha = picking.date_done
             if not fecha:
                 continue
             mes = fecha.strftime('%B %Y')
             origen = picking.location_id.display_name
+            destino = picking.location_dest_id.display_name
+            subtotal = 0.0
+            productos = []
             for ml in picking.move_line_ids_without_package:
                 precio_interno = productos_precio_interno.get(ml.product_id.id, 0.0)
-                peso = ml.product_id.weight or 0.0
-                subtotal = ml.quantity * (precio_interno + peso)
-                resumen[mes][origen] += subtotal
-
-        resumen_listo = []
-        for mes, origenes in sorted(resumen.items()):
-            for origen, total in origenes.items():
-                resumen_listo.append({
-                    'mes': mes,
-                    'origen': origen,
-                    'total': round(total, 2),
+                linea_total = ml.quantity * precio_interno
+                subtotal += linea_total
+                productos.append({
+                    'producto': ml.product_id.display_name,
+                    'cantidad': ml.quantity,
+                    'uom': ml.product_uom_id.name,
+                    'precio_interno': precio_interno,
+                    'peso': ml.product_id.weight or 0.0,
+                    'linea_total': linea_total
+                })
+            if subtotal > 0:
+                resumen[mes][origen]['total'] += subtotal
+                resumen[mes][origen]['traspasos'].append({
+                    'nombre': picking.name,
+                    'destino': destino,
+                    'usuario': picking.create_uid.name,
+                    'fecha': fecha.strftime('%d/%m/%Y %H:%M:%S'),
+                    'productos': productos,
+                    'subtotal': subtotal
                 })
 
-        # DEBUG: Si quieres ver el dict en consola, descomenta
-        # print('DEBUG precios_interno:', productos_precio_interno)
+        # Pasar resumen listo como lista ordenada
+        resumen_mensual = []
+        for mes, origenes in sorted(resumen.items()):
+            for origen, data in origenes.items():
+                resumen_mensual.append({
+                    'mes': mes,
+                    'origen': origen,
+                    'total': round(data['total'], 2),
+                    'traspasos': data['traspasos'],
+                })
 
         return {
             'doc_ids': pickings.ids,
             'doc_model': 'stock.picking',
             'docs': pickings,
-            'resumen_mensual': resumen_listo,
-            'precios_interno': productos_precio_interno,  # SIEMPRE VIENE aunque sea {}
+            'resumen_mensual': resumen_mensual,
         }
