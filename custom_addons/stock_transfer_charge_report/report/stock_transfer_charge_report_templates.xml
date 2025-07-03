@@ -4,6 +4,8 @@
       <t t-call="web.external_layout">
         <div class="page">
           <h2 style="text-align:center;">Traspasos seleccionados</h2>
+          <!-- 1. Línea mágica para evitar error KeyError -->
+          <t t-set="precios_interno" t-value="precios_interno if 'precios_interno' in locals() else (data['precios_interno'] if data and 'precios_interno' in data else {})"/>
           <t t-foreach="docs" t-as="o">
             <div style="margin-bottom:30px;">
               <h3>Traspaso: <t t-esc="o.name"/></h3>
