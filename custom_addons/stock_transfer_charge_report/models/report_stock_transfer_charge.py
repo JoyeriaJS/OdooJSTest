@@ -13,7 +13,8 @@ class ReportStockTransferCharge(models.AbstractModel):
 
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
         if not pickings:
-            pickings = self.env['stock.picking'].search([('id', '=', 0)])  # Esto es un recordset vacío
+            pickings = self.env['stock.picking'].search([('id', '=', 0)])  # Recordset vacío
+
 
         # Buscar la pricelist "Interno"
         pricelist = self.env['product.pricelist'].search([('name', '=', 'Interno')], limit=1)
