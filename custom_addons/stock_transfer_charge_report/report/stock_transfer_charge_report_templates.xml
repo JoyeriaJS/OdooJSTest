@@ -24,8 +24,12 @@
                   <td><t t-esc="ml.product_id.display_name"/></td>
                   <td><t t-esc="ml.quantity"/></td>
                   <td><t t-esc="ml.product_uom_id.name"/></td>
-                  <td><t t-esc="precios_interno.get(ml.product_id.id, 0.0)"/></td>
-                  <td><t t-esc="ml.quantity * precios_interno.get(ml.product_id.id, 0.0)"/></td>
+                  <td>
+                    <t t-esc="precios_interno.get(ml.product_id.id, 0.0)"/>
+                  </td>
+                  <td>
+                    <t t-esc="ml.quantity * precios_interno.get(ml.product_id.id, 0.0)"/>
+                  </td>
                 </tr>
               </tbody>
             </table>
