@@ -9,59 +9,59 @@
             <strong>Joyería Sebastián, Chile</strong>
           </div>
         </div>
+
         <h2>Reporte Salida Taller</h2>
+
         <!-- Recorremos cada grupo (mes/año) -->
         <t t-foreach="groups" t-as="grp">
+          <!-- Título del grupo: MM/YYYY -->
           <h3>
             <t t-esc="('%02d/%04d' % (grp['month'], grp['year']))"/>
           </h3>
+
           <table class="table table-sm">
             <thead>
               <tr>
                 <th>RMA</th>
-                <th>Fecha de Firma</th>
-                <th>Peso (g)</th>
+                <th>Metal Utilizado</th>
+                <th>Peso</th>
                 <th>Cobro Interno</th>
                 <th>Hechura</th>
                 <th>Cobros Extras</th>
-                <th>Oro Rosado (valor)</th>
-                <th>Oro Amarillo (valor)</th>
-                <th>Total Metales</th>
-                <th>Pago a Taller</th>
+                <th>Total Salida Taller</th>
               </tr>
             </thead>
             <tbody>
+              <!-- Cada RMA dentro del grupo -->
               <t t-foreach="grp['docs']" t-as="rec">
                 <tr>
                   <td><t t-esc="rec.name"/></td>
-                  <td><t t-esc="rec.fecha_firma or ''"/></td>
-                  <td><t t-esc="rec.peso_valor or 0.0"/></td>
-                  <td><t t-esc="rec.cobro_interno or 0.0"/></td>
-                  <td><t t-esc="rec.hechura or 0.0"/></td>
-                  <td><t t-esc="rec.cobros_extras or 0.0"/></td>
-                  <td><t t-esc="rec.oro_rosado_valor or 0.0"/></td>
-                  <td><t t-esc="rec.oro_amarillo_valor or 0.0"/></td>
-                  <td><t t-esc="rec.total_metales or 0.0"/></td>
-                  <td><t t-esc="rec.pago_a_taller or 0.0"/></td>
+                  <td><t t-esc="rec.metal_utilizado or ''"/></td>
+                  <td><t t-esc="rec.peso_valor     or 0.0"/></td>
+                  <td><t t-esc="rec.cobro_interno  or 0.0"/></td>
+                  <td><t t-esc="rec.hechura        or 0.0"/></td>
+                  <td><t t-esc="rec.cobros_extras  or 0.0"/></td>
+                  <td><t t-esc="rec.total_salida_taller or 0.0"/></td>
                 </tr>
               </t>
             </tbody>
             <tfoot>
               <tr>
                 <th>Total del mes:</th>
-                <!-- hueco para fecha de firma -->
+                <!-- hueco para Metal Utilizado -->
                 <th/>
-                <th><t t-esc="grp['sums']['peso_valor']"/></th>
-                <th><t t-esc="grp['sums']['cobro_interno']"/></th>
-                <th><t t-esc="grp['sums']['hechura']"/></th>
-                <th><t t-esc="grp['sums']['cobros_extras']"/></th>
-                <th><t t-esc="grp['sums']['oro_rosado_valor']"/></th>
-                <th><t t-esc="grp['sums']['oro_amarillo_valor']"/></th>
-                <th><t t-esc="grp['sums']['total_metales']"/></th>
-                <th><t t-esc="grp['sums']['pago_a_taller']"/></th>
+                <!-- Sumas de floats -->
+                <th><t t-esc="grp['sums']['peso_valor']       "/></th>
+                <th><t t-esc="grp['sums']['metales_extra']    "/></th>
+                <th><t t-esc="grp['sums']['cobro_interno']    "/></th>
+                <th><t t-esc="grp['sums']['hechura']          "/></th>
+                <th><t t-esc="grp['sums']['cobros_extras']    "/></th>
+                <th><t t-esc="grp['sums']['total_salida_taller']"/></th>
               </tr>
             </tfoot>
           </table>
+
+          <!-- Salto de página tras cada mes -->
           <div style="page-break-after: always;"/>
         </t>
       </main>
