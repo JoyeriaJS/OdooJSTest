@@ -16,7 +16,7 @@ class ReportStockTransferCharge(models.AbstractModel):
             pickings = self.env['stock.picking'].search([('id', '=', 0)])  # recordset vacío
 
         # Buscar la pricelist "Interno (CLP)"
-        pricelist = self.env['product.pricelist'].search([('name', 'ilike', 'Interno')], limit=1)
+        pricelist = self.env['product.pricelist'].search([('name', '=', 'Interno (CLP)')], limit=1)
         productos_precio_interno = {}
         if pricelist:
             for picking in pickings:
