@@ -3,52 +3,70 @@
     <t t-call="web.html_container">
       <t t-call="web.external_layout">
         <div class="page">
-          <h2 style="text-align:center;">Resumen mensual de traspasos</h2>
-          <t t-foreach="resumen_mensual" t-as="rm">
-            <h3>Mes: <t t-esc="rm['mes']"/> | Local Origen: <t t-esc="rm['origen']"/></h3>
-            <t t-foreach="rm['traspasos']" t-as="tras">
-              <div style="margin-bottom:20px;">
-                <h4>Traspaso: <t t-esc="tras['nombre']"/> | Destino: <t t-esc="tras['destino']"/></h4>
-                <p><strong>Realizado por:</strong> <t t-esc="tras['usuario']"/> | <strong>Fecha:</strong> <t t-esc="tras['fecha']"/></p>
-                <table class="table table-sm" style="font-size:12px;">
-                  <thead>
-                    <tr>
-                      <th>Producto</th>
-                      <th>Cantidad</th>
-                      <th>UoM</th>
-                      <th>Precio Interno</th>
-                      <th>Peso</th>
-                      <th>Subtotal</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr t-foreach="tras['productos']" t-as="prod">
-                      <td><t t-esc="prod['producto']"/></td>
-                      <td><t t-esc="prod['cantidad']"/></td>
-                      <td><t t-esc="prod['uom']"/></td>
-                      <td><t t-esc="prod['precio_interno']"/></td>
-                      <td><t t-esc="prod['peso']"/></td>
-                      <td><t t-esc="prod['linea_total']"/></td>
-                    </tr>
-                  </tbody>
-                </table>
-                <p style="text-align:right;"><strong>Subtotal Traspaso:</strong> <t t-esc="tras['subtotal']"/> CLP</p>
-                <p style="text-align:right; color:#1976d2;">
-                  <strong>
-                    El local "<t t-esc="tras['destino']"/>" le debe <t t-esc="tras['subtotal']"/> CLP a "<t t-esc="rm['origen']"/>" por este traspaso.
-                  </strong>
-                </p>
-              </div>
+          <h2 style="text-align:center;">Traspasos seleccionados</h2>
+          <t t-foreach="docs" t-as="o">
+            <div style="margin-bottom:30px;">
+              <h3>Traspaso: <t t-esc="o.name"/></h3>
+              <p><strong>Origen:</strong> <t t-esc="o.location_id.display_name"/></p>
+              <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
+              <p><strong>Estado:</strong> <t t-esc="o.state"/></p>
+              <p><strong>Tipo:</strong> <t t-esc="o.picking_type_code"/></p>
+              <p><strong>Fecha efectiva:</strong> <t t-esc="o.date_done and o.date_done.strftime('%d/%m/%Y %H:%M:%S') or ''"/></p>
+              <table class="table table-sm" t-if="o.move_line_ids_without_package">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>UoM</th>
+                    <th>Precio Interno</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
+                    <td><t t-esc="ml.product_id.display_name"/></td>
+                    <td><t t-esc="ml.quantity"/></td>
+                    <td><t t-esc="ml.product_uom_id.name"/></td>
+                    <td>
+                      <t t-set="precio_interno" t-value="precios_interno.get(ml.product_id.id, 0.0)"/>
+                      <t t-esc="precio_interno"/>
+                    </td>
+                    <td>
+                      <t t-esc="ml.quantity * precio_interno"/>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <t t-if="not o.move_line_ids_without_package">
+                <p>No hay movimientos de productos en este traspaso.</p>
+              </t>
+              <hr style="margin: 15px 0;"/>
+            </div>
+          </t>
+
+          <!-- RESUMEN MENSUAL POR LOCAL DE ORIGEN -->
+          <div class="page">
+            <h2 style="text-align:center;">Resumen mensual por local de origen</h2>
+            <table class="table table-sm" t-if="resumen_mensual">
+              <thead>
+                <tr>
+                  <th>Mes</th>
+                  <th>Local Origen</th>
+                  <th>Total (CLP)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr t-foreach="resumen_mensual" t-as="r">
+                  <td><t t-esc="r['mes']"/></td>
+                  <td><t t-esc="r['origen']"/></td>
+                  <td><t t-esc="r['total']"/></td>
+                </tr>
+              </tbody>
+            </table>
+            <t t-if="not resumen_mensual">
+              <p>No hay traspasos efectivos este mes.</p>
             </t>
-            <p style="font-size:14px; text-align:right; color:#388e3c; border-top:1px solid #aaa;">
-              <strong>Total a cobrar por "<t t-esc="rm['origen']"/>":</strong>
-              <t t-esc="rm['total']"/> CLP en <t t-esc="rm['mes']"/>.
-            </p>
-            <hr style="margin:20px 0;"/>
-          </t>
-          <t t-if="not resumen_mensual">
-            <p>No hay traspasos efectivos en el mes seleccionado.</p>
-          </t>
+          </div>
         </div>
       </t>
     </t>
