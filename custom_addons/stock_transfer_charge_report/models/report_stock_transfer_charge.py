@@ -7,30 +7,23 @@ class ReportStockTransferCharge(models.AbstractModel):
     @api.model
     def _get_report_values(self, docids, data=None):
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
-
-        # Busca la lista de precios "Interno (CLP)" con ILIKE por si tiene espacios
-        pricelist = self.env['product.pricelist'].search([('name', 'ilike', 'Interno (CLP)')], limit=1)
-
-        # Pre-carga los precios internos para todos los productos involucrados
-        precios_interno = {}
-        if pricelist:
-            items = self.env['product.pricelist.item'].search([
-                ('pricelist_id', '=', pricelist.id),
-                ('applied_on', '=', '1_product'),
-            ])
-            for item in items:
-                # OJO: product_id, no product_tmpl_id (en muchos Odoo, product_id es el correcto para la regla)
-                if item.product_id:
-                    precios_interno[item.product_id.id] = item.fixed_price
-                elif item.product_tmpl_id:
-                    # fallback por si hay reglas por template
-                    for prod in self.env['product.product'].search([('product_tmpl_id','=',item.product_tmpl_id.id)]):
-                        precios_interno[prod.id] = item.fixed_price
-
         movimientos = []
+
+        # Busca la lista de precios "Interno (CLP)" solo una vez
+        pricelist = self.env['product.pricelist'].search([('name', '=', 'Interno (CLP)')], limit=1)
+
         for picking in pickings:
             for ml in picking.move_line_ids_without_package:
-                precio_interno = precios_interno.get(ml.product_id.id, 0.0)
+                precio_interno = 0.0
+                if pricelist:
+                    # OJO: el campo product_tmpl_id es el que cruza con la lista de precios
+                    item = self.env['product.pricelist.item'].search([
+                        ('pricelist_id', '=', pricelist.id),
+                        ('product_tmpl_id', '=', ml.product_id.product_tmpl_id.id),
+                    ], limit=1)
+                    if item:
+                        precio_interno = item.fixed_price
+
                 movimientos.append({
                     'producto': ml.product_id.display_name or '',
                     'cantidad': ml.quantity or 0.0,
