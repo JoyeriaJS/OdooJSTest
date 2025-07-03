@@ -22,10 +22,10 @@
             <t t-foreach="lines" t-as="l">
               <tr>
                 <td><t t-esc="l['month_name']"/></td>
-                <td><t t-esc="l['rma_total'] or 0.0"/></td>
-                <td><t t-esc="l['pos_total'] or 0.0"/></td>
+                <td><t t-esc="l['rma_total'] or $0.0"/></td>
+                <td><t t-esc="l['pos_total'] or $0.0"/></td>
                 <td>
-                  <t t-esc="(l['rma_total'] or 0.0) + (l['pos_total'] or 0.0)"/>
+                  <t t-esc="(l['rma_total'] or $0.0) + (l['pos_total'] or $.0)"/>
                 </td>
               </tr>
             </t>

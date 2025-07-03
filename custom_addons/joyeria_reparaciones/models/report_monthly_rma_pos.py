@@ -32,7 +32,7 @@ class ReportMonthlyRmaPos(models.AbstractModel):
             dt = fields.Datetime.to_datetime(r.fecha_firma)
             mes = dt.strftime('%Y-%m')
             groups.setdefault(mes, {'rma_total': 0.0, 'pos_total': 0.0})
-            groups[mes]['rma_total'] += r.saldo
+            groups[mes]['rma_total'] += r.abono
 
         # 2) Todas las ventas POS en ese rango
         orders = self.env['pos.order'].search([
