@@ -15,19 +15,17 @@
                   <th>Producto</th>
                   <th>Cantidad</th>
                   <th>UoM</th>
-                  <th>Precio Interno</th>
+                  <th>Precio Unitario</th>
                   <th>Subtotal</th>
                 </tr>
               </thead>
               <tbody>
-                <tr t-foreach="movimientos" t-as="mv">
-                  <t t-if="mv['picking_name'] == o.name">
-                    <td><t t-esc="mv['producto']"/></td>
-                    <td><t t-esc="mv['cantidad']"/></td>
-                    <td><t t-esc="mv['uom']"/></td>
-                    <td><t t-esc="mv['precio_interno']"/></td>
-                    <td><t t-esc="mv['subtotal']"/></td>
-                  </t>
+                <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
+                  <td><t t-esc="ml.product_id.display_name"/></td>
+                  <td><t t-esc="ml.quantity"/></td>
+                  <td><t t-esc="ml.product_uom_id.name"/></td>
+                  <td><t t-esc="ml.product_id.standard_price"/></td>
+                  <td><t t-esc="ml.quantity * (ml.product_id.standard_price or 0.0)"/></td>
                 </tr>
               </tbody>
             </table>

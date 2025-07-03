@@ -7,26 +7,20 @@ class ReportStockTransferCharge(models.AbstractModel):
     @api.model
     def _get_report_values(self, docids, data=None):
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
+        movimientos = []
 
-        # Busca la lista de precios "Interno (CLP)"
+        # Busca la lista de precios "Interno (CLP)" solo una vez
         pricelist = self.env['product.pricelist'].search([('name', '=', 'Interno (CLP)')], limit=1)
 
-        movimientos = []
         for picking in pickings:
             for ml in picking.move_line_ids_without_package:
                 precio_interno = 0.0
-                # Busca por variante primero
                 if pricelist:
+                    # OJO: el campo product_tmpl_id es el que cruza con la lista de precios
                     item = self.env['product.pricelist.item'].search([
                         ('pricelist_id', '=', pricelist.id),
-                        ('product_id', '=', ml.product_id.id),  # buscar por variante
+                        ('product_tmpl_id', '=', ml.product_id.product_tmpl_id.id),
                     ], limit=1)
-                    # Si no lo encuentra, busca por plantilla
-                    if not item:
-                        item = self.env['product.pricelist.item'].search([
-                            ('pricelist_id', '=', pricelist.id),
-                            ('product_tmpl_id', '=', ml.product_id.product_tmpl_id.id),
-                        ], limit=1)
                     if item:
                         precio_interno = item.fixed_price
 
