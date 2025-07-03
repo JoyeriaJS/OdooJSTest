@@ -9,16 +9,12 @@
             <strong>Joyería Sebastián, Chile</strong>
           </div>
         </div>
-
         <h2>Reporte Salida Taller</h2>
-
         <!-- Recorremos cada grupo (mes/año) -->
         <t t-foreach="groups" t-as="grp">
-          <!-- Título del grupo: MM/YYYY -->
           <h3>
             <t t-esc="('%02d/%04d' % (grp['month'], grp['year']))"/>
           </h3>
-
           <table class="table table-sm">
             <thead>
               <tr>
@@ -28,14 +24,13 @@
                 <th>Cobro Interno</th>
                 <th>Hechura</th>
                 <th>Cobros Extras</th>
-                <th>Oro Rosado (Valor)</th>
-                <th>Oro Amarillo (Valor)</th>
+                <th>Oro Rosado (valor)</th>
+                <th>Oro Amarillo (valor)</th>
                 <th>Total Metales</th>
                 <th>Pago a Taller</th>
               </tr>
             </thead>
             <tbody>
-              <!-- Cada RMA dentro del grupo -->
               <t t-foreach="grp['docs']" t-as="rec">
                 <tr>
                   <td><t t-esc="rec.name"/></td>
@@ -54,6 +49,7 @@
             <tfoot>
               <tr>
                 <th>Total del mes:</th>
+                <!-- hueco para fecha de firma -->
                 <th/>
                 <th><t t-esc="grp['sums']['peso_valor']"/></th>
                 <th><t t-esc="grp['sums']['cobro_interno']"/></th>
@@ -66,8 +62,6 @@
               </tr>
             </tfoot>
           </table>
-
-          <!-- Salto de página tras cada mes -->
           <div style="page-break-after: always;"/>
         </t>
       </main>
