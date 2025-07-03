@@ -13,29 +13,30 @@ class ReportStockTransferCharge(models.AbstractModel):
 
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
         if not pickings:
-            pickings = self.env['stock.picking'].search([('id', '=', 0)])  # Recordset vacío
+            pickings = self.env['stock.picking'].search([('id', '=', 0)])  # recordset vacío
 
-
-        # Buscar la pricelist "Interno"
-        pricelist = self.env['product.pricelist'].search([('name', '=', 'Interno')], limit=1)
+        # Buscar la pricelist "Interno (CLP)"
+        pricelist = self.env['product.pricelist'].search([('name', 'ilike', 'Interno')], limit=1)
         productos_precio_interno = {}
-        for picking in pickings:
-            for ml in picking.move_line_ids_without_package:
-                product = ml.product_id
-                if not product:
-                    continue
-                if product.id in productos_precio_interno:
-                    continue
-                precio_interno = 0.0
-                if pricelist:
+        if pricelist:
+            for picking in pickings:
+                for ml in picking.move_line_ids_without_package:
+                    product = ml.product_id
+                    if not product or product.id in productos_precio_interno:
+                        continue
+                    # Busca el precio de la lista "Interno" para ese producto
                     item = self.env['product.pricelist.item'].search([
                         ('pricelist_id', '=', pricelist.id),
                         ('product_tmpl_id', '=', product.product_tmpl_id.id),
                         ('applied_on', '=', '1_product'),
                     ], limit=1)
                     if item:
-                        precio_interno = item.fixed_price
-                productos_precio_interno[product.id] = precio_interno
+                        productos_precio_interno[product.id] = item.fixed_price
+                    else:
+                        productos_precio_interno[product.id] = 0.0
+        else:
+            # Si no hay lista, igual define el diccionario vacío
+            productos_precio_interno = {}
 
         # Agrupación para el resumen mensual
         resumen = defaultdict(lambda: defaultdict(float))
@@ -60,7 +61,7 @@ class ReportStockTransferCharge(models.AbstractModel):
                     'total': round(total, 2),
                 })
 
-        # Para debug, puedes imprimir los productos_precio_interno aquí
+        # DEBUG: Si quieres ver el dict en consola, descomenta
         # print('DEBUG precios_interno:', productos_precio_interno)
 
         return {
@@ -68,5 +69,5 @@ class ReportStockTransferCharge(models.AbstractModel):
             'doc_model': 'stock.picking',
             'docs': pickings,
             'resumen_mensual': resumen_listo,
-            'precios_interno': productos_precio_interno,
+            'precios_interno': productos_precio_interno,  # SIEMPRE VIENE aunque sea {}
         }
