@@ -3,70 +3,40 @@
     <t t-call="web.html_container">
       <t t-call="web.external_layout">
         <div class="page">
-          <h2 style="text-align:center;">Traspasos seleccionados</h2>
-          <t t-foreach="docs" t-as="o">
-            <div style="margin-bottom:30px;">
-              <h3>Traspaso: <t t-esc="o.name"/></h3>
-              <p><strong>Origen:</strong> <t t-esc="o.location_id.display_name"/></p>
-              <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
-              <p><strong>Estado:</strong> <t t-esc="o.state"/></p>
-              <p><strong>Tipo:</strong> <t t-esc="o.picking_type_code"/></p>
-              <p><strong>Fecha efectiva:</strong> <t t-esc="o.date_done and o.date_done.strftime('%d/%m/%Y %H:%M:%S') or ''"/></p>
-              <table class="table table-sm" t-if="o.move_line_ids_without_package">
-                <thead>
-                  <tr>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>UoM</th>
-                    <th>Precio Interno</th>
-                    <th>Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
-                    <td><t t-esc="ml.product_id.display_name"/></td>
-                    <td><t t-esc="ml.quantity"/></td>
-                    <td><t t-esc="ml.product_uom_id.name"/></td>
-                    <td>
-                      <t t-set="precio_interno" t-value="precios_interno.get(ml.product_id.id, 0.0)"/>
-                      <t t-esc="precio_interno"/>
-                    </td>
-                    <td>
-                      <t t-esc="ml.quantity * precio_interno"/>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <t t-if="not o.move_line_ids_without_package">
-                <p>No hay movimientos de productos en este traspaso.</p>
-              </t>
-              <hr style="margin: 15px 0;"/>
-            </div>
+          <h2 style="text-align:center;">Traspasos realizados</h2>
+          <table class="table table-sm" t-if="movimientos">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>UoM</th>
+                <th>Desde</th>
+                <th>A</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr t-foreach="movimientos" t-as="m">
+                <td>
+                  <t t-esc="m['code']"/> - <t t-esc="m['name']"/>
+                </td>
+                <td>
+                  <t t-esc="m['qty']"/>
+                </td>
+                <td>
+                  <t t-esc="m['uom']"/>
+                </td>
+                <td>
+                  <t t-esc="m['origen']"/>
+                </td>
+                <td>
+                  <t t-esc="m['destino']"/>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <t t-if="not movimientos">
+            <p>No hay movimientos de productos en los traspasos seleccionados.</p>
           </t>
-
-          <!-- RESUMEN MENSUAL POR LOCAL DE ORIGEN -->
-          <div class="page">
-            <h2 style="text-align:center;">Resumen mensual por local de origen</h2>
-            <table class="table table-sm" t-if="resumen_mensual">
-              <thead>
-                <tr>
-                  <th>Mes</th>
-                  <th>Local Origen</th>
-                  <th>Total (CLP)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr t-foreach="resumen_mensual" t-as="r">
-                  <td><t t-esc="r['mes']"/></td>
-                  <td><t t-esc="r['origen']"/></td>
-                  <td><t t-esc="r['total']"/></td>
-                </tr>
-              </tbody>
-            </table>
-            <t t-if="not resumen_mensual">
-              <p>No hay traspasos efectivos este mes.</p>
-            </t>
-          </div>
         </div>
       </t>
     </t>
