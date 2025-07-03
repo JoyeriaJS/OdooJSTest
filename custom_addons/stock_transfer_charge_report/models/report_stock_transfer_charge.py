@@ -8,10 +8,8 @@ class ReportStockTransferCharge(models.AbstractModel):
     def _get_report_values(self, docids, data=None):
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
 
-        # Busca la lista de precios "Interno (CLP)"
         pricelist = self.env['product.pricelist'].search([('name', '=', 'Interno (CLP)')], limit=1)
         precios_interno = {}
-
         if pricelist:
             productos = pickings.mapped('move_line_ids_without_package.product_id')
             for producto in productos:
@@ -28,5 +26,5 @@ class ReportStockTransferCharge(models.AbstractModel):
 
         return {
             'docs': pickings,
-            'precios_interno': precios_interno,  # Ahora sí el template lo tendrá disponible
+            'precios_interno': precios_interno,  # <-- SIEMPRE mandamos este dict
         }
