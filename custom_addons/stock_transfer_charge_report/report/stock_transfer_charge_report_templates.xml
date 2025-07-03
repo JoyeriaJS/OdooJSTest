@@ -15,31 +15,17 @@
                   <th>Producto</th>
                   <th>Cantidad</th>
                   <th>UoM</th>
-                  <th>Precio Interno</th>
+                  <th>Precio Unitario</th>
                   <th>Subtotal</th>
                 </tr>
               </thead>
               <tbody>
                 <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
-                  <!-- Aquí hacemos lo mismo que en Python -->
-                  <t t-set="precio_interno" t-value="0.0"/>
-                  <t t-if="ml.product_id and env['product.pricelist'].search([('name','=','Interno (CLP)')], limit=1)">
-                    <t t-set="pricelist_id" t-value="env['product.pricelist'].search([('name','=','Interno (CLP)')], limit=1).id"/>
-                    <t t-set="item"
-                          t-value="env['product.pricelist.item'].search([
-                            ('pricelist_id', '=', pricelist_id),
-                            ('product_tmpl_id', '=', ml.product_id.product_tmpl_id.id),
-                            ('applied_on', '=', '1_product')
-                          ], limit=1)"/>
-                    <t t-if="item">
-                      <t t-set="precio_interno" t-value="item.fixed_price"/>
-                    </t>
-                  </t>
                   <td><t t-esc="ml.product_id.display_name"/></td>
                   <td><t t-esc="ml.quantity"/></td>
                   <td><t t-esc="ml.product_uom_id.name"/></td>
-                  <td><t t-esc="precio_interno"/></td>
-                  <td><t t-esc="ml.quantity * precio_interno"/></td>
+                  <td><t t-esc="ml.product_id.standard_price"/></td>
+                  <td><t t-esc="ml.quantity * (ml.product_id.standard_price or 0.0)"/></td>
                 </tr>
               </tbody>
             </table>
