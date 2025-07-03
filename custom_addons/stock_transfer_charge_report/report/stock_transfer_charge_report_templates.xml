@@ -1,41 +1,39 @@
 <odoo>
   <template id="stock_transfer_charge_report_template">
     <t t-call="web.html_container">
-      <t t-foreach="traspasos_por_mes.items()" t-as="mes_traspasos">
-        <div class="page">
-          <h2 style="text-align:center;">Traspasos <t t-esc="mes_traspasos[0]"/></h2>
-          <table class="table table-sm">
-            <thead>
-              <tr>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>UoM</th>
-                <th>Precio Interno</th>
-                <th>Subtotal</th>
-                <th>Origen</th>
-                <th>Destino</th>
-                <th>Traspaso</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr t-foreach="mes_traspasos[1]" t-as="mov">
-                <td><t t-esc="mov['producto']"/></td>
-                <td><t t-esc="mov['cantidad']"/></td>
-                <td><t t-esc="mov['uom']"/></td>
-                <td><t t-esc="mov['precio_interno']"/></td>
-                <td><t t-esc="mov['subtotal_interno']"/></td>
-                <td><t t-esc="mov['origen']"/></td>
-                <td><t t-esc="mov['destino']"/></td>
-                <td><t t-esc="mov['traspaso']"/></td>
-                <td><t t-esc="mov['fecha']"/></td>
-                <td><t t-esc="mov['estado']"/></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </t>
+      <div class="page">
+        <h2 style="text-align:center;">Traspasos</h2>
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>UoM</th>
+              <th>Precio Interno</th>
+              <th>Subtotal</th>
+              <th>Origen</th>
+              <th>Destino</th>
+              <th>Traspaso</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr t-foreach="movimientos" t-as="mov">
+              <td><t t-esc="mov['producto']"/></td>
+              <td><t t-esc="mov['cantidad']"/></td>
+              <td><t t-esc="mov['uom']"/></td>
+              <td><t t-esc="mov['precio_interno']"/></td>
+              <td><t t-esc="mov['subtotal_interno']"/></td>
+              <td><t t-esc="mov['origen']"/></td>
+              <td><t t-esc="mov['destino']"/></td>
+              <td><t t-esc="mov['traspaso']"/></td>
+              <td><t t-esc="mov['fecha']"/></td>
+              <td><t t-esc="mov['estado']"/></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </t>
   </template>
 </odoo>
