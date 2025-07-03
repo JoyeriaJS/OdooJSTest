@@ -2,7 +2,7 @@
   <report
     id="action_report_sales_by_vendedora"
     model="joyeria.reparacion"
-    string="Ventas por Vendedora y Mes"
+    string="Ventas RMA por vendedor"
     report_type="qweb-pdf"
     name="joyeria_reparaciones.report_sales_by_vendedora_template"
     file="joyeria_reparaciones.report_sales_by_vendedora_template"
