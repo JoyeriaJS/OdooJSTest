@@ -3,7 +3,7 @@
     <t t-call="web.external_layout">
       <main class="page">
         <h2 style="text-align:center; margin-bottom:1em;">
-          Ventas por Vendedora y Mes
+          Ventas RMA por vendedor
         </h2>
         <!-- Iteramos por cada grupo (vendedora + mes) -->
         <t t-foreach="groups" t-as="grp">
