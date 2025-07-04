@@ -17,5 +17,6 @@ class WizardSetPrecioOros(models.TransientModel):
         # Normalmente el wizard conoce los IDs a reportar a través del contexto
         docids = self.env.context.get('active_ids', [])
         return self.env.ref('joyeria_reparaciones.action_report_sales_by_store').report_action(docids, data=data)
+                             
 
                              
