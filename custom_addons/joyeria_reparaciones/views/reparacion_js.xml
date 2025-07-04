@@ -142,11 +142,7 @@
     </record>
 
     <menuitem id="menu_joyeria_root" name="Reparaciones" action="action_joyeria_reparacion_listado"/>
-    <button name="action_open_precio_oros_wizard"
-        string="Reporte con valores de oro"
-        type="object"
-        class="oe_highlight"/>
-
+    
     
 </odoo>
 
