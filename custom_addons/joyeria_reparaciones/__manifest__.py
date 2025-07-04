@@ -6,6 +6,7 @@
     'category': 'Operations',
     'depends': ['base', 'product', 'sale', 'contacts','point_of_sale'],
     'data': [
+        "report/report_sales_by_store_copy.xml",
         'security/joyeria_security.xml',
         'security/ir.model.access.csv',
         'views/reparacion_js.xml',
@@ -36,6 +37,7 @@
         'report/report_monthly_rma_pos_template.xml',
         'wizard/wizard_set_precio_oros_view.xml',
         'wizard/wizard_set_precio_oros_action.xml',
+
 
 
         
