@@ -18,5 +18,6 @@ class WizardSetPrecioOros(models.TransientModel):
         docids = self.env.context.get('active_ids', [])
         return self.env.ref('joyeria_reparaciones.action_report_sales_by_store').report_action(docids, data=data)
                              
+                             
 
                              
