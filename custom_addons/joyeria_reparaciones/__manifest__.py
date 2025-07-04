@@ -34,6 +34,7 @@
 
         'report/report_monthly_rma_pos_action.xml',
         'report/report_monthly_rma_pos_template.xml',
+        'wizard/wizard_set_precio_oros_view.xml',
 
 
         

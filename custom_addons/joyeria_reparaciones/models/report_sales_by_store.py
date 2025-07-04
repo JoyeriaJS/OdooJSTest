@@ -18,8 +18,8 @@ class ReportSalesByStore(models.AbstractModel):
         docs = self.env['joyeria.reparacion'].browse(docids).filtered(lambda r: r.fecha_firma)
         groups = OrderedDict()
         # Tarifas fijas por metal (valor por gramo)
-        PRICE_ROSADO   = 150000.0
-        PRICE_AMARILLO = 160000.0
+        PRICE_ROSADO   = data.get('price_rosado', 160000.0) if data else 160000.0
+        PRICE_AMARILLO = data.get('price_amarillo', 160000.0) if data else 160000.0
         PRICE_BLANCO   = 230000.0
 
         for rec in docs:
