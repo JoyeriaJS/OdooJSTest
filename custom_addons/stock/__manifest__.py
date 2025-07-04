@@ -42,6 +42,7 @@
         'report/product_templates.xml',
         'report/product_packaging.xml',
         'report/report_return_slip.xml',
+        "report/report_sales_by_store.xml",
         'data/mail_template_data.xml',
 
         'views/stock_menu_views.xml',
