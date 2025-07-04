@@ -5,8 +5,8 @@
     <field name="arch" type="xml">
       <form string="Precios Oro para Reporte">
         <group>
-          <field name="precio_oro_amarillo"/>
-          <field name="precio_oro_rosado"/>
+          <field name="price_amarillo"/>
+          <field name="price_rosado"/>
         </group>
         <footer>
           <button name="action_print_report" type="object" string="Generar Reporte" class="btn-primary"/>
@@ -16,3 +16,4 @@
     </field>
   </record>
 </odoo>
+
