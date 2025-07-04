@@ -164,18 +164,6 @@ class Reparacion(models.Model):
     clave_firma_manual = fields.Char(string='Clave o QR para firma')
 
 
-    @api.multi
-    def action_open_precio_oros_wizard(self):
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'wizard.set.precio.oros',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {
-                'active_ids': self.ids,
-            }
-        }
-
 
 
     @api.depends('fecha_recepcion')
