@@ -1,27 +1,18 @@
-# report_sales_by_store.py
-# -*- coding: utf-8 -*-
-from odoo import api, models
-from collections import OrderedDict
-from odoo.exceptions import AccessError
-
 class ReportSalesByStore(models.AbstractModel):
     _name = 'report.joyeria_reparaciones.report_sales_by_store_template'
     _description = 'Ventas por Tienda y Mes (por Fecha de Firma)'
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # --- Validación de permisos ---
+        # Permisos...
         if not self.env.user.has_group('base.group_system'):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
-        # --------------------------------
-        # sólo registros con fecha de firma
+        # Datos de wizard (si no vienen, poner por defecto)
+        precio_oro_amarillo = data.get('precio_oro_amarillo') if data else 160000.0
+        precio_oro_rosado = data.get('precio_oro_rosado') if data else 150000.0
+
         docs = self.env['joyeria.reparacion'].browse(docids).filtered(lambda r: r.fecha_firma)
         groups = OrderedDict()
-        # Tarifas fijas por metal (valor por gramo)
-        PRICE_ROSADO   = 150000.0
-        PRICE_AMARILLO = 160000.0
-        PRICE_BLANCO   = 230000.0
-
         for rec in docs:
             store = rec.local_tienda or 'Sin Tienda'
             dt = rec.fecha_firma
@@ -37,7 +28,7 @@ class ReportSalesByStore(models.AbstractModel):
                         'metales_extra':     0.0,
                         'precio_unitario':   0.0,
                         'extra':             0.0,
-                        'extra2':             0.0,
+                        'extra2':            0.0,
                         'saldo':             0.0,
                         'cobro_interno':     0.0,
                         'hechura':           0.0,
@@ -52,16 +43,14 @@ class ReportSalesByStore(models.AbstractModel):
 
             w_val = rec.peso_valor or 0.0
             w_ext = rec.metales_extra or 0.0
-            # valor de metales según metal_utilizado
             val_rosado   = 0.0
             val_amarillo = 0.0
-            total_metales = 0.0
 
             total_weight = w_val + w_ext
             if rec.metal_utilizado == 'oro 18k rosado':
-                val_rosado = total_weight * PRICE_ROSADO
+                val_rosado = total_weight * precio_oro_rosado
             elif rec.metal_utilizado == 'oro 18k amarillo':
-                val_amarillo = total_weight * PRICE_AMARILLO
+                val_amarillo = total_weight * precio_oro_amarillo
 
             total_metales = val_rosado + val_amarillo
 
@@ -87,7 +76,7 @@ class ReportSalesByStore(models.AbstractModel):
             s['metales_extra']     += w_ext
             s['precio_unitario']   += rec.precio_unitario or 0.0
             s['extra']             += rec.extra or 0.0
-            s['extra2']            += rec.extra or 0.0
+            s['extra2']            += rec.extra2 or 0.0
             s['saldo']             += saldo
             s['cobro_interno']     += rec.cobro_interno or 0.0
             s['hechura']           += rec.hechura or 0.0
