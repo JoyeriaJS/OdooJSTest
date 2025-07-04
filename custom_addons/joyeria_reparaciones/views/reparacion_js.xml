@@ -32,6 +32,7 @@
                             <field name="solicitud_cliente" colspan="2"/>
                         </group>
 
+
                         <!-- Datos de salida del taller -->
                         <group string="🔧 Datos de salida del taller" col="2" groups="base.group_system">
                             <field name="metal_utilizado" groups="base.group_system" options="{'no_empty': True}"/>
