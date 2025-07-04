@@ -164,8 +164,6 @@ class Reparacion(models.Model):
     clave_firma_manual = fields.Char(string='Clave o QR para firma')
 
 
-
-
     @api.depends('fecha_recepcion')
     def _compute_vencimiento_garantia(self):
         for rec in self:
