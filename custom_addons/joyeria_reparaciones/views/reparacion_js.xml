@@ -124,26 +124,7 @@
         </field>
     </record>
 
-    <!-- Botón en la vista de árbol -->
-    <record id="joyeria_reparacion_action_cobro_taller_precio" model="ir.actions.server">
-        <field name="name">Cobro Taller (con precios)</field>
-        <field name="model_id" ref="model_joyeria_reparacion"/>
-        <field name="binding_model_id" ref="model_joyeria_reparacion"/>
-        <field name="binding_type">action</field>
-        <field name="state">code</field>
-        <field name="code">
-            action = {
-                "type": "ir.actions.act_window",
-                "res_model": "wizard.set.precio.oros",
-                "view_mode": "form",
-                "target": "new",
-                "context": {
-                    "active_ids": records.ids,
-                }
-            }
-        </field>
-    </record>
-
+    
 
     <!-- Acción y Menú -->
     <record id="action_joyeria_reparacion_listado" model="ir.actions.act_window">
