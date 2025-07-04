@@ -1,5 +1,3 @@
-# report_sales_by_store.py
-# -*- coding: utf-8 -*-
 from odoo import api, models
 from collections import OrderedDict
 from odoo.exceptions import AccessError
@@ -14,13 +12,21 @@ class ReportSalesByStore(models.AbstractModel):
         if not self.env.user.has_group('base.group_system'):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
         # --------------------------------
-        # sólo registros con fecha de firma
+
+        # Precios por defecto
+        PRICE_ROSADO = 150000.0
+        PRICE_AMARILLO = 160000.0
+        PRICE_BLANCO = 230000.0
+
+        # Sobrescribe con los del wizard si existen
+        if data:
+            if 'precio_oro_rosado' in data:
+                PRICE_ROSADO = data['precio_oro_rosado']
+            if 'precio_oro_amarillo' in data:
+                PRICE_AMARILLO = data['precio_oro_amarillo']
+
         docs = self.env['joyeria.reparacion'].browse(docids).filtered(lambda r: r.fecha_firma)
         groups = OrderedDict()
-        # Tarifas fijas por metal (valor por gramo)
-        PRICE_ROSADO   = data.get('price_rosado', 160000.0) if data else 160000.0
-        PRICE_AMARILLO = data.get('price_amarillo', 160000.0) if data else 160000.0
-        PRICE_BLANCO   = 230000.0
 
         for rec in docs:
             store = rec.local_tienda or 'Sin Tienda'
@@ -37,7 +43,7 @@ class ReportSalesByStore(models.AbstractModel):
                         'metales_extra':     0.0,
                         'precio_unitario':   0.0,
                         'extra':             0.0,
-                        'extra2':             0.0,
+                        'extra2':            0.0,
                         'saldo':             0.0,
                         'cobro_interno':     0.0,
                         'hechura':           0.0,
@@ -52,8 +58,9 @@ class ReportSalesByStore(models.AbstractModel):
 
             w_val = rec.peso_valor or 0.0
             w_ext = rec.metales_extra or 0.0
+
             # valor de metales según metal_utilizado
-            val_rosado   = 0.0
+            val_rosado = 0.0
             val_amarillo = 0.0
             total_metales = 0.0
 
