@@ -1,6 +1,6 @@
 <odoo>
   <report
-    id="action_report_sales_by_store"""
+    id="action_report_sales_by_store"
     model="joyeria.reparacion"
     string="Cobro de taller a locales"
     report_type="qweb-pdf"
