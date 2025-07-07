@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields
 
 class WizardSetPrecioOros(models.TransientModel):
     _name = 'wizard.set.precio.oros'
@@ -13,7 +13,4 @@ class WizardSetPrecioOros(models.TransientModel):
             'precio_oro_rosado': self.precio_oro_rosado,
         }
         docids = self.env.context.get('active_ids', [])
-        # Aquí SIEMPRE debe coincidir con el id en el XML de report (abajo)
-        return self.env.ref('joyeria_reparaciones_demo.action_report_sales_by_store').report_action(
-            self.env['joyeria.reparacion'].browse(docids), data=data
-        )
+        return self.env.ref('joyeria_reparaciones_demo.action_report_sales_by_store').report_action(docids, data=data)
