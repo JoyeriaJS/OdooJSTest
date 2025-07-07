@@ -1,0 +1,38 @@
+<odoo>
+    <record id="view_joyeria_reparacion_tree" model="ir.ui.view">
+        <field name="name">joyeria.reparacion.tree</field>
+        <field name="model">joyeria.reparacion</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="peso_valor"/>
+                <field name="metales_extra"/>
+                <field name="metal_utilizado"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_joyeria_reparacion_form" model="ir.ui.view">
+        <field name="name">joyeria.reparacion.form</field>
+        <field name="model">joyeria.reparacion</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="name"/>
+                    <field name="peso_valor"/>
+                    <field name="metales_extra"/>
+                    <field name="metal_utilizado"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <menuitem id="menu_joyeria_root" name="Reparaciones Demo"/>
+    <menuitem id="menu_joyeria_reparacion" name="Órdenes de Reparación" parent="menu_joyeria_root" action="action_joyeria_reparacion"/>
+
+    <record id="action_joyeria_reparacion" model="ir.actions.act_window">
+        <field name="name">Órdenes de Reparación</field>
+        <field name="res_model">joyeria.reparacion</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>
