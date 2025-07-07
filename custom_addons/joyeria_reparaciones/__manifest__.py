@@ -28,15 +28,14 @@
         'report/reporte_salida_taller_report_action.xml',
         'report/reporte_salida_taller_templates.xml',
         'report/report_sales_by_store.xml',
+        'wizard/wizard_set_precio_oros_action.xml',
+        'wizard/wizard_set_precio_oros_view.xml',
         'report/report_sales_by_store_template.xml',
         'report/report_sales_by_vendedora.xml',
         'report/report_sales_by_vendedora_template.xml',
 
         'report/report_monthly_rma_pos_action.xml',
         'report/report_monthly_rma_pos_template.xml',
-        'wizard/wizard_set_precio_oros_view.xml',
-        'wizard/wizard_set_precio_oros_action.xml',
-
 
 
 
