@@ -1,14 +1,16 @@
-<record id="view_users_form_inherit_reporte_responsable" model="ir.ui.view">
-    <field name="name">res.users.form.reporte.responsables</field>
-    <field name="model">res.users</field>
-    <field name="inherit_id" ref="base.view_users_form"/>
-    <field name="arch" type="xml">
-        <header position="inside">
-            <button name="%(joyeria_reparaciones.action_wizard_reporte_responsables)d"
-                    string="Reporte por Fechas"
-                    type="action"
-                    class="btn-secondary"
-                    context="{'default_responsable_id': active_id}"/>
-        </header>
-    </field>
-</record>
+<odoo>
+    <record id="view_users_form_inherit_reporte_responsable" model="ir.ui.view">
+        <field name="name">res.users.form.reporte.responsables</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button name="%(joyeria_reparaciones.action_wizard_reporte_responsables)d"
+                        string="Reporte por Fechas"
+                        type="action"
+                        class="btn-secondary"
+                        context="{'default_responsable_id': active_id}"/>
+            </header>
+        </field>
+    </record>
+</odoo>
