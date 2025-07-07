@@ -8,7 +8,8 @@ class WizardSetPrecioOros(models.TransientModel):
     precio_oro_rosado   = fields.Float("Oro Rosado 18k", required=True)
 
     def print_report(self):
-        # Valores del wizard
+        return True
+        """ # Valores del wizard
         data = {
             'precio_oro_amarillo': self.precio_oro_amarillo,
             'precio_oro_rosado': self.precio_oro_rosado,
@@ -17,4 +18,4 @@ class WizardSetPrecioOros(models.TransientModel):
         docids = self.env.context.get('active_ids', [])
         return self.env.ref('joyeria_reparaciones.action_report_sales_by_store').report_action(
             self.env['joyeria.reparacion'].browse(docids), data=data
-        )
+        ) """
