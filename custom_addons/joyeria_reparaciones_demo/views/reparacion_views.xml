@@ -1,4 +1,11 @@
 <odoo>
+    <!-- Primero el action -->
+    <record id="action_joyeria_reparacion" model="ir.actions.act_window">
+        <field name="name">Órdenes de Reparación</field>
+        <field name="res_model">joyeria.reparacion</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
     <record id="view_joyeria_reparacion_tree" model="ir.ui.view">
         <field name="name">joyeria.reparacion.tree</field>
         <field name="model">joyeria.reparacion</field>
@@ -28,11 +35,6 @@
     </record>
 
     <menuitem id="menu_joyeria_root" name="Reparaciones Demo"/>
+    <!-- Luego el menuitem, ahora sí encuentra el action -->
     <menuitem id="menu_joyeria_reparacion" name="Órdenes de Reparación" parent="menu_joyeria_root" action="action_joyeria_reparacion"/>
-
-    <record id="action_joyeria_reparacion" model="ir.actions.act_window">
-        <field name="name">Órdenes de Reparación</field>
-        <field name="res_model">joyeria.reparacion</field>
-        <field name="view_mode">tree,form</field>
-    </record>
 </odoo>
