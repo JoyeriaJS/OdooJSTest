@@ -15,6 +15,6 @@ class WizardSetPrecioOros(models.TransientModel):
         }
         # Obtener los IDs seleccionados (registros activos)
         docids = self.env.context.get('active_ids', [])
-        return self.env.ref('joyeria_reparaciones.wizard_set_precio_oros_form').report_action(
+        return self.env.ref('joyeria_reparaciones.action_report_sales_by_store').report_action(
             self.env['joyeria.reparacion'].browse(docids), data=data
         )
