@@ -5,7 +5,6 @@
     'author': 'DR + ChatGPT',
     'depends': ['base'],
     'data': [
-        'models/reparacion.py',
         'views/reparacion_views.xml',
         'report/report_sales_by_store.xml',
         'report/report_sales_by_store_template.xml',
