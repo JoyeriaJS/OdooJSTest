@@ -13,30 +13,28 @@ class ReportStockTransferCharge(models.AbstractModel):
             total_peso = 0.0
             lines = []
             for ml in picking.move_line_ids_without_package:
-                cantidad = ml.qty_done or ml.quantity or 0.0
-                precio_unitario = ml.product_id.standard_price or 0.0
-                subtotal = cantidad * precio_unitario
-                peso = (ml.product_id.weight or 0.0) * cantidad
+                qty = ml.qty_done or ml.quantity or 0.0
+                precio = ml.product_id.standard_price or 0.0
+                subtotal = qty * precio
+                peso = (ml.product_id.weight or 0.0) * qty
                 total_precio += subtotal
                 total_peso += peso
                 lines.append({
                     'producto': ml.product_id.display_name,
-                    'cantidad': cantidad,
+                    'cantidad': qty,
                     'uom': ml.product_uom_id.name,
-                    'precio_unitario': precio_unitario,
-                    'subtotal': subtotal,
+                    'precio_unitario': precio,
                     'peso': peso,
+                    'subtotal': subtotal,
                 })
             res_docs.append({
-                'name': picking.name,
-                'location_id': picking.location_id.display_name,
+                'name':             picking.name,
+                'location_id':      picking.location_id.display_name,
                 'location_dest_id': picking.location_dest_id.display_name,
-                'state': picking.state,
-                'picking_type_code': picking.picking_type_code,
-                'lines': lines,
-                'total_precio': total_precio,
-                'total_peso': total_peso,
+                'state':            picking.state,
+                'picking_type_code':picking.picking_type_code,
+                'lines':            lines,
+                'total_precio':     total_precio,
+                'total_peso':       total_peso,
             })
-        return {
-            'docs': res_docs,
-        }
+        return {'docs': res_docs}
