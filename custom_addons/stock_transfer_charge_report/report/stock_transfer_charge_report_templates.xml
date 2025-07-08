@@ -11,9 +11,15 @@
             <p><strong>Destino:</strong> <t t-esc="o['location_dest_id']"/></p>
             <p><strong>Estado:</strong> <t t-esc="o['state']"/></p>
             <p><strong>Tipo:</strong> <t t-esc="o['picking_type_code']"/></p>
+
+            <!-- Peso total trasladado -->
             <p><strong>Peso total trasladado (kg):</strong>
               <t t-esc="o['total_peso']"/>
             </p>
+            <p><strong>Valor total trasladado ($):</strong>
+              <t t-esc="o['total_precio']"/>
+            </p>
+
             <table class="table table-sm" t-if="o['lines']">
               <thead>
                 <tr>
@@ -39,10 +45,12 @@
             <t t-if="not o['lines']">
               <p>No hay movimientos de productos en este traspaso.</p>
             </t>
+
+            <!-- Firma -->
             <div style="margin-top:30px; text-align:right;">
               <p>Entregado por: ____________________</p>
-              <p>Recibido por: ____________________</p>
-              <p>Firma: ____________________________</p>
+              <p>Recibido por:  ____________________</p>
+              <p>Firma:         ____________________</p>
             </div>
           </div>
         </t>
