@@ -4,13 +4,20 @@
       <t t-foreach="docs" t-as="o">
         <t t-call="web.external_layout">
           <div class="page">
-            <h2 style="text-align:center;">Traspaso: <t t-esc="o['name']"/></h2>
+            <!-- Firma arriba derecha -->
+            <div style="position:absolute; top:30px; right:30px; text-align:right; font-size:12px;">
+              <p><strong>Recibió:</strong> ____________________</p>
+              <p><strong>Firma:</strong> ____________________</p>
+            </div>
+
+            <h2 style="text-align:center; margin-top:0;">Traspaso: <t t-esc="o['name']"/></h2>
             <p><strong>Origen:</strong> <t t-esc="o['location_id']"/></p>
             <p><strong>Destino:</strong> <t t-esc="o['location_dest_id']"/></p>
             <p><strong>Estado:</strong> <t t-esc="o['state']"/></p>
             <p><strong>Tipo:</strong> <t t-esc="o['picking_type_code']"/></p>
             <p><strong>Peso total trasladado (kg):</strong> <t t-esc="o['total_peso']"/></p>
             <p><strong>Valor total trasladado ($):</strong> <t t-esc="o['total_precio']"/></p>
+
             <table class="table table-sm" t-if="o['lines']">
               <thead>
                 <tr>
@@ -18,8 +25,8 @@
                   <th>Cantidad</th>
                   <th>UoM</th>
                   <th>Precio Unitario</th>
-                  <th>Peso trasladado</th>
-                  <th>Subtotal</th>
+                  <th>Peso trasladado (kg)</th>
+                  <th>Subtotal ($)</th>
                 </tr>
               </thead>
               <tbody>
