@@ -2,7 +2,7 @@ from odoo import models, api
 
 class ReportStockTransferCharge(models.AbstractModel):
     _name = 'report.stock_transfer_charge_report.stock_transfer_charge_report_template'
-    _description = 'Reporte Simple de Traspasos con Peso y Precio'
+    _description = 'Reporte Simple de Traspasos con Precio Interno'
 
     @api.model
     def _get_report_values(self, docids, data=None):
@@ -24,8 +24,8 @@ class ReportStockTransferCharge(models.AbstractModel):
                     'cantidad': cantidad,
                     'uom': ml.product_uom_id.name,
                     'precio_unitario': precio_unitario,
-                    'peso': peso,
                     'subtotal': subtotal,
+                    'peso': peso,
                 })
             res_docs.append({
                 'name': picking.name,
