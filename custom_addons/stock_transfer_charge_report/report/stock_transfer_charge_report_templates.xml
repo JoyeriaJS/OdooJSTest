@@ -24,7 +24,7 @@
                   <th>Cantidad</th>
                   <th>UoM</th>
                   <th>Precio Unitario</th>
-                  <th>Peso (kg)</th>
+                  <th>Peso (kg)</th>            <!-- Nueva columna -->
                   <th>Subtotal</th>
                 </tr>
               </thead>
@@ -34,7 +34,7 @@
                   <td><t t-esc="ml['cantidad']"/></td>
                   <td><t t-esc="ml['uom']"/></td>
                   <td><t t-esc="ml['precio_unitario']"/></td>
-                  <td><t t-esc="ml['peso']"/></td>
+                  <td><t t-esc="ml['peso']"/></td>          <!-- Muestra peso -->
                   <td><t t-esc="ml['subtotal']"/></td>
                 </tr>
               </tbody>
