@@ -35,8 +35,8 @@ class ReportStockTransferCharge(models.AbstractModel):
 
             docs.append({
                 'name':              picking.name,
-                'origen':            picking.location_id.display_name,
-                'destino':           picking.location_dest_id.display_name,
+                'location_id':       picking.location_id.display_name,
+                'location_dest_id':  picking.location_dest_id.display_name,
                 'estado':            picking.state,
                 'tipo':              picking.picking_type_code,
                 'lines':             lines,
