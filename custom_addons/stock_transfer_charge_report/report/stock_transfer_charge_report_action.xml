@@ -4,9 +4,8 @@
         model="stock.picking"
         string="Cargos entre Locales"
         report_type="qweb-pdf"
-        report_name="stock_transfer_charge_report.stock_transfer_charge_report_template"
-        template="stock_transfer_charge_report.stock_transfer_charge_report_template"
+        name="stock_transfer_charge_report.stock_transfer_charge_report_template"
+        file="stock_transfer_charge_report.stock_transfer_charge_report_template"
         attachment_use="False"
-
     />
 </odoo>
