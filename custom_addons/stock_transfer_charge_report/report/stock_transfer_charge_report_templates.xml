@@ -11,6 +11,7 @@
             <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
             <p><strong>Estado:</strong> <t t-esc="o.state"/></p>
             <p><strong>Tipo:</strong> <t t-esc="o.picking_type_code"/></p>
+
             <table class="table table-sm" t-if="o.move_line_ids_without_package">
               <thead>
                 <tr>
@@ -26,12 +27,11 @@
                   <td><t t-esc="ml.product_id.display_name"/></td>
                   <td><t t-esc="ml.quantity"/></td>
                   <td><t t-esc="ml.product_uom_id.name"/></td>
-                  <!-- Aquí usamos el precio interno -->
                   <td>
-                    <t t-esc="precios_interno.get(ml.product_id.id, 0.0)"/>
+                    <t t-esc="ml.product_id.standard_price or 0.0"/>
                   </td>
                   <td>
-                    <t t-esc="ml.quantity * precios_interno.get(ml.product_id.id, 0.0)"/>
+                    <t t-esc="ml.quantity * (ml.product_id.standard_price or 0.0)"/>
                   </td>
                 </tr>
               </tbody>
@@ -39,6 +39,12 @@
             <t t-if="not o.move_line_ids_without_package">
               <p>No hay movimientos de productos en este traspaso.</p>
             </t>
+
+            <!-- Total del traspaso -->
+            <p t-if="o.move_line_ids_without_package" style="text-align: right; margin-top: 1em;">
+              <strong>Total del traspaso ($):</strong>
+              <t t-esc="totals.get(o.id, 0.0)"/>
+            </p>
           </div>
         </t>
       </t>
