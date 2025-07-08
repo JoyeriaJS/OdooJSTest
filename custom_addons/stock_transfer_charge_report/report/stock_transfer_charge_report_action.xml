@@ -7,5 +7,6 @@
         name="stock_transfer_charge_report.stock_transfer_charge_report_template"
         file="stock_transfer_charge_report.stock_transfer_charge_report_template"
         attachment_use="False"
+        
     />
 </odoo>
