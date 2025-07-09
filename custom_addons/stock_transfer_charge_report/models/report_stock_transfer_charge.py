@@ -33,4 +33,5 @@ class ReportStockTransferCharge(models.AbstractModel):
             'doc_model': 'stock.picking',
             'docs': pickings,
             'precios_interno': precios_interno,
+            
         }
