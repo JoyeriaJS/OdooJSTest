@@ -40,6 +40,7 @@
                 <th>Total del mes:</th>
                 <th/>
                 <th><t t-esc="grp['total']"/></th>
+                <th><t t-esc="grp['costo']"/></th>
               </tr>
             </tfoot>
           </table>

@@ -27,11 +27,13 @@ class ReportSalesByVendedora(models.AbstractModel):
                     'month':     dt.month,
                     'docs':      [],
                     'total':     0.0,
+                    'costo':     0.0,
                 }
             grp = groups[key]
             grp['docs'].append(rec)
             # rec.saldo ya es (precio + extra – abono)
             grp['total'] += rec.saldo or 0.0
+            grp['costo'] += rec.subtotal or 0.0
 
         return {
             'doc_ids':   docids,
