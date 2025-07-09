@@ -1,4 +1,4 @@
-# models/report_salida_taller_xlsx.py
+# -*- coding: utf-8 -*-
 from odoo import models
 
 class ReportSalidaTallerXlsx(models.AbstractModel):
@@ -7,12 +7,13 @@ class ReportSalidaTallerXlsx(models.AbstractModel):
     _description = 'Reporte Salida Taller en Excel'
 
     def generate_xlsx_report(self, workbook, data, records):
-        # 1) crear hoja
+        # 1) Creamos la hoja
         sheet = workbook.add_worksheet("Salida Taller")
-        # 2) formatos
-        bold = workbook.add_format({'bold': True})
+        # 2) Definimos formatos
+        bold  = workbook.add_format({'bold': True})
         money = workbook.add_format({'num_format': '#,##0.00'})
-        # 3) cabeceras
+
+        # 3) Cabeceras
         headers = [
             "RMA",
             "Fecha Recepción",
@@ -26,7 +27,8 @@ class ReportSalidaTallerXlsx(models.AbstractModel):
         ]
         for col, h in enumerate(headers):
             sheet.write(0, col, h, bold)
-        # 4) filas de datos
+
+        # 4) Filas de datos
         row = 1
         for rec in records:
             sheet.write(row, 0, rec.name)
@@ -39,6 +41,7 @@ class ReportSalidaTallerXlsx(models.AbstractModel):
             sheet.write_number(row, 7, rec.cobros_extras or 0.0, money)
             sheet.write_number(row, 8, rec.total_salida_taller or 0.0, money)
             row += 1
-        # 5) autoajustar columnas
+
+        # 5) Autoajustar anchos de columna
         for i in range(len(headers)):
             sheet.set_column(i, i, 18)
