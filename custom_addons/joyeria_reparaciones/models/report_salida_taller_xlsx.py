@@ -56,7 +56,7 @@ class ReportSalidaTallerXlsx(models.AbstractModel):
 
             for rec in recs:
                 # extraer valores
-                peso        = rec.peso_valor        or 0.0
+                peso        = rec.peso_total        or 0.0
                 me_extra    = rec.metales_extra     or 0.0
                 cob_int     = rec.cobro_interno     or 0.0
                 hechura     = rec.hechura           or 0.0
