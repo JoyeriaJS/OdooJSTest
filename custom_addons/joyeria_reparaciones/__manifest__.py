@@ -25,6 +25,9 @@
         'report/report_etiqueta_vendedora.xml',
         #'views/wizard_reporte_responsables.xml',
         #'views/res_users_inherit.xml',
+
+        'report/reporte_salida_taller_xlsx_action.xml',
+
         'report/reporte_salida_taller_report_action.xml',
         'report/reporte_salida_taller_templates.xml',
         'report/report_sales_by_store.xml',
