@@ -1,11 +1,11 @@
 <odoo>
     <report
-        id="action_stock_transfer_charge"
+        id="action_stock_transfer_charge_report"
         model="stock.picking"
         string="Cargos entre Locales"
         report_type="qweb-pdf"
-        name="report.stock_transfer_charge"
-        file="report.stock_transfer_charge"
+        name="stock_transfer_charge_report.stock_transfer_charge_report_template"
+        file="stock_transfer_charge_report.stock_transfer_charge_report_template"
         attachment_use="False"
     />
 </odoo>
