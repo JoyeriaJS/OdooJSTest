@@ -21,7 +21,7 @@
               </tr>
             </thead>
             <tbody>
-                <tr t-foreach="o.lines" t-as="l">
+                <tr t-foreach="l.lines" t-as="l">
                   <td><t t-esc="l.producto"/></td>
                   <td><t t-esc="l.cantidad"/></td>
                   <td><t t-esc="l.uom"/></td>
@@ -31,7 +31,7 @@
                 </tr>
               </tbody>
             </table>
-            <t t-if="not o.lines">
+            <t t-if="not l.lines">
               <p><em>No hay movimientos de productos en este traspaso.</em></p>
             </t>
           </div>
