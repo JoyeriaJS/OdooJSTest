@@ -283,7 +283,7 @@ class Reparacion(models.Model):
             rec.saldo = rec.subtotal - rec.abono
 
 
-    @api.depends('subtotal', 'abono')
+    @api.depends('gramos_utilizado', 'metales_extra')
     def _compute_peso_total(self):
         for rec in self:
             rec.peso_total = rec.gramos_utilizado + rec.metales_extra
