@@ -159,6 +159,8 @@ class Reparacion(models.Model):
     hechura = fields.Float("🔨 Hechura")
     cobros_extras = fields.Float("➕ Cobros extras")
     total_salida_taller = fields.Float("💰 Total salida del taller", compute="_compute_total_salida", store=True)
+    peso_total = fields.Float("💰 Total salida del taller", compute="_compute_peso_total", store=True)
+    
 
     #firma_salida_id = fields.Many2one('joyeria.vendedora', string="Firma salida del taller", readonly=True)
     #fecha_salida_taller = fields.Datetime("🕒 Fecha y hora de salida", readonly=True)
