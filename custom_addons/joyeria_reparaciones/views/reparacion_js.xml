@@ -36,7 +36,9 @@
                         <!-- Datos de salida del taller -->
                         <group string="🔧 Datos de salida del taller" col="2" groups="base.group_system">
                             <field name="metal_utilizado" groups="base.group_system" options="{'no_empty': True}"/>
+                            <field name="gramos_utilizado" groups="base.group_system"/>
                             <field name="metales_extra" groups="base.group_system"/>
+                            <field name="peso_total" groups="base.group_system" readonly="1"/>
                             <field name="cobro_interno" groups="base.group_system"/>
                             <field name="hechura" groups="base.group_system"/>
                             <field name="cobros_extras" groups="base.group_system"/>
