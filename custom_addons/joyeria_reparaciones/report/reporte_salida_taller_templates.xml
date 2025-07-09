@@ -38,7 +38,7 @@
                 <tr>
                   <td><t t-esc="rec.name"/></td>
                   <td><t t-esc="rec.metal_utilizado or ''"/></td>
-                  <td><t t-esc="rec.peso_valor     or 0.0"/></td>
+                  <td><t t-esc="rec.peso_total     or 0.0"/></td>
                   <td><t t-esc="rec.metales_extra  or 0.0"/></td>
                   <td><t t-esc="rec.cobro_interno  or 0.0"/></td>
                   <td><t t-esc="rec.hechura        or 0.0"/></td>
@@ -53,7 +53,7 @@
                 <!-- hueco para Metal Utilizado -->
                 <th/>
                 <!-- Sumas de floats -->
-                <th><t t-esc="grp['sums']['peso_valor']       "/></th>
+                <th><t t-esc="grp['sums']['peso_total']       "/></th>
                 <th><t t-esc="grp['sums']['metales_extra']    "/></th>
                 <th><t t-esc="grp['sums']['cobro_interno']    "/></th>
                 <th><t t-esc="grp['sums']['hechura']          "/></th>
