@@ -34,7 +34,7 @@ class ReportSalidaTallerXlsx(models.AbstractModel):
             sheet.write(row, 0, rec.name)
             sheet.write(row, 1, rec.fecha_recepcion.strftime("%Y-%m-%d") if rec.fecha_recepcion else "")
             sheet.write(row, 2, rec.metal_utilizado or "")
-            sheet.write_number(row, 3, rec.peso_valor or 0.0, money)
+            sheet.write_number(row, 3, rec.peso_total or 0.0, money)
             sheet.write_number(row, 4, rec.metales_extra or 0.0, money)
             sheet.write_number(row, 5, rec.cobro_interno or 0.0, money)
             sheet.write_number(row, 6, rec.hechura or 0.0, money)

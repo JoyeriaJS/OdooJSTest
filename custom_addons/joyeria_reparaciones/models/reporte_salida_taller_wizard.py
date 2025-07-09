@@ -27,7 +27,7 @@ class ReportSalidaTaller(models.AbstractModel):
                 groups[key] = {
                     'docs': [],
                     'sums': {
-                        'peso_valor':           0.0,
+                        'peso_total':           0.0,
                         'metales_extra':        0.0,
                         'cobro_interno':        0.0,
                         'hechura':              0.0,
@@ -37,7 +37,7 @@ class ReportSalidaTaller(models.AbstractModel):
                 }
             grp = groups[key]
             grp['docs'].append(rec)
-            grp['sums']['peso_valor']           += rec.peso_valor           or 0.0
+            grp['sums']['peso_total']           += rec.peso_total           or 0.0
             grp['sums']['metales_extra']        += rec.metales_extra        or 0.0
             grp['sums']['cobro_interno']        += rec.cobro_interno        or 0.0
             grp['sums']['hechura']              += rec.hechura              or 0.0
