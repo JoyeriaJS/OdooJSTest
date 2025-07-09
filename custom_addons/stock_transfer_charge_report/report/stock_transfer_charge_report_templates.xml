@@ -1,51 +1,46 @@
 <odoo>
-  <data>
-    <template id="stock_transfer_charge_report_template">
-      <t t-call="web.html_container">
-        <t t-call="web.external_layout">
-          <div class="page">
-            <h2 style="text-align:center;">
-              Movimientos Internos con Precio “Interno (CLP)”
-            </h2>
-            <table class="table table-sm">
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Producto</th>
-                  <th>Cantidad</th>
-                  <th>UoM</th>
-                  <th>Origen</th>
-                  <th>Destino</th>
-                  <th>Picking</th>
-                  <th>Fecha</th>
-                  <th>Estado</th>
-                  <th>Precio Interno</th>
-                  <th>Subtotal Interno</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr t-foreach="movimientos" t-as="m">
-                  <td><t t-esc="m['code']"/></td>
-                  <td><t t-esc="m['name']"/></td>
-                  <td><t t-esc="m['qty']"/></td>
-                  <td><t t-esc="m['uom']"/></td>
-                  <td><t t-esc="m['origen']"/></td>
-                  <td><t t-esc="m['destino']"/></td>
-                  <td><t t-esc="m['picking_name']"/></td>
-                  <td><t t-esc="m['fecha']"/></td>
-                  <td><t t-esc="m['estado']"/></td>
-                  <td><t t-esc="m['precio_interno']"/></td>
-                  <td><t t-esc="m['subtotal_interno']"/></td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="mt16">
-              <strong>Total Interno (CLP):</strong>
-              <t t-esc="total_interno"/>
-            </div>
-          </div>
-        </t>
+  <template id="stock_transfer_charge_report_template">
+    <t t-call="web.html_container">
+      <t t-call="web.external_layout">
+        <div class="page">
+          <h2 style="text-align:center;">Movimientos Internos con Precio “Interno (CLP)”</h2>
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Código Producto</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>UoM</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Picking</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Precio Interno</th>
+                <th>Subtotal Interno</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr t-foreach="movimientos" t-as="m">
+                <td><t t-esc="m['code']"/></td>
+                <td><t t-esc="m['name']"/></td>
+                <td><t t-esc="m['qty']"/></td>
+                <td><t t-esc="m['uom']"/></td>
+                <td><t t-esc="m['origen']"/></td>
+                <td><t t-esc="m['destino']"/></td>
+                <td><t t-esc="m['picking_name']"/></td>
+                <td><t t-esc="m['fecha']"/></td>
+                <td><t t-esc="m['estado']"/></td>
+                <td><t t-esc="m['precio_interno']"/></td>
+                <td><t t-esc="m['subtotal_interno']"/></td>
+              </tr>
+            </tbody>
+          </table>
+          <h3 style="text-align:right; margin-top:1em;">
+            Total Interno (CLP): <t t-esc="total_interno"/>
+          </h3>
+        </div>
       </t>
-    </template>
-  </data>
+    </t>
+  </template>
 </odoo>
