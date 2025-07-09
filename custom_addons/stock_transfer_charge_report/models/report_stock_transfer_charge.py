@@ -37,7 +37,7 @@ class ReportStockTransferCharge(models.AbstractModel):
                 movimientos.append({
                     'code':              ml.product_id.default_code or '',
                     'name':              ml.product_id.display_name or '',
-                    'qty':               qty,
+                    'qty':               ml.quantity or 0.0,
                     'uom':               ml.product_uom_id.name or '',
                     'origen':            picking.location_id.display_name or '',
                     'destino':           picking.location_dest_id.display_name or '',
@@ -52,4 +52,5 @@ class ReportStockTransferCharge(models.AbstractModel):
         return {
             'movimientos':    movimientos,
             'total_interno':  total_interno,
+            'pickings': pickings,
         }

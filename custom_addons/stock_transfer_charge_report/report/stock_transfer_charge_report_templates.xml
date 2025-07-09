@@ -21,25 +21,20 @@
               </tr>
             </thead>
             <tbody>
-              <tr t-foreach="movimientos" t-as="m">
-                <td><t t-esc="m['code']"/></td>
-                <td><t t-esc="m['name']"/></td>
-                <td><t t-esc="m['qty']"/></td>
-                <td><t t-esc="m['uom']"/></td>
-                <td><t t-esc="m['origen']"/></td>
-                <td><t t-esc="m['destino']"/></td>
-                <td><t t-esc="m['picking_name']"/></td>
-                <td><t t-esc="m['fecha']"/></td>
-                <td><t t-esc="m['estado']"/></td>
-                <td><t t-esc="m['precio_interno']"/></td>
-                <td><t t-esc="m['subtotal_interno']"/></td>
-              </tr>
-            </tbody>
-          </table>
-          <h3 style="text-align:right; margin-top:1em;">
-            Total Interno (CLP): <t t-esc="total_interno"/>
-          </h3>
-        </div>
+                <tr t-foreach="o.lines" t-as="l">
+                  <td><t t-esc="l.producto"/></td>
+                  <td><t t-esc="l.cantidad"/></td>
+                  <td><t t-esc="l.uom"/></td>
+                  <td><t t-esc="l.precio_unitario"/></td>
+                  <td><t t-esc="l.peso_linea"/></td>
+                  <td><t t-esc="l.subtotal"/></td>
+                </tr>
+              </tbody>
+            </table>
+            <t t-if="not o.lines">
+              <p><em>No hay movimientos de productos en este traspaso.</em></p>
+            </t>
+          </div>
       </t>
     </t>
   </template>
