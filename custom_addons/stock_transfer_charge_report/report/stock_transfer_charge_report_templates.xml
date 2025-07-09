@@ -1,37 +1,58 @@
-<template id="stock_transfer_charge_report_template">
-  <t t-call="web.html_container">
-    <!-- Fallback: si no viene la variable, la convertimos en {} -->
-    <t t-set="precios_interno" t-value="precios_interno or {}"/>
-    <t t-foreach="docs" t-as="o">
-      <t t-call="web.external_layout">
-        <div class="page">
-          ...
-          <table class="table table-sm" t-if="o.move_line_ids_without_package">
-            <thead> … </thead>
-            <tbody>
-              <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
-                <td><t t-esc="ml.product_id.display_name"/></td>
-                <td><t t-esc="ml.quantity"/></td>
-                <td><t t-esc="ml.product_uom_id.name"/></td>
-                <!-- precio interno desde la pricelist -->
-                <td>
-                  <t t-esc="precios_interno.get(ml.id, 0.0)"/>
-                </td>
-                <!-- subtotal interno -->
-                <td>
-                  <t t-esc="ml.quantity * precios_interno.get(ml.id, 0.0)"/>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <!-- total general -->
-          <p style="text-align:right; margin-top:1em;">
-            <strong>Total Interno (CLP):</strong>
-            <t t-esc="total_interno or 0.0"/>
-          </p>
-          ...
-        </div>
+<odoo>
+  <template id="stock_transfer_charge_report_template">
+    <t t-call="web.html_container">
+      <t t-foreach="docs" t-as="o">
+        <t t-call="web.external_layout">
+          <div class="page">
+            <h2 style="text-align:center;">Traspaso: <t t-esc="o.name"/></h2>
+            <p><strong>Origen:</strong>  <t t-esc="o.location_id.display_name"/></p>
+            <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
+            <p><strong>Estado:</strong>  <t t-esc="o.state"/></p>
+            <p><strong>Tipo:</strong>    <t t-esc="o.picking_type_code"/></p>
+
+            <table class="table table-sm" t-if="o.move_line_ids_without_package">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>UoM</th>
+                  <th>Precio Unitario</th>
+                  <th>Subtotal</th>
+                  <th>Precio Interno</th>
+                  <th>Subtotal Interno</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
+                  <td><t t-esc="ml.product_id.display_name"/></td>
+                  <td><t t-esc="ml.quantity"/></td>
+                  <td><t t-esc="ml.product_uom_id.name"/></td>
+                  <td><t t-esc="ml.product_id.standard_price"/></td>
+                  <td>
+                    <t t-esc="ml.quantity * (ml.product_id.standard_price or 0.0)"/>
+                  </td>
+                  <!-- aquí usamos el mapping que devolvimos en Python -->
+                  <td>
+                    <t t-esc="precios_interno.get(ml.id, 0.0)"/>
+                  </td>
+                  <td>
+                    <t t-esc="ml.quantity * (precios_interno.get(ml.id, 0.0))"/>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <t t-if="not o.move_line_ids_without_package">
+              <p>No hay movimientos de productos en este traspaso.</p>
+            </t>
+
+            <!-- total interno al pie -->
+            <p style="text-align: right; margin-top: 1em;">
+              <strong>Total Interno (CLP):</strong>
+              <t t-esc="total_interno"/>
+            </p>
+          </div>
+        </t>
       </t>
     </t>
-  </t>
-</template>
+  </template>
+</odoo>
