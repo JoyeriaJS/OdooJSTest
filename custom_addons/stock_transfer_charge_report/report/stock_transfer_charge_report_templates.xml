@@ -1,40 +1,51 @@
 <odoo>
-  <template id="stock_transfer_charge_report_template">
-    <t t-call="web.html_container">
-      <t t-foreach="docs" t-as="o">
+  <data>
+    <template id="stock_transfer_charge_report_template">
+      <t t-call="web.html_container">
         <t t-call="web.external_layout">
           <div class="page">
-            <h2 style="text-align:center;">Traspaso: <t t-esc="o.name"/></h2>
-            <p><strong>Origen:</strong> <t t-esc="o.location_id.display_name"/></p>
-            <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
-            <p><strong>Estado:</strong> <t t-esc="o.state"/></p>
-            <p><strong>Tipo:</strong> <t t-esc="o.picking_type_code"/></p>
-            <table class="table table-sm" t-if="o.move_line_ids_without_package">
+            <h2 style="text-align:center;">
+              Movimientos Internos con Precio “Interno (CLP)”
+            </h2>
+            <table class="table table-sm">
               <thead>
                 <tr>
+                  <th>Código</th>
                   <th>Producto</th>
                   <th>Cantidad</th>
                   <th>UoM</th>
-                  <th>Precio Unitario</th>
-                  <th>Subtotal</th>
+                  <th>Origen</th>
+                  <th>Destino</th>
+                  <th>Picking</th>
+                  <th>Fecha</th>
+                  <th>Estado</th>
+                  <th>Precio Interno</th>
+                  <th>Subtotal Interno</th>
                 </tr>
               </thead>
               <tbody>
-                <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
-                  <td><t t-esc="ml.product_id.display_name"/></td>
-                  <td><t t-esc="ml.quantity"/></td>
-                  <td><t t-esc="ml.product_uom_id.name"/></td>
-                  <td><t t-esc="ml.product_id.standard_price"/></td>
-                  <td><t t-esc="ml.quantity * (ml.product_id.standard_price or 0.0)"/></td>
+                <tr t-foreach="movimientos" t-as="m">
+                  <td><t t-esc="m['code']"/></td>
+                  <td><t t-esc="m['name']"/></td>
+                  <td><t t-esc="m['qty']"/></td>
+                  <td><t t-esc="m['uom']"/></td>
+                  <td><t t-esc="m['origen']"/></td>
+                  <td><t t-esc="m['destino']"/></td>
+                  <td><t t-esc="m['picking_name']"/></td>
+                  <td><t t-esc="m['fecha']"/></td>
+                  <td><t t-esc="m['estado']"/></td>
+                  <td><t t-esc="m['precio_interno']"/></td>
+                  <td><t t-esc="m['subtotal_interno']"/></td>
                 </tr>
               </tbody>
             </table>
-            <t t-if="not o.move_line_ids_without_package">
-              <p>No hay movimientos de productos en este traspaso.</p>
-            </t>
+            <div class="mt16">
+              <strong>Total Interno (CLP):</strong>
+              <t t-esc="total_interno"/>
+            </div>
           </div>
         </t>
       </t>
-    </t>
-  </template>
+    </template>
+  </data>
 </odoo>
