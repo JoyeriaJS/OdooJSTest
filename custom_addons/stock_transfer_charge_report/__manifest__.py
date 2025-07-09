@@ -10,9 +10,6 @@
         'report/stock_transfer_charge_report_templates.xml',
     ],
 
-    'models': [
-    'models/report_stock_transfer_charge.py',
-    ],
     
     'installable': True,
     'application': False,
