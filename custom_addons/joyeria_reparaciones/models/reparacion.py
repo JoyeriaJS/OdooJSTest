@@ -150,6 +150,7 @@ class Reparacion(models.Model):
         ('otros', 'Otros')
     ], string='Metal utilizado')
     
+    
 
     metales_extra = fields.Float("Metales extra(gr)")
 
