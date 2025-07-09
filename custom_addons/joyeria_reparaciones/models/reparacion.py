@@ -151,7 +151,7 @@ class Reparacion(models.Model):
     ], string='Metal utilizado')
     
     gramos_utilizado = fields.Float("Gramos utilizados(gr)")
-    
+
 
     metales_extra = fields.Float("Metales extra(gr)")
 
@@ -279,6 +279,14 @@ class Reparacion(models.Model):
     def _compute_saldo(self):
         for rec in self:
             rec.saldo = rec.subtotal - rec.abono
+
+
+    @api.depends('subtotal', 'abono')
+    def _compute_peso_total(self):
+        for rec in self:
+            rec.peso_total = rec.gramos_utilizado + rec.metales_extra
+
+    
 
     
     @api.model
