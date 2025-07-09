@@ -4,7 +4,7 @@
     'summary': 'Gestión de órdenes de reparación de joyas',
     'author': 'DR',
     'category': 'Operations',
-    'depends': ['base', 'product', 'sale', 'contacts','point_of_sale'],
+    'depends': ['base', 'product', 'sale', 'contacts','point_of_sale', 'report_xlsx',],
     'data': [
         'security/joyeria_security.xml',
         'security/ir.model.access.csv',
@@ -37,6 +37,7 @@
         'report/report_monthly_rma_pos_action.xml',
         'report/report_monthly_rma_pos_template.xml',
         'report/reporte_salida_taller_xlsx_action.xml',
+        'report/report_cobro_taller_xlsx_action.xml',
 
 
 
