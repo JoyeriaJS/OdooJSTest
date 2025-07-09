@@ -4,7 +4,7 @@ from odoo import models
 from odoo.exceptions import AccessError
 
 class ReportSalidaTallerXlsx(models.AbstractModel):
-    _name = 'joyeria_reparaciones.reporte_salida_taller_xlsx'
+    _name = 'report.joyeria_reparaciones.reporte_salida_taller_xlsx'
     _inherit = 'report.report_xlsx.abstract'
     _description = 'Reporte Salida Taller en Excel'
 
