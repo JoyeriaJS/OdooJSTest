@@ -1,0 +1,13 @@
+<odoo>
+  <data>
+    <report
+      id="action_report_salida_taller_xlsx"
+      model="joyeria.reparacion"
+      string="Reporte Salida Taller (Excel)"
+      report_type="xlsx"
+      name="joyeria_reparaciones.reporte_salida_taller_xlsx"
+      file="joyeria_reparaciones.reporte_salida_taller_xlsx"
+      attachment_use="False"
+    />
+  </data>
+</odoo>
