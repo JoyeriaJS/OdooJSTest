@@ -17,6 +17,7 @@
                 <th>RMA</th>
                 <th>Fecha Firma</th>
                 <th>Saldo</th>
+                <th>Costo</th>
               </tr>
             </thead>
             <tbody>
@@ -28,6 +29,9 @@
                       r.fecha_firma.strftime('%d/%m/%Y %H:%M:%S') or ''"/>
                   </td>
                   <td><t t-esc="r.saldo or 0.0"/></td>
+                  <td>
+                    <t t-esc="r.subtotal or 0.0"/>
+                    
                 </tr>
               </t>
             </tbody>

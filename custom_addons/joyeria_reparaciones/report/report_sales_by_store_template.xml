@@ -39,7 +39,7 @@
                   <td>
                     <t t-esc="r.fecha_firma and r.fecha_firma.strftime('%d/%m/%Y') or ''"/>
                   </td>
-                  <td><t t-esc="row['peso_valor']"/></td>
+                  <td><t t-esc="row['peso_total']"/></td>
                   <td><t t-esc="row['metales_extra']"/></td>
                   <td><t t-esc="r.precio_unitario or 0.0"/></td>
                   <td><t t-esc="r.extra or 0.0"/></td>
@@ -58,7 +58,7 @@
             <tfoot>
               <tr>
                 <th colspan="2">Total del mes:</th>
-                <th><t t-esc="grp['sums']['peso_valor']"/></th>
+                <th><t t-esc="grp['sums']['peso_total']"/></th>
                 <th><t t-esc="grp['sums']['metales_extra']"/></th>
                 <th><t t-esc="grp['sums']['precio_unitario']"/></th>
                 <th><t t-esc="grp['sums']['extra']"/></th>

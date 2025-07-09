@@ -39,7 +39,7 @@ class ReportSalesByStore(models.AbstractModel):
                     'month': dt.month,
                     'docs': [],
                     'sums': {
-                        'peso_valor':        0.0,
+                        'peso_total':        0.0,
                         'metales_extra':     0.0,
                         'precio_unitario':   0.0,
                         'extra':             0.0,
@@ -56,7 +56,7 @@ class ReportSalesByStore(models.AbstractModel):
                 }
             grp = groups[key]
 
-            w_val = rec.peso_valor or 0.0
+            w_val = rec.peso_total or 0.0
             w_ext = rec.metales_extra or 0.0
 
             # valor de metales según metal_utilizado
@@ -80,7 +80,7 @@ class ReportSalesByStore(models.AbstractModel):
 
             grp['docs'].append({
                 'rec': rec,
-                'peso_valor':       w_val,
+                'peso_total':       w_val,
                 'metales_extra':    w_ext,
                 'saldo':            saldo,
                 'rosado_value':     val_rosado,
@@ -90,7 +90,7 @@ class ReportSalesByStore(models.AbstractModel):
             })
 
             s = grp['sums']
-            s['peso_valor']        += w_val
+            s['peso_total']        += w_val
             s['metales_extra']     += w_ext
             s['precio_unitario']   += rec.precio_unitario or 0.0
             s['extra']             += rec.extra or 0.0
