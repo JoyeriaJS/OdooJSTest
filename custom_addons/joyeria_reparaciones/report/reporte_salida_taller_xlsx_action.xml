@@ -1,8 +1,0 @@
-<odoo>
-  <record id="action_salida_taller_xlsx" model="ir.actions.act_url">
-    <field name="name">Exportar Salida Taller a Excel</field>
-    <field name="type">ir.actions.act_url</field>
-    <field name="url">/joyeria_reparaciones/salida_taller_xlsx?docids=$(active_ids)</field>
-    <field name="target">new</field>
-  </record>
-</odoo>

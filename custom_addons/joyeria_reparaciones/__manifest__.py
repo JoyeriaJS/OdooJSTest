@@ -36,8 +36,7 @@
 
         'report/report_monthly_rma_pos_action.xml',
         'report/report_monthly_rma_pos_template.xml',
-        'report/reporte_salida_taller_xlsx_action.xml',
-        'report/report_cobro_taller_xlsx_action.xml',
+        
 
 
 
