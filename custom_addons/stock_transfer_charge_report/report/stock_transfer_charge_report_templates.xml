@@ -1,7 +1,7 @@
 <odoo>
   <data>
-     <template id="stock_transfer_charge"
-              t-name="mi_modulo.stock_transfer_charge">
+    <template id="stock_transfer_charge"
+              t-name="stock_transfer_charge">   <!-- mismo nombre que en report.name -->
 
       <t t-call="web.html_container">
         <t t-foreach="docs" t-as="o">
@@ -10,29 +10,23 @@
               <h2 style="text-align:center;">
                 Traspaso: <t t-esc="o.name"/>
               </h2>
-
               <p><strong>Origen:</strong>  <t t-esc="o.location_id.display_name"/></p>
               <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
               <p><strong>Estado:</strong>  <t t-esc="o.state"/></p>
               <p><strong>Tipo:</strong>    <t t-esc="o.picking_type_code"/></p>
 
-              <!-- Totales -->
+              <!-- Total estándar -->
               <p>
-                <strong>Valor total estándar ($):</strong>
-                <t t-esc="sum(
-                  o.move_line_ids_without_package
-                   .mapped(lambda ml: (ml.quantity or 0.0) * (ml.product_id.standard_price or 0.0))
-                )"/>
-              </p>
-              <p>
-                <strong>Valor total interno ($):</strong>
-                <t t-esc="sum(
-                  o.move_line_ids_without_package
-                   .mapped(lambda ml: (ml.quantity or 0.0) * precios_interno.get(ml.product_id.id, 0.0))
-                )"/>
+                <strong>Total estándar ($):</strong>
+                <t t-esc="sum( o.move_line_ids_without_package.mapped(lambda ml: (ml.quantity or 0.0)*(ml.product_id.standard_price or 0.0)) )"/>
               </p>
 
-              <!-- Detalle -->
+              <!-- Total interno -->
+              <p>
+                <strong>Total interno ($):</strong>
+                <t t-esc="sum( o.move_line_ids_without_package.mapped(lambda ml: (ml.quantity or 0.0)*precios_interno.get(ml.product_id.id, 0.0)) )"/>
+              </p>
+
               <table class="table table-sm" border="1" cellpadding="3"
                      t-if="o.move_line_ids_without_package">
                 <thead>
@@ -42,8 +36,8 @@
                     <th>UoM</th>
                     <th>Precio Std.</th>
                     <th>Interno (CLP)</th>
-                    <th>Subtotal Std.</th>
-                    <th>Subtotal Int.</th>
+                    <th>Sub. Std.</th>
+                    <th>Sub. Int.</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -54,12 +48,10 @@
                     <td><t t-esc="ml.product_id.standard_price or 0.0"/></td>
                     <td><t t-esc="precios_interno.get(ml.product_id.id, 0.0)"/></td>
                     <td>
-                      <t t-esc="(ml.quantity or 0.0) 
-                        * (ml.product_id.standard_price or 0.0)"/>
+                      <t t-esc="(ml.quantity or 0.0)*(ml.product_id.standard_price or 0.0)"/>
                     </td>
                     <td>
-                      <t t-esc="(ml.quantity or 0.0) 
-                        * precios_interno.get(ml.product_id.id, 0.0)"/>
+                      <t t-esc="(ml.quantity or 0.0)*precios_interno.get(ml.product_id.id, 0.0)"/>
                     </td>
                   </tr>
                 </tbody>
