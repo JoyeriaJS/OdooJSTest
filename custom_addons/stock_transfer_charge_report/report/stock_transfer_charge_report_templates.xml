@@ -4,9 +4,7 @@
       <t t-foreach="docs" t-as="o">
         <t t-call="web.external_layout">
           <div class="page">
-            <h2 style="text-align:center;">
-              Traspaso: <t t-esc="o.name"/>
-            </h2>
+            <h2 style="text-align:center;">Traspaso: <t t-esc="o.name"/></h2>
             <p><strong>Origen:</strong>  <t t-esc="o.location_id.display_name"/></p>
             <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
             <p><strong>Estado:</strong>  <t t-esc="o.state"/></p>
@@ -19,9 +17,9 @@
                   <th>Cantidad</th>
                   <th>UoM</th>
                   <th>Precio Unitario</th>
-                  <th>Interno (CLP)</th>            <!-- Nueva columna -->
-                  <th>Subtotal U.</th>
-                  <th>Subtotal Int.</th>           <!-- Nueva columna -->
+                  <th>Interno (CLP)</th>      <!-- Nueva -->
+                  <th>Subtotal</th>
+                  <th>Subtotal Int.</th>     <!-- Nueva -->
                 </tr>
               </thead>
               <tbody>
@@ -30,14 +28,12 @@
                   <td><t t-esc="ml.quantity"/></td>
                   <td><t t-esc="ml.product_uom_id.name"/></td>
                   <td><t t-esc="ml.product_id.standard_price"/></td>
-                  <!-- precio interno por producto -->
                   <td>
                     <t t-esc="precios_interno.get(ml.product_id.id, 0.0)"/>
                   </td>
                   <td>
                     <t t-esc="ml.quantity * (ml.product_id.standard_price or 0.0)"/>
                   </td>
-                  <!-- subtotal interno -->
                   <td>
                     <t t-esc="ml.quantity * precios_interno.get(ml.product_id.id, 0.0)"/>
                   </td>
@@ -47,8 +43,8 @@
                 <tr>
                   <th colspan="6" style="text-align:right;">Total Interno (CLP):</th>
                   <th>
-                    <t t-esc="sum( ml.quantity * precios_interno.get(ml.product_id.id, 0.0)
-                                   for ml in o.move_line_ids_without_package )"/>
+                    <t t-esc="sum(ml.quantity * precios_interno.get(ml.product_id.id, 0.0)
+                                   for ml in o.move_line_ids_without_package)"/>
                   </th>
                 </tr>
               </tfoot>

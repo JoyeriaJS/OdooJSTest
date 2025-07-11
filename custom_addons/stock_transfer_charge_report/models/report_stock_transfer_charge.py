@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import models, api
 
 class ReportStockTransferCharge(models.AbstractModel):
@@ -6,25 +7,29 @@ class ReportStockTransferCharge(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        # 1) Pickings seleccionados (o todos si no docids)
         pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
-        movimientos = []
 
-        for picking in pickings:
-            for ml in picking.move_line_ids_without_package:
-                movimientos.append({
-                    'code': ml.product_id.default_code or '',
-                    'name': ml.product_id.display_name or '',
-                    'qty': ml.quantity or 0.0,
-                    'uom': ml.product_uom_id.name or '',
-                    'origen': picking.location_id.display_name or '',
-                    'destino': picking.location_dest_id.display_name or '',
-                    'picking_name': picking.name or '',
-                    'fecha': picking.date_done.strftime('%d/%m/%Y %H:%M:%S') if picking.date_done else '',
-                    'estado': picking.state or '',
-                })
+        # 2) Buscamos la pricelist “Interno (CLP)”
+        pricelist = self.env['product.pricelist'].search([('name','=','Interno (CLP)')], limit=1)
+
+        # 3) Preparamos un mapa { product_id → precio_interno }
+        precios_interno = {}
+        productos = pickings.mapped('move_line_ids_without_package.product_id')
+        for producto in productos:
+            # Precio por defecto 0.0
+            precios_interno[producto.id] = 0.0
+            if pricelist:
+                item = self.env['product.pricelist.item'].search([
+                    ('pricelist_id','=',pricelist.id),
+                    ('product_tmpl_id','=',producto.product_tmpl_id.id),
+                    ('applied_on','=','1_product'),
+                ], limit=1)
+                precios_interno[producto.id] = item.fixed_price or 0.0
 
         return {
-            'movimientos': movimientos,
-            'pickings': pickings,
-            
+            'doc_ids':         docids,
+            'doc_model':       'stock.picking',
+            'docs':            pickings,
+            'precios_interno': precios_interno,
         }
