@@ -1,7 +1,7 @@
 from odoo import models, api
 
 class ReportStockTransferCharge(models.AbstractModel):
-    _name = 'report.stock_transfer_charge_report.stock_transfer_charge_report_template'
+    _name = 'report.stock_transfer_charge'
     _description = 'Reporte Simple de Traspasos'
     _auto = False
 
