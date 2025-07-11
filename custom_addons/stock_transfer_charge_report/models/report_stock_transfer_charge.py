@@ -2,39 +2,34 @@
 from odoo import api, models
 
 class StockTransferChargeReport(models.AbstractModel):
-    #  EL _name debe coincidir con el atributo name de tu <report> en el XML:
-    _name = 'report.stock_transfer_charge_report.stock_transfer_charge'
+    _name = 'report.mi_modulo.stock_transfer_charge'
     _description = 'Reporte de cargos entre locales'
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        # 1) cargamos los pickings
         pickings = self.env['stock.picking'].browse(docids or [])
 
-        # 1) buscamos la pricelist que contenga "Interno"
+        # 2) buscamos la pricelist "Interno (CLP)"
         pricelist = self.env['product.pricelist'].search(
-            [('name', 'ilike', 'Interno')], limit=1
+            [('name', '=', 'Interno (CLP)')], limit=1
         )
 
-        # 2) armamos el dict { variante_id: precio_interno }
+        # 3) preparamos { move_line_id: precio_interno }
         precios_interno = {}
-        if pricelist:
-            # items aplicables a variante
-            variant_items = self.env['product.pricelist.item'].search([
-                ('pricelist_id', '=', pricelist.id),
-                ('applied_on',   '=', '0_product_variant'),
-                ('product_id', '!=', False),
-            ])
-            for it in variant_items:
-                precios_interno[it.product_id.id] = it.fixed_price or 0.0
-            # items aplicables a plantilla
-            template_items = self.env['product.pricelist.item'].search([
-                ('pricelist_id',    '=', pricelist.id),
-                ('applied_on',      '=', '1_product'),
-                ('product_tmpl_id', '!=', False),
-            ])
-            for it in template_items:
-                for var in it.product_tmpl_id.product_variant_ids:
-                    precios_interno.setdefault(var.id, it.fixed_price or 0.0)
+        for picking in pickings:
+            for ml in picking.move_line_ids_without_package:
+                if pricelist:
+                    # get_product_price(prod, qty, uom_id, partner_id) en Odoo 17
+                    precio = pricelist.get_product_price(
+                        ml.product_id,
+                        ml.quantity or 0.0,
+                        ml.product_uom_id.id,
+                        picking.partner_id.id or False,
+                    )
+                else:
+                    precio = 0.0
+                precios_interno[ml.id] = precio
 
         return {
             'doc_ids':         pickings.ids,
