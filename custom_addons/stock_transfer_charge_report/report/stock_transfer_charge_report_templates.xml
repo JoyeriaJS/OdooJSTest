@@ -5,7 +5,7 @@
         <t t-call="web.external_layout">
           <div class="page">
             <h2 style="text-align:center;">Traspaso: <t t-esc="o.name"/></h2>
-            <!-- ... tus párrafos de origen/destino/etc ... -->
+            <!-- ... Origen/Destino/Estado/Tipo ... -->
 
             <table class="table table-sm" t-if="o.move_line_ids_without_package">
               <thead>
@@ -15,7 +15,7 @@
                   <th>UoM</th>
                   <th>Precio Unitario</th>
                   <th>Interno (CLP)</th>
-                  <th>Subtotal</th>
+                  <th>Subtotal U.</th>
                   <th>Subtotal Int.</th>
                 </tr>
               </thead>
@@ -25,15 +25,15 @@
                   <td><t t-esc="ml.quantity"/></td>
                   <td><t t-esc="ml.product_uom_id.name"/></td>
                   <td><t t-esc="ml.product_id.standard_price or 0.0"/></td>
-                  <!-- leemos data.precios_interno -->
+                  <!-- Leemos directamente -->
                   <td>
-                    <t t-esc="data.precios_interno.get(ml.product_id.id, 0.0)"/>
+                    <t t-esc="precios_interno.get(ml.product_id.id, 0.0)"/>
                   </td>
                   <td>
                     <t t-esc="ml.quantity * (ml.product_id.standard_price or 0.0)"/>
                   </td>
                   <td>
-                    <t t-esc="ml.quantity * data.precios_interno.get(ml.product_id.id, 0.0)"/>
+                    <t t-esc="ml.quantity * precios_interno.get(ml.product_id.id, 0.0)"/>
                   </td>
                 </tr>
               </tbody>
@@ -41,10 +41,11 @@
                 <tr>
                   <th colspan="6" style="text-align:right;">Total Interno (CLP):</th>
                   <th>
-                    <!-- sumamos todos los subtotales internos -->
                     <t t-esc="
-                      sum(ml.quantity * data.precios_interno.get(ml.product_id.id, 0.0)
-                          for ml in o.move_line_ids_without_package)
+                      sum(
+                        ml.quantity * precios_interno.get(ml.product_id.id, 0.0)
+                        for ml in o.move_line_ids_without_package
+                      )
                     "/>
                   </th>
                 </tr>
