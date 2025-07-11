@@ -4,7 +4,7 @@ from odoo import api, models
 class StockTransferChargeReport(models.AbstractModel):
     _name = 'report.mi_modulo.stock_transfer_charge'
     _description = 'Reporte de cargos entre locales'
-    _inherit = 'report.report_xlsx.abstract'    # si fuese XLSX, pero para PDF elimina esta línea
+   # si fuese XLSX, pero para PDF elimina esta línea
 
     @api.model
     def _get_report_values(self, docids, data=None):
