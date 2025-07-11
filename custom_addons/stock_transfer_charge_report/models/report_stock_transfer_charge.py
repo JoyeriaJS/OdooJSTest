@@ -2,17 +2,19 @@
 from odoo import api, models
 
 class StockTransferChargeReport(models.AbstractModel):
-    _name = 'report.mi_modulo.stock_transfer_charge'      # ← coincide con name="mi_modulo.stock_transfer_charge"
+    _name = 'report.mi_modulo.stock_transfer_charge'    # <-- esto
     _description = 'Reporte de cargos entre locales'
-    _auto = False  # evita creación de tabla
+    _auto = False
 
     @api.model
     def _get_report_values(self, docids, data=None):
         pickings = self.env['stock.picking'].browse(docids or [])
 
-        # 1) Tarifas “Interno (CLP)”
+        # 1) Buscamos la tarifa "Interno (CLP)"
         pricelist = self.env['product.pricelist'].search(
             [('name', '=', 'Interno (CLP)')], limit=1)
+
+        # 2) Construimos el dict { variante_id: precio_interno }
         precios_interno = {}
         if pricelist:
             items = self.env['product.pricelist.item'].search([
@@ -27,5 +29,5 @@ class StockTransferChargeReport(models.AbstractModel):
             'doc_ids':         pickings.ids,
             'doc_model':       'stock.picking',
             'docs':            pickings,
-            'precios_interno': precios_interno,
+            'precios_interno': precios_interno,            # <-- esto
         }

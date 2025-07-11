@@ -1,6 +1,8 @@
 <odoo>
   <data>
-    <template id="stock_transfer_charge">
+     <template id="stock_transfer_charge"
+              t-name="mi_modulo.stock_transfer_charge">
+
       <t t-call="web.html_container">
         <t t-foreach="docs" t-as="o">
           <t t-call="web.external_layout">
@@ -8,21 +10,31 @@
               <h2 style="text-align:center;">
                 Traspaso: <t t-esc="o.name"/>
               </h2>
+
               <p><strong>Origen:</strong>  <t t-esc="o.location_id.display_name"/></p>
               <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
               <p><strong>Estado:</strong>  <t t-esc="o.state"/></p>
               <p><strong>Tipo:</strong>    <t t-esc="o.picking_type_code"/></p>
 
-              <p style="margin-top:1em;">
+              <!-- Totales -->
+              <p>
                 <strong>Valor total estándar ($):</strong>
-                <t t-esc="sum([ (ml.quantity or 0.0) * (ml.product_id.standard_price or 0.0) for ml in o.move_line_ids_without_package ])"/>
+                <t t-esc="sum(
+                  o.move_line_ids_without_package
+                   .mapped(lambda ml: (ml.quantity or 0.0) * (ml.product_id.standard_price or 0.0))
+                )"/>
               </p>
               <p>
                 <strong>Valor total interno ($):</strong>
-                <t t-esc="sum([ (ml.quantity or 0.0) * precios_interno.get(ml.product_id.id, 0.0) for ml in o.move_line_ids_without_package ])"/>
+                <t t-esc="sum(
+                  o.move_line_ids_without_package
+                   .mapped(lambda ml: (ml.quantity or 0.0) * precios_interno.get(ml.product_id.id, 0.0))
+                )"/>
               </p>
 
-              <table class="table table-sm" border="1" cellpadding="3" t-if="o.move_line_ids_without_package">
+              <!-- Detalle -->
+              <table class="table table-sm" border="1" cellpadding="3"
+                     t-if="o.move_line_ids_without_package">
                 <thead>
                   <tr>
                     <th>Producto</th>
@@ -40,17 +52,21 @@
                     <td><t t-esc="ml.quantity or 0.0"/></td>
                     <td><t t-esc="ml.product_uom_id.name"/></td>
                     <td><t t-esc="ml.product_id.standard_price or 0.0"/></td>
-                    <!--  precio interno desde el dict -->
                     <td><t t-esc="precios_interno.get(ml.product_id.id, 0.0)"/></td>
-                    <td><t t-esc="(ml.quantity or 0.0) * (ml.product_id.standard_price or 0.0)"/></td>
-                    <td><t t-esc="(ml.quantity or 0.0) * precios_interno.get(ml.product_id.id, 0.0)"/></td>
+                    <td>
+                      <t t-esc="(ml.quantity or 0.0) 
+                        * (ml.product_id.standard_price or 0.0)"/>
+                    </td>
+                    <td>
+                      <t t-esc="(ml.quantity or 0.0) 
+                        * precios_interno.get(ml.product_id.id, 0.0)"/>
+                    </td>
                   </tr>
                 </tbody>
               </table>
               <t t-if="not o.move_line_ids_without_package">
                 <p><em>No hay movimientos de productos en este traspaso.</em></p>
               </t>
-
             </div>
           </t>
         </t>
