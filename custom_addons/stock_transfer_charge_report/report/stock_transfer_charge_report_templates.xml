@@ -1,18 +1,17 @@
 <odoo>
   <data>
-    <!-- Este t-name debe coincidir con el _name_ del AbstractModel anterior -->
-    <template id="stock_transfer_charge" t-name="mi_modulo.stock_transfer_charge">
+    <template id="stock_transfer_charge">
       <t t-call="web.html_container">
         <t t-foreach="docs" t-as="o">
           <t t-call="web.external_layout">
             <div class="page">
               <h2 style="text-align:center;">
-                Traspaso: <t t-esc="o.name"/>
+                Traspaso: <t t-esc="o['name']"/>
               </h2>
-              <p><strong>Origen:</strong>  <t t-esc="o.location_id.display_name"/></p>
-              <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
-              <p><strong>Estado:</strong>  <t t-esc="o.state"/></p>
-              <p><strong>Tipo:</strong>    <t t-esc="o.picking_type_code"/></p>
+              <p><strong>Origen:</strong>  <t t-esc="o['location']"/></p>
+              <p><strong>Destino:</strong> <t t-esc="o['location_dest']"/></p>
+              <p><strong>Estado:</strong>  <t t-esc="o['state']"/></p>
+              <p><strong>Tipo:</strong>    <t t-esc="o['type']"/></p>
 
               <table class="table table-sm" border="1" cellpadding="4" cellspacing="0">
                 <thead>
@@ -20,45 +19,31 @@
                     <th>Producto</th>
                     <th>Cantidad</th>
                     <th>UoM</th>
-                    <th>Precio Unitario</th>
+                    <th>Precio Unit.</th>
                     <th>Interno (CLP)</th>
                     <th>Subtotal U.</th>
                     <th>Subtotal Int.</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
-                    <td><t t-esc="ml.product_id.display_name"/></td>
-                    <td><t t-esc="ml.quantity or 0.0"/></td>
-                    <td><t t-esc="ml.product_uom_id.name"/></td>
-                    <td><t t-esc="ml.product_id.standard_price or 0.0"/></td>
-                    <!-- precio interno sacado del dict -->
-                    <td>
-                      <t t-esc="precios_interno.get(ml.product_id.id, 0.0)"/>
-                    </td>
-                    <td>
-                      <t t-esc="(ml.quantity or 0.0) * (ml.product_id.standard_price or 0.0)"/>
-                    </td>
-                    <td>
-                      <t t-esc="(ml.quantity or 0.0) * precios_interno.get(ml.product_id.id, 0.0)"/>
-                    </td>
+                  <tr t-foreach="o['lines']" t-as="l">
+                    <td><t t-esc="l['producto']"/></td>
+                    <td><t t-esc="l['cantidad']"/></td>
+                    <td><t t-esc="l['uom']"/></td>
+                    <td><t t-esc="l['precio_unit']"/></td>
+                    <td><t t-esc="l['precio_int']"/></td>
+                    <td><t t-esc="l['subtotal_unit']"/></td>
+                    <td><t t-esc="l['subtotal_int']"/></td>
                   </tr>
                 </tbody>
                 <tfoot>
                   <tr>
                     <th colspan="6" style="text-align:right;">Total Interno:</th>
-                    <th>
-                      <t t-esc="
-                        sum([
-                          (ml.quantity or 0.0)
-                          * precios_interno.get(ml.product_id.id, 0.0)
-                          for ml in o.move_line_ids_without_package
-                        ])
-                      "/>
-                    </th>
+                    <th><t t-esc="o['total_int']"/></th>
                   </tr>
                 </tfoot>
               </table>
+
             </div>
           </t>
         </t>
