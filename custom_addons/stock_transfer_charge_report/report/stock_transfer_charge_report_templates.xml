@@ -11,49 +11,45 @@
             <p><strong>Tipo:</strong> <t t-esc="o.picking_type_code"/></p>
 
             <table class="table table-sm" t-if="o.move_line_ids_without_package">
-              <thead>
-                <tr>
-                  <th>Producto</th>
-                  <th>Cantidad</th>
-                  <th>UoM</th>
-                  <th>Precio Unitario</th>
-                  <th>Interno (CLP)</th>
-                  <th>Subtotal U.</th>
-                  <th>Subtotal Int.</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
-                  <td><t t-esc="ml.product_id.display_name"/></td>
-                  <td><t t-esc="ml.quantity"/></td>
-                  <td><t t-esc="ml.product_uom_id.name"/></td>
-                  <td><t t-esc="ml.product_id.standard_price or 0.0"/></td>
-                  <!-- AQUÍ uso precios_interno, que ya devolví en el contexto -->
-                  <td>
-                    <t t-esc="precios_interno.get(ml.product_id.id, 0.0)"/>
-                  </td>
-                  <td>
-                    <t t-esc="ml.quantity * (ml.product_id.standard_price or 0.0)"/>
-                  </td>
-                  <td>
-                    <t t-esc="ml.quantity * precios_interno.get(ml.product_id.id, 0.0)"/>
-                  </td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr>
-                  <th colspan="5" class="text-right">Total Interno (CLP):</th>
-                  <th colspan="2">
-                    <t t-esc="
-                      sum(
-                        ml.quantity * precios_interno.get(ml.product_id.id, 0.0)
-                        for ml in o.move_line_ids_without_package
-                      )
-                    "/>
-                  </th>
-                </tr>
-              </tfoot>
-            </table>
+                  <thead>
+                    <tr>
+                      <th>Producto</th><th>Cantidad</th><th>UoM</th>
+                      <th>Precio Unitario</th><th>Interno (CLP)</th>
+                      <th>Subtotal Unit.</th><th>Subtotal Int.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr t-foreach="o.move_line_ids_without_package" t-as="ml">
+                      <td><t t-esc="ml.product_id.display_name"/></td>
+                      <td><t t-esc="ml.quantity"/></td>
+                      <td><t t-esc="ml.product_uom_id.name"/></td>
+                      <td><t t-esc="ml.product_id.standard_price or 0.0"/></td>
+                      <!-- acuérdate: precios_interno viene en el contexto -->
+                      <td>
+                        <t t-esc="precios_interno.get(ml.product_id.id, 0.0)"/>
+                      </td>
+                      <td>
+                        <t t-esc="ml.quantity * (ml.product_id.standard_price or 0.0)"/>
+                      </td>
+                      <td>
+                        <t t-esc="ml.quantity * precios_interno.get(ml.product_id.id, 0.0)"/>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th colspan="5" class="text-right">Total Interno (CLP):</th>
+                      <th colspan="2">
+                        <t t-esc="
+                          sum(
+                            ml.quantity * precios_interno.get(ml.product_id.id, 0.0)
+                            for ml in o.move_line_ids_without_package
+                          )
+                        "/>
+                      </th>
+                    </tr>
+                  </tfoot>
+                </table>
 
             <t t-if="not o.move_line_ids_without_package">
               <p>No hay movimientos de productos en este traspaso.</p>
