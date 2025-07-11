@@ -4,7 +4,7 @@ from odoo import api, models
 class ReportStockTransferCharge(models.AbstractModel):
     _name = 'report.stock.transfer.charge'
     _description = 'Reporte Simple de Traspasos'
-    _auto = False   # evita que intente crear una tabla
+    _auto = True   # evita que intente crear una tabla
 
     @api.model
     def _get_report_values(self, docids, data=None):
