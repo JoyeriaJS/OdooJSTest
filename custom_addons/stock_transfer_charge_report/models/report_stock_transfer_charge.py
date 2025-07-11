@@ -1,28 +1,27 @@
-# -*- coding: utf-8 -*-
+# models/report_stock_transfer_charge.py
 from odoo import api, models
 
 class StockTransferChargeReport(models.AbstractModel):
-    _name = 'report.mi_modulo.stock_transfer_charge'
+    _name = 'report.mi_modulo.stock_transfer_charge'      # ← coincide con name="mi_modulo.stock_transfer_charge"
     _description = 'Reporte de cargos entre locales'
-   # si fuese XLSX, pero para PDF elimina esta línea
+    _auto = False  # evita creación de tabla
 
     @api.model
     def _get_report_values(self, docids, data=None):
         pickings = self.env['stock.picking'].browse(docids or [])
-        # 1) Buscamos la tarifa "Interno (CLP)"
+
+        # 1) Tarifas “Interno (CLP)”
         pricelist = self.env['product.pricelist'].search(
             [('name', '=', 'Interno (CLP)')], limit=1)
-        # 2) Construimos un map de precios { variante_id: precio_interno }
         precios_interno = {}
         if pricelist:
             items = self.env['product.pricelist.item'].search([
                 ('pricelist_id', '=', pricelist.id),
-                ('applied_on', '=', '1_product'),
+                ('applied_on',    '=', '1_product'),
             ])
             for item in items:
-                # cada item tiene product_tmpl_id, aplicable a todas sus variantes
-                for v in item.product_tmpl_id.product_variant_ids:
-                    precios_interno[v.id] = item.fixed_price or 0.0
+                for var in item.product_tmpl_id.product_variant_ids:
+                    precios_interno[var.id] = item.fixed_price or 0.0
 
         return {
             'doc_ids':         pickings.ids,
