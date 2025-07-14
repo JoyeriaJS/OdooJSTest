@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import api, models, _
-from odoo.exceptions import UserError
+from odoo import api, models
 
 class StockTransferChargeReport(models.AbstractModel):
     _name = 'report.mi_modulo.stock_transfer_charge'
@@ -8,26 +7,30 @@ class StockTransferChargeReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # 1) obtenemos los pickings
+        # 1) Cargo los pickings seleccionados
         pickings = self.env['stock.picking'].browse(docids or [])
-        # 2) buscamos la pricelist interna (con fallback a “Interno” si no existiera)
-        pricelist = self.env['product.pricelist'].search(
-            [('name', 'ilike', 'Interno')], limit=1)
-        if not pricelist:
-            raise UserError(_('No se encontró la lista de precios interna (Interno CLP).'))
 
-        # 3) obtenemos precio interno para cada variante en las líneas
+        # 2) Busco la pricelist “Interno (CLP)” (o “Interno” si así la tienes)
+        pricelist = self.env['product.pricelist'].search(
+            [('name', 'in', ['Interno (CLP)', 'Interno'])],
+            limit=1
+        )
+
+        # 3) Calculo el precio interno por cada move_line e indexo por ml.id
         precios_interno = {}
         for picking in pickings:
             for ml in picking.move_line_ids_without_package:
-                # Odoo 17: get_product_price devuelve el precio fijo segun la regla
-                price = pricelist.get_product_price(
-                    ml.product_id,
-                    ml.quantity or 0.0,
-                    ml.product_uom_id.id,
-                    picking.partner_id.id or False,
-                )
-                precios_interno[ml.product_id.id] = price
+                qty = ml.quantity or 0.0
+                uom_id = ml.product_uom_id.id
+                partner_id = picking.partner_id.id or False
+                if pricelist:
+                    # Odoo 17: get_product_price(product, qty, uom, partner)
+                    precio = pricelist.get_product_price(
+                        ml.product_id, qty, uom_id, partner_id
+                    )
+                else:
+                    precio = 0.0
+                precios_interno[ml.id] = precio
 
         return {
             'doc_ids':         pickings.ids,
