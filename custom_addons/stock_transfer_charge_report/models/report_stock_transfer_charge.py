@@ -7,20 +7,19 @@ class StockTransferChargeReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # 1) cargamos los pickings
+        # 1) recupera los pickings
         pickings = self.env['stock.picking'].browse(docids or [])
 
-        # 2) buscamos la pricelist "Interno (CLP)"
+        # 2) busca la pricelist "Interno (CLP)"
         pricelist = self.env['product.pricelist'].search(
             [('name', '=', 'Interno (CLP)')], limit=1
         )
 
-        # 3) preparamos { move_line_id: precio_interno }
+        # 3) construye { move_line_id → precio_interno }
         precios_interno = {}
         for picking in pickings:
             for ml in picking.move_line_ids_without_package:
                 if pricelist:
-                    # get_product_price(prod, qty, uom_id, partner_id) en Odoo 17
                     precio = pricelist.get_product_price(
                         ml.product_id,
                         ml.quantity or 0.0,
