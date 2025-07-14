@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import api, models
+from odoo import api, models, _
+from odoo.exceptions import UserError
 
 class StockTransferChargeReport(models.AbstractModel):
     _name = 'report.mi_modulo.stock_transfer_charge'
@@ -7,26 +8,26 @@ class StockTransferChargeReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        # 1) obtenemos los pickings
         pickings = self.env['stock.picking'].browse(docids or [])
+        # 2) buscamos la pricelist interna (con fallback a “Interno” si no existiera)
+        pricelist = self.env['product.pricelist'].search(
+            [('name', 'ilike', 'Interno')], limit=1)
+        if not pricelist:
+            raise UserError(_('No se encontró la lista de precios interna (Interno CLP).'))
 
-        # 1) Buscamos cualquier pricelist cuyo nombre contenga "interno"
-        pricelist = (
-            self.env['product.pricelist']
-            .search([('name', 'ilike', 'interno')], limit=1)
-        )
-
-        # 2) Construimos el dict { product_id: precio_interno_fijo }
+        # 3) obtenemos precio interno para cada variante en las líneas
         precios_interno = {}
-        if pricelist:
-            prods = pickings.mapped('move_line_ids_without_package.product_id')
-            for prod in prods:
-                # pedimos 1 unidad sólo para tomar el fixed_price
-                precios_interno[prod.id] = pricelist.get_product_price(
-                    prod,                     # product.product
-                    1.0,                      # qty 1
-                    prod.uom_id.id,           # uom
-                    False,                    # partner (no importa aquí)
+        for picking in pickings:
+            for ml in picking.move_line_ids_without_package:
+                # Odoo 17: get_product_price devuelve el precio fijo segun la regla
+                price = pricelist.get_product_price(
+                    ml.product_id,
+                    ml.quantity or 0.0,
+                    ml.product_uom_id.id,
+                    picking.partner_id.id or False,
                 )
+                precios_interno[ml.product_id.id] = price
 
         return {
             'doc_ids':         pickings.ids,
