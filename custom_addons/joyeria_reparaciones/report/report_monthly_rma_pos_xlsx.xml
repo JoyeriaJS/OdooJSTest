@@ -1,0 +1,14 @@
+<!-- report/report_monthly_rma_pos_xlsx.xml -->
+<odoo>
+  <data>
+    <report
+      id="action_report_monthly_rma_pos_xlsx"
+      model="joyeria.reparacion"
+      string="RMA + POS Mensual (Excel)"
+      report_type="xlsx"
+      name="report.joyeria_reparaciones.report_monthly_rma_pos_xlsx"
+      file="report.joyeria_reparaciones.report_monthly_rma_pos_xlsx"
+      attachment_use="False"
+    />
+  </data>
+</odoo>
