@@ -9,24 +9,21 @@ class StockTransferChargeReport(models.AbstractModel):
     def _get_report_values(self, docids, data=None):
         pickings = self.env['stock.picking'].browse(docids or [])
 
-        # 1) Buscamos la pricelist "Interno (CLP)"
+        # 1) recupero la pricelist "Interno (CLP)"
         pricelist = self.env['product.pricelist'].search(
             [('name', '=', 'Interno (CLP)')], limit=1)
 
-        # 2) Preparamos { move_line_id: precio_interno } buscando el ítem fijo
+        # 2) preparo un dict { move_line_id: precio_interno }
         precios_interno = {}
-        for picking in pickings:
-            for ml in picking.move_line_ids_without_package:
-                precio = 0.0
-                if pricelist:
-                    item = self.env['product.pricelist.item'].search([
-                        ('pricelist_id',   '=', pricelist.id),
-                        ('product_tmpl_id', '=', ml.product_id.product_tmpl_id.id),
-                        ('applied_on',      '=', '1_product'),
-                    ], limit=1)
-                    precio = item.fixed_price or 0.0
-                precios_interno[ml.id] = precio
+        if pricelist:
+            for item in self.env['product.pricelist.item'].search([
+                    ('pricelist_id', '=', pricelist.id),
+                    ('applied_on',    '=', '1_product'),
+                ]):
+                for v in item.product_tmpl_id.product_variant_ids:
+                    precios_interno[v.id] = item.fixed_price or 0.0
 
+        # 3) lo paso al QWeb
         return {
             'doc_ids':         pickings.ids,
             'doc_model':       'stock.picking',
