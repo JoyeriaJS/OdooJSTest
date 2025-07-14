@@ -28,6 +28,7 @@
 
         'report/report_salida_taller_xlsx.xml',
         'report/report_sales_by_store_xlsx.xml',
+        'report/report_sales_by_vendedora_xlsx.xml',
 
         'report/reporte_salida_taller_report_action.xml',
         'report/reporte_salida_taller_templates.xml',
