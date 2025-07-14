@@ -291,24 +291,7 @@ class Reparacion(models.Model):
     
 
     
-    @api.model
-    def default_get(self, fields_list):
-        res = super().default_get(fields_list)
-        # Sólo interesa para nuevos registros:
-        if 'hechura' in fields_list and not res.get('hechura'):
-            today = fields.Date.context_today(self)
-            day = today.day
-            # -- Aquí defines tus 4 rangos y valores estáticos:
-            if day <= 7:
-                price = 15000
-            elif day <= 14:
-                price = 17000
-            elif day <= 21:
-                price = 20000
-            else:
-                price = 22000
-            res['hechura'] = price
-        return res
+    
 
 
     #def write(self, vals):
