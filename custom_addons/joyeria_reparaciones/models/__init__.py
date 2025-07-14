@@ -7,6 +7,7 @@ from . import report_sales_by_store
 from . import report_sales_by_vendedora
 from . import report_monthly_rma_pos
 from . import report_sales_by_store_xlsx
+from . import report_sales_by_vendedora_xlsx
 
 #from . import res_users
 
