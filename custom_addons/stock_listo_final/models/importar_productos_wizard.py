@@ -5,7 +5,8 @@ import requests
 from io import BytesIO
 from PIL import Image
 
-from odoo import api, models, fields
+from odoo import api, models, fields, _
+
 from odoo.exceptions import UserError
 
 class ImportarProductosWizard(models.TransientModel):
