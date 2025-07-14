@@ -1,16 +1,19 @@
-from odoo import models, fields
+# -*- coding: utf-8 -*-
 import base64
 import xlrd
 import requests
-from PIL import Image
 from io import BytesIO
+from PIL import Image
+
+from odoo import api, models, fields
+from odoo.exceptions import UserError
 
 class ImportarProductosWizard(models.TransientModel):
     _name = 'importar.productos.wizard'
     _description = 'Importar productos desde Excel'
 
-    archivo = fields.Binary(string='Archivo Excel')
-    filename = fields.Char(string='Nombre del archivo')
+    archivo   = fields.Binary(string='Archivo Excel', required=True)
+    filename  = fields.Char(string='Nombre del archivo')
 
     def safe_float(self, val):
         try:
@@ -19,7 +22,6 @@ class ImportarProductosWizard(models.TransientModel):
             return 0.0
 
     def resize_image_128(self, img_bytes):
-        """Redimensiona imagen a 128x128 px y retorna base64."""
         try:
             image = Image.open(BytesIO(img_bytes)).convert("RGB")
             image = image.resize((128, 128), Image.LANCZOS)
@@ -29,63 +31,90 @@ class ImportarProductosWizard(models.TransientModel):
         except Exception:
             return False
 
+    @api.model
+    def _get_pricelists(self):
+        """Busca o crea las pricelists y devuelve un dict { nombre: record }."""
+        names = {
+            'Pública':    None,
+            'Mayorista':  None,
+            'Preferente': None,
+            'Interno (CLP)': None,
+        }
+        PrList = self.env['product.pricelist']
+        for name in list(names):
+            pl = PrList.search([('name', '=', name)], limit=1)
+            if not pl:
+                pl = PrList.create({
+                    'name':        name,
+                    'currency_id': self.env.user.company_id.currency_id.id,
+                })
+            names[name] = pl
+        return names
+
     def importar_productos(self):
         if not self.archivo:
-            return
+            raise UserError("Adjunta primero un archivo Excel.")
         data = base64.b64decode(self.archivo)
         book = xlrd.open_workbook(file_contents=data)
-        sheet = book.sheet_by_name("Productos")
+        try:
+            sheet = book.sheet_by_name("Productos")
+        except:
+            sheet = book.sheet_by_index(0)
 
-        Product = self.env['product.template']
+        # Prepárate para crear
+        Product  = self.env['product.template']
         Category = self.env['product.category']
-        Attr = self.env['product.attribute']
-        AttrVal = self.env['product.attribute.value']
-        PrList = self.env['product.pricelist']
-        PrItem = self.env['product.pricelist.item']
+        Attr     = self.env['product.attribute']
+        AttrVal  = self.env['product.attribute.value']
+        pricelists = self._get_pricelists()
 
-        duplicates = []
-        imported = 0
-
-        price_lists = {
-            'Pública': 5,
-            'Mayorista': 6,
-            'Preferente': 7,
-            'Interno': 8,
+        # Mapea nombre de columna → índice en tu hoja
+        # Ajusta estos índices a la estructura real de tu Excel
+        cols = {
+            'default_code':       9,
+            'name':               1,
+            'weight':             3,
+            'interno_price':      8,
+            'barcode':           15,
+            'image_url':         16,
+            'attr_name':         17,
+            'attr_vals':         18,
+            # tarifas:
+            'Pública':           5,
+            'Mayorista':         6,
+            'Preferente':        7,
+            'Interno (CLP)':     8,
         }
 
-        for pl_name in price_lists:
-            PrList.search([('name', '=', pl_name)], limit=1) or PrList.create({
-                'name': pl_name,
-                'currency_id': self.env.user.company_id.currency_id.id,
-            })
+        duplicates = set()
+        imported   = 0
 
-        for row in range(3, sheet.nrows):
-            code = str(sheet.cell(row, 9).value).strip().upper()
-            name = str(sheet.cell(row, 1).value).strip()
-            weight = self.safe_float(sheet.cell(row, 3).value)
-            cost_interno = self.safe_float(sheet.cell(row, 8).value)  # "Interno"
-            cost = cost_interno
-            barcode = str(sheet.cell(row, 15).value).strip()
-            img_url = str(sheet.cell(row, 16).value).strip()
-            attr_name = str(sheet.cell(row, 17).value).strip()
-            attr_vals = str(sheet.cell(row, 18).value).strip()
+        # Filas de datos (suponemos encabezado en fila 2→index 2; datos a partir de index 3)
+        for row_idx in range(3, sheet.nrows):
+            row = sheet.row(row_idx)
+            code = str(row[cols['default_code']].value).strip().upper()
+            name = str(row[cols['name']].value).strip()
+            if not code or code.lower().startswith('code'): 
+                continue  # salta filas vacías o de ejemplo
 
-            # Prefijo del código
-            code_prefix = code[:2]
-            if not code:
-                continue  # No crear productos vacíos
+            # Control de duplicados
+            if Product.search([('default_code','=',code)], limit=1):
+                duplicates.add(code)
+                continue
 
-            # Calcular el costo según prefijo
-            if code_prefix in ['AU', 'OA', 'OB']:
-                cost = cost_interno + weight
-            else:
-                cost = cost_interno
+            # Datos base
+            weight       = self.safe_float(row[cols['weight']].value)
+            interno_cost = self.safe_float(row[cols['interno_price']].value)
+            barcode      = str(row[cols['barcode']].value).strip()
+            img_url      = str(row[cols['image_url']].value).strip()
+            attr_name    = str(row[cols['attr_name']].value).strip()
+            attr_vals    = str(row[cols['attr_vals']].value).strip()
 
-            # Categoría compuesta
-            metal = str(sheet.cell(row, 10).value).strip()
-            nacimp = str(sheet.cell(row, 11).value).strip()
-            externa = str(sheet.cell(row, 12).value).strip()
-            tipo = str(sheet.cell(row, 14).value).strip()
+            # Categoría combinada (ajusta si tu lógica varía)
+            metal   = str(row[10].value).strip()
+            nacimp  = str(row[11].value).strip()
+            externa = str(row[12].value).strip()
+            tipo    = str(row[14].value).strip()
             cat_name = f"{metal} / {nacimp} / {externa} / {tipo}"
             categ = Category.search([('name','=',cat_name)], limit=1) or Category.create({'name': cat_name})
 
@@ -93,77 +122,70 @@ class ImportarProductosWizard(models.TransientModel):
             img_data = False
             if img_url.startswith('http'):
                 try:
-                    resp = requests.get(img_url, timeout=10)
-                    if resp.status_code == 200:
+                    resp = requests.get(img_url, timeout=5)
+                    if resp.ok:
                         img_data = self.resize_image_128(resp.content)
                 except:
                     pass
 
-            # Duplicados
-            if code and Product.search([('default_code','=',code)], limit=1):
-                duplicates.append(code)
-                continue
-            if name and Product.search([('name','=',name)], limit=1):
-                duplicates.append(name)
-                continue
-
             # Atributos
             attr_lines = []
             if attr_name and attr_vals:
-                att = Attr.search([('name','=',attr_name)], limit=1) or Attr.create({'name': attr_name})
+                att = Attr.search([('name','=',attr_name)], limit=1) \
+                      or Attr.create({'name':attr_name})
                 val_ids = []
-                for v in [v.strip() for v in attr_vals.split(',') if v.strip()]:
-                    av = AttrVal.search([
-                        ('name','=',v),('attribute_id','=',att.id)
-                    ], limit=1) or AttrVal.create({'name': v, 'attribute_id': att.id})
+                for v in [x.strip() for x in attr_vals.split(',') if x.strip()]:
+                    av = AttrVal.search([('name','=',v),('attribute_id','=',att.id)], limit=1) \
+                         or AttrVal.create({'name':v,'attribute_id':att.id})
                     val_ids.append(av.id)
                 if val_ids:
-                    attr_lines = [(0,0,{'attribute_id': att.id,'value_ids': [(6,0,val_ids)]})]
+                    attr_lines = [(0,0,{'attribute_id':att.id,'value_ids':[(6,0,val_ids)]})]
 
-            # Leer tarifas desde Excel
-            tarifas = {pl_name: self.safe_float(sheet.cell(row, idx).value)
-                    for pl_name, idx in price_lists.items()}
+            # Tarifas del Excel
+            tarifas = {
+                name: self.safe_float(row[idx].value)
+                for name, idx in cols.items()
+                if name in pricelists and idx < len(row)
+            }
 
-            # Crear plantilla SOLO si el código existe (nunca CODEXXXX ni vacío)
-            if code:
-                tmpl = Product.create({
-                    'default_code': code,
-                    'name': name,
-                    'categ_id': categ.id,
-                    'type': 'product',
-                    'barcode': barcode,
-                    'list_price': tarifas.get('Pública', 0.0),
-                    'standard_price': cost,
-                    'weight': weight,
-                    'image_1920': img_data,
-                    'attribute_line_ids': attr_lines or False,
+            # Crea la plantilla de producto
+            tmpl = Product.create({
+                'default_code':     code,
+                'name':             name,
+                'categ_id':         categ.id,
+                'type':             'product',
+                'barcode':          barcode,
+                'list_price':       tarifas.get('Pública', 0.0),
+                'standard_price':   interno_cost,
+                'weight':           weight,
+                'image_1920':       img_data,
+                'attribute_line_ids': attr_lines or False,
+            })
+            imported += 1
+
+            # Crea cada regla de precio sólo si price > 0
+            for pl_name, price in tarifas.items():
+                if pl_name not in pricelists or price <= 0.0:
+                    continue
+                PrItem = self.env['product.pricelist.item']
+                PrItem.create({
+                    'pricelist_id':    pricelists[pl_name].id,
+                    'product_tmpl_id': tmpl.id,
+                    'applied_on':      '1_product',
+                    'compute_price':   'fixed',
+                    'fixed_price':     price,
                 })
-                imported += 1
 
-                # Crear reglas de precio
-                for pl_name, price in tarifas.items():
-                    if price > 0:
-                        pl = PrList.search([('name','=',pl_name)], limit=1)
-                        PrItem.create({
-                            'pricelist_id':     pl.id,
-                            'product_tmpl_id':  tmpl.id,
-                            'applied_on':       '1_product',
-                            'compute_price':    'fixed',
-                            'fixed_price':      price,
-                        })
-
-        # Notificación al usuario
-        msg = f"{imported} productos importados."
+        # Feedback al usuario
+        msg = _(f"{imported} productos importados.")
         if duplicates:
-            uniques = list(dict.fromkeys(duplicates))
-            msg += f" Omitidos {len(uniques)} duplicados: {', '.join(uniques)}."
-
+            msg += _(" Omitidos duplicados: %s") % ', '.join(sorted(duplicates))
         return {
             'type': 'ir.actions.client',
-            'tag': 'display_notification',
+            'tag':  'display_notification',
             'params': {
-                'title': "Importación Productos",
+                'title':   _("Importación finalizada"),
                 'message': msg,
-                'sticky': False,
+                'sticky':  False,
             }
         }
