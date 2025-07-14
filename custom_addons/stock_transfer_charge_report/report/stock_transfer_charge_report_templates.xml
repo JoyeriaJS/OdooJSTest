@@ -19,7 +19,7 @@
       <th>Producto</th>
       <th>Cantidad</th>
       <th>UoM</th>
-      <th>Peso (kg)</th>
+      <th>Peso (Gr)</th>
       <th>Interno (CLP)</th>
       <th>Subtotal Int.</th>
     </tr>
