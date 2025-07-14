@@ -9,23 +9,24 @@ class StockTransferChargeReport(models.AbstractModel):
     def _get_report_values(self, docids, data=None):
         pickings = self.env['stock.picking'].browse(docids or [])
 
-        # 1) Pricelist “Interno (CLP)”
-        pricelist = self.env['product.pricelist'].search(
-            [('name', '=', 'Interno (CLP)')], limit=1)
+        # 1) Buscamos cualquier pricelist cuyo nombre contenga "interno"
+        pricelist = (
+            self.env['product.pricelist']
+            .search([('name', 'ilike', 'interno')], limit=1)
+        )
 
-        # 2) Para cada línea tomamos el precio fijo interno
+        # 2) Construimos el dict { product_id: precio_interno_fijo }
         precios_interno = {}
         if pricelist:
-            for picking in pickings:
-                for ml in picking.move_line_ids_without_package:
-                    prod = ml.product_id
-                    qty  = ml.quantity or 0.0
-                    # get_product_price en Odoo17 devuelve el price fijo
-                    precio = pricelist.get_product_price(
-                        prod, qty, ml.product_uom_id.id, picking.partner_id.id or False
-                    )
-                    precios_interno[prod.id] = precio
-                    
+            prods = pickings.mapped('move_line_ids_without_package.product_id')
+            for prod in prods:
+                # pedimos 1 unidad sólo para tomar el fixed_price
+                precios_interno[prod.id] = pricelist.get_product_price(
+                    prod,                     # product.product
+                    1.0,                      # qty 1
+                    prod.uom_id.id,           # uom
+                    False,                    # partner (no importa aquí)
+                )
 
         return {
             'doc_ids':         pickings.ids,
