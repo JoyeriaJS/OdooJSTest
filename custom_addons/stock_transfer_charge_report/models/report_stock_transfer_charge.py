@@ -12,7 +12,7 @@ class StockTransferChargeReport(models.AbstractModel):
 
         # 2) Busco la pricelist "Interno (CLP)" (ajusta si tu empresa la llamó distinto)
         pricelist = self.env['product.pricelist'].search(
-            [('name', 'ilike', 'Interno')], limit=1
+            [('name', 'ilike', 'Interno', "Interno (CLP)")], limit=1
         )
 
         # 3) Construyo un dict { variante_id: precio_fijo_interno }
