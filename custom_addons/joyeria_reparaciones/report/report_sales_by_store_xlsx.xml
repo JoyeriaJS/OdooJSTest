@@ -1,0 +1,13 @@
+<odoo>
+  <data>
+    <report
+      id="action_report_sales_by_store_xlsx"
+      model="joyeria.reparacion"
+      string="Ventas por Tienda y Mes (Excel)"
+      report_type="xlsx"
+      name="joyeria_reparaciones.report_sales_by_store_xlsx"
+      file="joyeria_reparaciones.report_sales_by_store_xlsx"
+      attachment_use="False"
+    />
+  </data>
+</odoo>
