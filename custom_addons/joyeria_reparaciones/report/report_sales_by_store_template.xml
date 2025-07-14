@@ -1,4 +1,3 @@
-<!-- report_sales_by_store_template.xml -->
 <odoo>
   <template id="report_sales_by_store_template">
     <t t-call="web.external_layout">
@@ -11,23 +10,16 @@
             <t t-esc="grp['store']"/> — 
             <t t-esc="('%02d/%04d' % (grp['month'], grp['year']))"/>
           </h3>
-          <table class="table table-sm">
+          <table class="table table-sm" border="1" cellpadding="3">
             <thead>
               <tr>
                 <th>RMA</th>
                 <th>Fecha de Firma</th>
-                <th>Peso (g)</th>
-                <th>Metales Extra (g)</th>
-                <th>Precio Unitario</th>
-                <th>Extra</th>
-                <th>Extra2</th>
-                <th>Saldo</th>
+                <th>Metal Utilizado</th>
+                <th>Gramos Utilizado</th>
                 <th>Cobro Interno</th>
                 <th>Hechura</th>
                 <th>Cobros Extras</th>
-                <th>Oro Rosado (valor)</th>
-                <th>Oro Amarillo (valor)</th>
-                <th>Total Metales</th>
                 <th>Pago a Taller</th>
               </tr>
             </thead>
@@ -37,39 +29,24 @@
                 <tr>
                   <td><t t-esc="r.name"/></td>
                   <td>
-                    <t t-esc="r.fecha_firma and r.fecha_firma.strftime('%d/%m/%Y') or ''"/>
+                    <t t-esc="r.fecha_firma.strftime('%d/%m/%Y')"/>
                   </td>
-                  <td><t t-esc="row['peso_total']"/></td>
-                  <td><t t-esc="row['metales_extra']"/></td>
-                  <td><t t-esc="r.precio_unitario or 0.0"/></td>
-                  <td><t t-esc="r.extra or 0.0"/></td>
-                  <td><t t-esc="r.extra2 or 0.0"/></td>
-                  <td><t t-esc="row['saldo']"/></td>
-                  <td><t t-esc="r.cobro_interno or 0.0"/></td>
-                  <td><t t-esc="r.hechura or 0.0"/></td>
-                  <td><t t-esc="r.cobros_extras or 0.0"/></td>
-                  <td><t t-esc="row['rosado_value']"/></td>
-                  <td><t t-esc="row['amarillo_value']"/></td>
-                  <td><t t-esc="row['total_metales']"/></td>
+                  <td><t t-esc="row['metal_utilizado']"/></td>
+                  <td><t t-esc="row['gramos_utilizado']"/></td>
+                  <td><t t-esc="row['cobro_interno']"/></td>
+                  <td><t t-esc="row['hechura']"/></td>
+                  <td><t t-esc="row['cobros_extras']"/></td>
                   <td><t t-esc="row['pago_taller']"/></td>
                 </tr>
               </t>
             </tbody>
             <tfoot>
               <tr>
-                <th colspan="2">Total del mes:</th>
-                <th><t t-esc="grp['sums']['peso_total']"/></th>
-                <th><t t-esc="grp['sums']['metales_extra']"/></th>
-                <th><t t-esc="grp['sums']['precio_unitario']"/></th>
-                <th><t t-esc="grp['sums']['extra']"/></th>
-                <th><t t-esc="grp['sums']['extra2']"/></th>
-                <th><t t-esc="grp['sums']['saldo']"/></th>
+                <th colspan="3" style="text-align:right;">Totales:</th>
+                <th><t t-esc="grp['sums']['gramos_utilizado']"/></th>
                 <th><t t-esc="grp['sums']['cobro_interno']"/></th>
                 <th><t t-esc="grp['sums']['hechura']"/></th>
                 <th><t t-esc="grp['sums']['cobros_extras']"/></th>
-                <th><t t-esc="grp['sums']['rosado_value']"/></th>
-                <th><t t-esc="grp['sums']['amarillo_value']"/></th>
-                <th><t t-esc="grp['sums']['total_metales']"/></th>
                 <th><t t-esc="grp['sums']['pago_taller']"/></th>
               </tr>
             </tfoot>

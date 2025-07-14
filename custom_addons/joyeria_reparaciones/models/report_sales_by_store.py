@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import api, models
 from collections import OrderedDict
 from odoo.exceptions import AccessError
@@ -8,101 +9,60 @@ class ReportSalesByStore(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # --- Validación de permisos ---
+        # Sólo admins
         if not self.env.user.has_group('base.group_system'):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
-        # --------------------------------
 
-        # Precios por defecto
-        PRICE_ROSADO = 150000.0
-        PRICE_AMARILLO = 160000.0
-        PRICE_BLANCO = 230000.0
-
-        # Sobrescribe con los del wizard si existen
-        if data:
-            if 'precio_oro_rosado' in data:
-                PRICE_ROSADO = data['precio_oro_rosado']
-            if 'precio_oro_amarillo' in data:
-                PRICE_AMARILLO = data['precio_oro_amarillo']
-
-        docs = self.env['joyeria.reparacion'].browse(docids).filtered(lambda r: r.fecha_firma)
+        # filtramos sólo los que tienen fecha de firma
+        recs = self.env['joyeria.reparacion'].browse(docids or []).filtered(lambda r: r.fecha_firma)
         groups = OrderedDict()
 
-        for rec in docs:
-            store = rec.local_tienda or 'Sin Tienda'
-            dt = rec.fecha_firma
+        for r in recs:
+            store = r.local_tienda or 'Sin Tienda'
+            dt = r.fecha_firma
             key = (store, dt.year, dt.month)
             if key not in groups:
                 groups[key] = {
                     'store': store,
-                    'year': dt.year,
+                    'year':  dt.year,
                     'month': dt.month,
-                    'docs': [],
+                    'docs':  [],
                     'sums': {
-                        'peso_total':        0.0,
-                        'metales_extra':     0.0,
-                        'precio_unitario':   0.0,
-                        'extra':             0.0,
-                        'extra2':            0.0,
-                        'saldo':             0.0,
-                        'cobro_interno':     0.0,
-                        'hechura':           0.0,
-                        'cobros_extras':     0.0,
-                        'rosado_value':      0.0,
-                        'amarillo_value':    0.0,
-                        'total_metales':     0.0,
-                        'pago_taller':       0.0,
+                        'gramos_utilizado': 0.0,
+                        'cobro_interno':    0.0,
+                        'hechura':          0.0,
+                        'cobros_extras':    0.0,
+                        'pago_taller':      0.0,
                     }
                 }
             grp = groups[key]
 
-            w_val = rec.peso_total or 0.0
-            w_ext = rec.metales_extra or 0.0
+            # leemos de tu modelo los valores
+            metal = r.metal_utilizado     or ''
+            gramos = r.gramos_utilizado   or r.peso_total or 0.0
+            ci     = r.cobro_interno      or 0.0
+            he     = r.hechura            or 0.0
+            ce     = r.cobros_extras      or 0.0
+            pago   = ci + he + ce
 
-            # valor de metales según metal_utilizado
-            val_rosado = 0.0
-            val_amarillo = 0.0
-            total_metales = 0.0
-
-            total_weight = w_val + w_ext
-            if rec.metal_utilizado == 'oro 18k rosado':
-                val_rosado = total_weight * PRICE_ROSADO
-            elif rec.metal_utilizado == 'oro 18k amarillo':
-                val_amarillo = total_weight * PRICE_AMARILLO
-
-            total_metales = val_rosado + val_amarillo
-
-            saldo = (rec.precio_unitario or 0.0) + (rec.extra or 0.0) - (rec.abono or 0.0)
-            pago_taller = total_metales + \
-                          (rec.cobro_interno or 0.0) + \
-                          (rec.hechura or 0.0) + \
-                          (rec.cobros_extras or 0.0)
-
+            # apend rows
             grp['docs'].append({
-                'rec': rec,
-                'peso_total':       w_val,
-                'metales_extra':    w_ext,
-                'saldo':            saldo,
-                'rosado_value':     val_rosado,
-                'amarillo_value':   val_amarillo,
-                'total_metales':    total_metales,
-                'pago_taller':      pago_taller,
+                'rec':              r,
+                'metal_utilizado':  metal,
+                'gramos_utilizado': gramos,
+                'cobro_interno':    ci,
+                'hechura':          he,
+                'cobros_extras':    ce,
+                'pago_taller':      pago,
             })
 
+            # acumula totales
             s = grp['sums']
-            s['peso_total']        += w_val
-            s['metales_extra']     += w_ext
-            s['precio_unitario']   += rec.precio_unitario or 0.0
-            s['extra']             += rec.extra or 0.0
-            s['extra2']            += rec.extra or 0.0
-            s['saldo']             += saldo
-            s['cobro_interno']     += rec.cobro_interno or 0.0
-            s['hechura']           += rec.hechura or 0.0
-            s['cobros_extras']     += rec.cobros_extras or 0.0
-            s['rosado_value']      += val_rosado
-            s['amarillo_value']    += val_amarillo
-            s['total_metales']     += total_metales
-            s['pago_taller']       += pago_taller
+            s['gramos_utilizado'] += gramos
+            s['cobro_interno']    += ci
+            s['hechura']          += he
+            s['cobros_extras']    += ce
+            s['pago_taller']      += pago
 
         return {
             'doc_ids':   docids,
