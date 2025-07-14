@@ -25,6 +25,7 @@ class StockTransferChargeReport(models.AbstractModel):
                         prod, qty, ml.product_uom_id.id, picking.partner_id.id or False
                     )
                     precios_interno[prod.id] = precio
+                    
 
         return {
             'doc_ids':         pickings.ids,
