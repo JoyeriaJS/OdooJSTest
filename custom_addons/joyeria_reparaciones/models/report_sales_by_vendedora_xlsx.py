@@ -4,7 +4,7 @@ from collections import OrderedDict
 from odoo.exceptions import AccessError
 
 class ReportSalesByVendedoraXlsx(models.AbstractModel):
-    _name = 'joyeria_reparaciones.report_sales_by_vendedora_xlsx'
+    _name = 'report.joyeria_reparaciones.report_sales_by_vendedora_xlsx'
     _inherit = 'report.report_xlsx.abstract'
     _description = 'Ventas por Vendedora y Mes (Excel)'
 
