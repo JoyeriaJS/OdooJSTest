@@ -1,7 +1,6 @@
 <!-- stock_transfer_charge_report_templates.xml -->
 <odoo>
   <data>
-       <!-- Plantilla QWeb -->
     <template id="stock_transfer_charge">
       <t t-call="web.html_container">
         <t t-foreach="docs" t-as="o">
@@ -15,11 +14,10 @@
               <p><strong>Estado:</strong>  <t t-esc="o.state"/></p>
               <p><strong>Tipo:</strong>    <t t-esc="o.picking_type_code"/></p>
 
-              <!-- Diccionario de precios internos -->
+              <!-- Diccionario de precios internos por move_line.id -->
               <t t-set="pi" t-value="precios_interno or {}"/>
 
-              <table class="table table-sm"
-                     border="1" cellpadding="4" cellspacing="0">
+              <table class="table table-sm" border="1" cellpadding="4" cellspacing="0">
                 <thead>
                   <tr>
                     <th>Producto</th>
@@ -36,12 +34,10 @@
                     <td><t t-esc="ml.quantity or 0.0"/></td>
                     <td><t t-esc="ml.product_uom_id.name"/></td>
                     <td><t t-esc="ml.product_id.weight or 0.0"/></td>
-                    <!-- precio interno lookup por ml.product_id.id -->
+                    <!-- precio interno del move_line -->
+                    <td><t t-esc="pi.get(ml.id, 0.0)"/></td>
                     <td>
-                      <t t-esc="pi.get(ml.product_id.id, 0.0)"/>
-                    </td>
-                    <td>
-                      <t t-esc="(ml.quantity or 0.0) * pi.get(ml.product_id.id, 0.0)"/>
+                      <t t-esc="(ml.quantity or 0.0) * pi.get(ml.id, 0.0)"/>
                     </td>
                   </tr>
                 </tbody>
@@ -55,21 +51,18 @@
                       ])"/>
                     </th>
                     <th>
-                      <t t-esc="sum([
-                        pi.get(ml.product_id.id, 0.0)
-                        for ml in o.move_line_ids_without_package
-                      ])"/>
+                      <t t-esc="sum(pi.get(ml.id,0.0)
+                        for ml in o.move_line_ids_without_package)"/>
                     </th>
                     <th>
                       <t t-esc="sum([
-                        (ml.quantity or 0.0) * pi.get(ml.product_id.id, 0.0)
+                        (ml.quantity or 0.0) * pi.get(ml.id, 0.0)
                         for ml in o.move_line_ids_without_package
                       ])"/>
                     </th>
                   </tr>
                 </tfoot>
               </table>
-
             </div>
           </t>
         </t>
