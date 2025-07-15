@@ -1,3 +1,4 @@
+# models/report_stock_transfer_charge.py
 # -*- coding: utf-8 -*-
 from odoo import api, models
 
@@ -7,30 +8,27 @@ class StockTransferChargeReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # 1) Cargo los pickings seleccionados
         pickings = self.env['stock.picking'].browse(docids or [])
 
-        # 2) Busco la pricelist “Interno (CLP)” (o “Interno” si así la tienes)
+        # 1) Pricelist “Interno (CLP)” o “Interno”
         pricelist = self.env['product.pricelist'].search(
             [('name', 'in', ['Interno (CLP)', 'Interno'])],
             limit=1
         )
 
-        # 3) Calculo el precio interno por cada move_line e indexo por ml.id
         precios_interno = {}
         for picking in pickings:
+            partner = picking.partner_id.id or False
             for ml in picking.move_line_ids_without_package:
-                qty = ml.quantity or 0.0
-                uom_id = ml.product_uom_id.id
-                partner_id = picking.partner_id.id or False
+                # Odoo17: get_product_price(product, qty, uom, partner)
                 if pricelist:
-                    # Odoo 17: get_product_price(product, qty, uom, partner)
-                    precio = pricelist.get_product_price(
-                        ml.product_id, qty, uom_id, partner_id
+                    # PASAMOS qty=1.0 para que devuelva precio unitario
+                    precio_unit = pricelist.get_product_price(
+                        ml.product_id, 1.0, ml.product_uom_id.id, partner
                     )
                 else:
-                    precio = 0.0
-                precios_interno[ml.id] = precio
+                    precio_unit = 0.0
+                precios_interno[ml.id] = precio_unit
 
         return {
             'doc_ids':         pickings.ids,
