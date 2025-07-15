@@ -1,3 +1,4 @@
+<!-- stock_transfer_charge_report_templates.xml -->
 <odoo>
   <data>
     <template id="stock_transfer_charge">
@@ -34,10 +35,8 @@
                     <td><t t-esc="ml.quantity or 0.0"/></td>
                     <td><t t-esc="ml.product_uom_id.name"/></td>
                     <td><t t-esc="ml.product_id.weight or 0.0"/></td>
-                    <!-- precio interno según variant_id -->
-                    <td>
-                      <t t-esc="pi.get(ml.product_id.id, 0.0)"/>
-                    </td>
+                    <!-- ahora usando el variant.id -->
+                    <td><t t-esc="pi.get(ml.product_id.id, 0.0)"/></td>
                     <td>
                       <t t-esc="(ml.quantity or 0.0) * pi.get(ml.product_id.id, 0.0)"/>
                     </td>
@@ -67,6 +66,7 @@
                   </tr>
                 </tfoot>
               </table>
+
             </div>
           </t>
         </t>
