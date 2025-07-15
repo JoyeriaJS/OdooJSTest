@@ -6,9 +6,7 @@
         <t t-foreach="docs" t-as="o">
           <t t-call="web.external_layout">
             <div class="page">
-              <h2 class="text-center">
-                Traspaso: <t t-esc="o.name"/>
-              </h2>
+              <h2 class="text-center">Traspaso: <t t-esc="o.name"/></h2>
               <p><strong>Origen:</strong>  <t t-esc="o.location_id.display_name"/></p>
               <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
               <p><strong>Estado:</strong>  <t t-esc="o.state"/></p>
@@ -34,7 +32,7 @@
                     <td><t t-esc="ml.quantity or 0.0"/></td>
                     <td><t t-esc="ml.product_uom_id.name"/></td>
                     <td><t t-esc="ml.product_id.weight or 0.0"/></td>
-                    <!-- precio interno del move_line -->
+                    <!-- fixed_price de la regla Interno -->
                     <td><t t-esc="pi.get(ml.id, 0.0)"/></td>
                     <td>
                       <t t-esc="(ml.quantity or 0.0) * pi.get(ml.id, 0.0)"/>
@@ -63,6 +61,7 @@
                   </tr>
                 </tfoot>
               </table>
+
             </div>
           </t>
         </t>

@@ -8,25 +8,31 @@ class StockTransferChargeReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # 1) recupera los pickings seleccionados
         pickings = self.env['stock.picking'].browse(docids or [])
 
-        # 2) busca la pricelist “Interno (CLP)” (o cualquier que contenga "Interno")
-        pricelist = self.env['product.pricelist'].search(
-            [('name', 'ilike', 'Interno')], limit=1
-        )
+        # 1) obtenemos la pricelist “Interno (CLP)”
+        Tarifas = self.env['product.pricelist']
+        Regla   = self.env['product.pricelist.item']
+        tarifa = Tarifas.search([('name','ilike','Interno')], limit=1)
 
-        # 3) construye un dict { move_line_id: precio_interno }
+        # 2) buscamos en las reglas el fixed_price
         precios_interno = {}
-        if pricelist:
-            for picking in pickings:
-                for ml in picking.move_line_ids_without_package:
-                    qty        = ml.quantity or 0.0
-                    uom_id     = ml.product_uom_id.id
-                    partner_id = picking.partner_id.id or False
-                    precios_interno[ml.id] = pricelist.get_product_price(
-                        ml.product_id, qty, uom_id, partner_id
-                    ) or 0.0
+        if tarifa:
+            # precargamos todas las reglas aplicables a productos
+            reglas = Regla.search([
+                ('pricelist_id','=', tarifa.id),
+                ('applied_on',   '=', '1_product'),
+            ])
+            # hacemos un dict { template_id: precio }
+            precios_por_template = {
+                r.product_tmpl_id.id: (r.fixed_price or 0.0)
+                for r in reglas
+            }
+            # ahora recorremos cada linea de picking
+            for p in pickings:
+                for ml in p.move_line_ids_without_package:
+                    tmpl_id = ml.product_id.product_tmpl_id.id
+                    precios_interno[ml.id] = precios_por_template.get(tmpl_id, 0.0)
 
         return {
             'doc_model':       'stock.picking',
