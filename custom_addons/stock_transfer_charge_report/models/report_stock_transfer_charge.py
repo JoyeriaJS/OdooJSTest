@@ -3,28 +3,43 @@ from odoo import api, models
 
 class StockTransferChargeReport(models.AbstractModel):
     _name = 'report.mi_modulo.stock_transfer_charge'
-    _description = 'Reporte Simple de Traspasos'
+    _description = 'Reporte de cargos entre locales'
 
     @api.model
-    def _get_report_values(self, docids, data=None):
-        pickings = self.env['stock.picking'].browse(docids) if docids else self.env['stock.picking'].search([])
-        movimientos = []
+    def _get_report_values(self, docids=None, data=None):
+        # 1) Cargo los pickings seleccionados
+        pickings = self.env['stock.picking'].browse(docids or [])
 
-        for picking in pickings:
-            for ml in picking.move_line_ids_without_package:
-                movimientos.append({
-                    'code': ml.product_id.default_code or '',
-                    'name': ml.product_id.display_name or '',
-                    'qty': ml.quantity or 0.0,
-                    'uom': ml.product_uom_id.name or '',
-                    'origen': picking.location_id.display_name or '',
-                    'destino': picking.location_dest_id.display_name or '',
-                    'picking_name': picking.name or '',
-                    'fecha': picking.date_done.strftime('%d/%m/%Y %H:%M:%S') if picking.date_done else '',
-                    'estado': picking.state or '',
-                })
+        # 2) Localizo la moneda CLP
+        clp = self.env['res.currency'].search([('name', '=', 'CLP')], limit=1)
+
+        # 3) Busco la pricelist “Interno (CLP)” (nombre que contenga “Interno” + moneda CLP)
+        Pricelist = self.env['product.pricelist']
+        tarif = Pricelist.search([
+            ('name', 'ilike', 'Interno'),
+            ('currency_id', '=', clp.id),
+        ], limit=1)
+
+        # 4) Construyo { variant_id: precio_interno_fijo }
+        precios_interno = {}
+        if tarif:
+            items = self.env['product.pricelist.item'].search([
+                ('pricelist_id', '=', tarif.id),
+                ('applied_on',    '=', '1_product'),
+            ])
+            for item in items:
+                price = item.fixed_price or 0.0
+                # si apuntan a variante concreta
+                if item.product_id:
+                    precios_interno[item.product_id.id] = price
+                # si apuntan a plantilla, todas sus variantes
+                elif item.product_tmpl_id:
+                    for var in item.product_tmpl_id.product_variant_ids:
+                        precios_interno[var.id] = price
 
         return {
-            'movimientos': movimientos,
-            'pickings': pickings,
+            'doc_model':       'stock.picking',
+            'doc_ids':         pickings.ids,
+            'docs':            pickings,
+            'precios_interno': precios_interno,
         }
