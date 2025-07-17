@@ -24,8 +24,7 @@
                     <th>Cantidad</th>
                     <th>UoM</th>
                     <th>Peso (g)</th>
-                    <th>Interno</th>
-                    <th>Subtotal Int.</th>
+                    <th>Costo</th>
                   </tr>
                 </thead>
                 <tbody>
