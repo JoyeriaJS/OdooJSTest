@@ -7,30 +7,52 @@ class StockTransferChargeReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # 1) Cargo los pickings
         pickings = self.env['stock.picking'].browse(docids or [])
 
-        # 2) Busco la pricelist “Interno (CLP)” (o cualquier que contenga “Interno”)
+        # 1) Tarifas y reglas
         Tarifas = self.env['product.pricelist']
         Regla   = self.env['product.pricelist.item']
-        tarifa  = Tarifas.search([('name','ilike','Interno')], limit=1)
+        tarifa = Tarifas.search([('name', '=', 'Interno (CLP)')], limit=1)
 
-        # 3) Recojo todas las reglas de precio internas aplicables a variantes
-        precios_interno = {}
+        # 2) Preparamos tres dicts: por variante, por producto, por categoría
+        price_variant = {}
+        price_product = {}
+        price_categ   = {}
         if tarifa:
-            items = Regla.search([
-                ('pricelist_id', '=', tarifa.id),
-                ('applied_on', 'in', ['0_product_variant','1_product']),
-            ])
+            items = Regla.search([('pricelist_id','=', tarifa.id)])
             for item in items:
                 price = item.fixed_price or 0.0
-                # si la regla es por variante concreta:
-                if item.applied_on == '0_product_variant' and item.product_id:
-                    precios_interno[item.product_id.id] = price
-                # si la regla es por plantilla, la aplico a todas sus variantes:
-                elif item.applied_on == '1_product' and item.product_tmpl_id:
+                if item.applied_on == '0_product_variant' and item.product_tmpl_id:
+                    # todas las variantes de esa plantilla
                     for var in item.product_tmpl_id.product_variant_ids:
-                        precios_interno[var.id] = price
+                        price_variant[var.id] = price
+                elif item.applied_on == '1_product' and item.product_id:
+                    price_product[item.product_id.id] = price
+                elif item.applied_on == '2_product_category' and item.categ_id:
+                    price_categ[item.categ_id.id] = price
+
+        # 3) Función auxiliar para resolver precio interno dado un producto
+        def get_internal_price(prod):
+            # 3.1) por variante
+            if prod.id in price_variant:
+                return price_variant[prod.id]
+            # 3.2) por producto variante->plantilla
+            tmpl = prod.product_tmpl_id
+            if tmpl and tmpl.id in price_product:
+                return price_product[tmpl.id]
+            # 3.3) por categoría (sube en el árbol)
+            cat = prod.categ_id
+            while cat:
+                if cat.id in price_categ:
+                    return price_categ[cat.id]
+                cat = cat.parent_id
+            return 0.0
+
+        # 4) Construimos dict { move_line_id: precio_interno }
+        precios_interno = {}
+        for picking in pickings:
+            for ml in picking.move_line_ids_without_package:
+                precios_interno[ml.id] = get_internal_price(ml.product_id)
 
         return {
             'doc_model':       'stock.picking',
