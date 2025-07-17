@@ -11,7 +11,7 @@ class StockTransferChargeReport(models.AbstractModel):
 
         # Buscamos la pricelist “Interno (CLP)” (o la que contenga “Interno”)
         pricelist = self.env['product.pricelist'].search(
-            [('name', 'ilike', 'Interno')], limit=1
+            [('name', 'ilike', 'Interno', 'Interno CLP', 'Mayorista', 'interno', 'INTERNO', 'Interno(CLP)', 'Interno (CLP)')], limit=1
         )
 
         interno = {}
