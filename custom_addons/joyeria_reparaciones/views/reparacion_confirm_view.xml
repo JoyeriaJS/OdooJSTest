@@ -1,3 +1,4 @@
+
 <odoo>
   <data>
     <record id="view_reparacion_form_confirm" model="ir.ui.view">
