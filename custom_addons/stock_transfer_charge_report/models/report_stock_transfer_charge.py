@@ -8,8 +8,9 @@ class StockTransferChargeReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # 1) Cargo los pickings seleccionados
+        # 1) Cargo los pickings seleccionados y los ordeno por fecha efectiva
         pickings = self.env['stock.picking'].browse(docids or [])
+        pickings = pickings.sorted('date_done')
 
         # 2) Busco la pricelist que contenga “Interno”
         pricelist = self.env['product.pricelist'].search(
@@ -24,10 +25,8 @@ class StockTransferChargeReport(models.AbstractModel):
             ])
             for item in items:
                 price = item.fixed_price or 0.0
-                # Regla por variante específica
                 if item.applied_on == '0_product_variant' and item.product_id:
                     precios_interno[item.product_id.id] = price
-                # Regla por plantilla → todas sus variantes
                 elif item.applied_on == '1_product' and item.product_tmpl_id:
                     for var in item.product_tmpl_id.product_variant_ids:
                         precios_interno[var.id] = price
