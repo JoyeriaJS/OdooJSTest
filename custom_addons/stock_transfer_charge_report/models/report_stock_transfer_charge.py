@@ -7,32 +7,34 @@ class StockTransferChargeReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        # 1) Cargo los pickings
         pickings = self.env['stock.picking'].browse(docids or [])
 
-        # Buscamos la pricelist “Interno (CLP)” (o la que contenga “Interno”)
-        pricelist = self.env['product.pricelist'].search(
-            [('name', 'ilike', 'Interno', 'Interno CLP', 'Mayorista', 'interno', 'INTERNO', 'Interno(CLP)', 'Interno (CLP)')], limit=1
-        )
+        # 2) Busco la pricelist “Interno (CLP)” (o cualquier que contenga “Interno”)
+        Tarifas = self.env['product.pricelist']
+        Regla   = self.env['product.pricelist.item']
+        tarifa  = Tarifas.search([('name','ilike','Interno')], limit=1)
 
-        interno = {}
-        if pricelist:
-            items = self.env['product.pricelist.item'].search([
-                ('pricelist_id', '=', pricelist.id),
-                ('compute_price',  '=', 'fixed'),
-                ('applied_on',    'in', ['0_product_variant', '1_product']),
+        # 3) Recojo todas las reglas de precio internas aplicables a variantes
+        precios_interno = {}
+        if tarifa:
+            items = Regla.search([
+                ('pricelist_id', '=', tarifa.id),
+                ('applied_on', 'in', ['0_product_variant','1_product']),
             ])
             for item in items:
                 price = item.fixed_price or 0.0
+                # si la regla es por variante concreta:
                 if item.applied_on == '0_product_variant' and item.product_id:
-                    interno[item.product_id.id] = price
+                    precios_interno[item.product_id.id] = price
+                # si la regla es por plantilla, la aplico a todas sus variantes:
                 elif item.applied_on == '1_product' and item.product_tmpl_id:
                     for var in item.product_tmpl_id.product_variant_ids:
-                        interno[var.id] = price
-                        
+                        precios_interno[var.id] = price
 
         return {
-            'doc_ids': pickings.ids,
-            'doc_model': 'stock.picking',
-            'docs': pickings,
-            'interno': interno,
+            'doc_model':       'stock.picking',
+            'doc_ids':         pickings.ids,
+            'docs':            pickings,
+            'precios_interno': precios_interno,
         }
