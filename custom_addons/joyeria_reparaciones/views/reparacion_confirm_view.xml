@@ -4,7 +4,7 @@
     <record id="view_reparacion_form_confirm" model="ir.ui.view">
       <field name="name">joyeria.reparacion.form.confirm</field>
       <field name="model">joyeria.reparacion</field>
-      <field name="inherit_id" ref="joyeria_reparaciones.view_reparacion_form"/>
+      <field name="inherit_id" ref="joyeria_reparaciones.view_joyeria_reparacion_form"/>
       <field name="arch" type="xml">
         <!-- Mete esto dentro del header -->
         <xpath expr="//header" position="inside">
