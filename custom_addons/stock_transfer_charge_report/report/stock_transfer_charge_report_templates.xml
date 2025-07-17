@@ -41,13 +41,13 @@
                     <th colspan="4" style="text-align:right;">Totales:</th>
                     <!-- Suma de precios unitarios internos -->
                     <th>
-                      <t t-esc="sum([ precios_interno.get(ml.product_id.id, 0.0)
+                      <t t-esc="sum([ ml.product_id.standard_price
                                       for ml in o.move_line_ids_without_package ])"/>
                     </th>
                     <!-- Suma de subtotales internos -->
                     <th>
-                      <t t-esc="sum([ (ml.qty_done or 0.0)
-                                       * precios_interno.get(ml.product_id.id, 0.0)
+                      <t t-esc="sum([ (ml.quantity or 0.0)
+                                       * ml.product_id.standard_price
                                        for ml in o.move_line_ids_without_package ])"/>
                     </th>
                   </tr>
