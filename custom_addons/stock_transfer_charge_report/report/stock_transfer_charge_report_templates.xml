@@ -1,3 +1,4 @@
+<!-- stock_transfer_charge_report_templates.xml -->
 <odoo>
   <data>
     <template id="stock_transfer_charge">
@@ -13,18 +14,19 @@
               <p><strong>Estado:</strong>  <t t-esc="o.state"/></p>
               <p><strong>Tipo:</strong>    <t t-esc="o.picking_type_code"/></p>
 
-              <!-- Diccionario de costes -->
-              <t t-set="co" t-value="costos or {}"/>
+              <!-- Diccionario de precios internos -->
+              <t t-set="pi" t-value="precios_interno or {}"/>
 
-              <table class="table table-sm" border="1" cellpadding="4" cellspacing="0">
+              <table class="table table-sm"
+                     border="1" cellpadding="4" cellspacing="0">
                 <thead>
                   <tr>
                     <th>Producto</th>
                     <th>Cantidad</th>
                     <th>UoM</th>
                     <th>Peso (g)</th>
-                    <th>Coste Unit.</th>
-                    <th>Subtotal Coste</th>
+                    <th>Interno (CLP)</th>
+                    <th>Subtotal Int.</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -33,33 +35,38 @@
                     <td><t t-esc="ml.quantity or 0.0"/></td>
                     <td><t t-esc="ml.product_uom_id.name"/></td>
                     <td><t t-esc="ml.product_id.weight or 0.0"/></td>
-                    <!-- aquí mostramos el coste unitario -->
+                    <!-- ahora usando el variant.id -->
+                    <td><t t-esc="pi.get(ml.product_id.id, 0.0)"/></td>
                     <td>
-                      <t t-esc="co.get(ml.id, 0.0)"/>
-                    </td>
-                    <td>
-                      <t t-esc="(ml.quantity or 0.0) * co.get(ml.id, 0.0)"/>
+                      <t t-esc="(ml.quantity or 0.0) * pi.get(ml.product_id.id, 0.0)"/>
                     </td>
                   </tr>
                 </tbody>
                 <tfoot>
                   <tr>
-                    <th colspan="4" style="text-align:right;">Totales:</th>
+                    <th colspan="3" style="text-align:right;">Totales:</th>
                     <th>
                       <t t-esc="sum([
-                        co.get(ml.id, 0.0)
+                        (ml.quantity or 0.0) * (ml.product_id.weight or 0.0)
                         for ml in o.move_line_ids_without_package
                       ])"/>
                     </th>
                     <th>
                       <t t-esc="sum([
-                        (ml.quantity or 0.0) * co.get(ml.id, 0.0)
+                        pi.get(ml.product_id.id, 0.0)
+                        for ml in o.move_line_ids_without_package
+                      ])"/>
+                    </th>
+                    <th>
+                      <t t-esc="sum([
+                        (ml.quantity or 0.0) * pi.get(ml.product_id.id, 0.0)
                         for ml in o.move_line_ids_without_package
                       ])"/>
                     </th>
                   </tr>
                 </tfoot>
               </table>
+
             </div>
           </t>
         </t>
