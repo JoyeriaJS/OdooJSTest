@@ -7,29 +7,29 @@ class StockTransferChargeReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # 1) Cargo los pickings seleccionados
+        # 1) load the pickings
         pickings = self.env['stock.picking'].browse(docids or [])
 
-        # 2) Busco la tarif­a “Interno (CLP)” (o cualquier que contenga “Interno”)
-        Pricelist   = self.env['product.pricelist']
-        PricelistItem = self.env['product.pricelist.item']
-        tarifa = Pricelist.search([('name', 'ilike', 'Interno')], limit=1)
+        # 2) find the “Interno (CLP)” pricelist
+        pricelist = self.env['product.pricelist'].search(
+            [('name', 'ilike', 'Interno')], limit=1)
 
-        # 3) Genero dict { variante_id: precio_interno }
+        # 3) build a dict { variant_id: fixed_price }
         precios_interno = {}
-        if tarifa:
-            items = PricelistItem.search([
-                ('pricelist_id', '=', tarifa.id),
-                ('applied_on', 'in', ['0_product_variant', '1_product']),
+        if pricelist:
+            Rule = self.env['product.pricelist.item']
+            internal_rules = Rule.search([
+                ('pricelist_id', '=', pricelist.id),
+                ('applied_on', 'in', ['0_product_variant','1_product']),
             ])
-            for item in items:
-                price = item.fixed_price or 0.0
-                # regla por variante concreta
-                if item.applied_on == '0_product_variant' and item.product_id:
-                    precios_interno[item.product_id.id] = price
-                # regla por plantilla: aplica a todas sus variantes
-                elif item.applied_on == '1_product' and item.product_tmpl_id:
-                    for var in item.product_tmpl_id.product_variant_ids:
+            for rule in internal_rules:
+                price = rule.fixed_price or 0.0
+                if rule.applied_on == '0_product_variant' and rule.product_id:
+                    # applies to one specific variant
+                    precios_interno[rule.product_id.id] = price
+                elif rule.applied_on == '1_product' and rule.product_tmpl_id:
+                    # applies to all variants of a template
+                    for var in rule.product_tmpl_id.product_variant_ids:
                         precios_interno[var.id] = price
 
         return {
