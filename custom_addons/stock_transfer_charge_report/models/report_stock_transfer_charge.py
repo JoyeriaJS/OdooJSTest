@@ -10,24 +10,29 @@ class StockTransferChargeReport(models.AbstractModel):
         # 1) Cargo los pickings seleccionados
         pickings = self.env['stock.picking'].browse(docids or [])
 
-        # 2) Busco la pricelist “Interno (CLP)” (o cualquier que contenga "Interno")
-        Tarifas = self.env['product.pricelist']
-        Regla   = self.env['product.pricelist.item']
-        tarifa = Tarifas.search([('name', 'ilike', 'Interno')], limit=1)
+        # 2) Localizo la moneda CLP
+        clp = self.env['res.currency'].search([('name', '=', 'CLP')], limit=1)
 
-        # 3) Construyo un dict { variant_id: precio_interno }
+        # 3) Busco la pricelist “Interno (CLP)” (nombre que contenga “Interno” + moneda CLP)
+        Pricelist = self.env['product.pricelist']
+        tarif = Pricelist.search([
+            ('name', 'ilike', 'Interno'),
+            ('currency_id', '=', clp.id),
+        ], limit=1)
+
+        # 4) Construyo { variant_id: precio_interno_fijo }
         precios_interno = {}
-        if tarifa:
-            items = Regla.search([
-                ('pricelist_id', '=', tarifa.id),
+        if tarif:
+            items = self.env['product.pricelist.item'].search([
+                ('pricelist_id', '=', tarif.id),
                 ('applied_on',    '=', '1_product'),
             ])
             for item in items:
                 price = item.fixed_price or 0.0
-                # Si está ligado a una variante concreta
+                # si apuntan a variante concreta
                 if item.product_id:
                     precios_interno[item.product_id.id] = price
-                # Si está ligado a una plantilla, aplico a todas sus variantes
+                # si apuntan a plantilla, todas sus variantes
                 elif item.product_tmpl_id:
                     for var in item.product_tmpl_id.product_variant_ids:
                         precios_interno[var.id] = price

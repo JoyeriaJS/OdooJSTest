@@ -5,9 +5,7 @@
         <t t-foreach="docs" t-as="o">
           <t t-call="web.external_layout">
             <div class="page">
-              <h2 class="text-center">
-                Traspaso: <t t-esc="o.name"/>
-              </h2>
+              <h2 class="text-center">Traspaso: <t t-esc="o.name"/></h2>
               <p><strong>Origen:</strong>  <t t-esc="o.location_id.display_name"/></p>
               <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
               <p><strong>Estado:</strong>  <t t-esc="o.state"/></p>
@@ -16,8 +14,7 @@
               <!-- Diccionario de precios internos -->
               <t t-set="pi" t-value="precios_interno or {}"/>
 
-              <table class="table table-sm"
-                     border="1" cellpadding="4" cellspacing="0">
+              <table class="table table-sm" border="1" cellpadding="4" cellspacing="0">
                 <thead>
                   <tr>
                     <th>Producto</th>
@@ -34,10 +31,8 @@
                     <td><t t-esc="ml.quantity or 0.0"/></td>
                     <td><t t-esc="ml.product_uom_id.name"/></td>
                     <td><t t-esc="ml.product_id.weight or 0.0"/></td>
-                    <!-- precio interno desde nuestro dict -->
-                    <td>
-                      <t t-esc="pi.get(ml.product_id.id, 0.0)"/>
-                    </td>
+                    <!-- precio interno desde pi[variant_id] -->
+                    <td><t t-esc="pi.get(ml.product_id.id, 0.0)"/></td>
                     <td>
                       <t t-esc="(ml.quantity or 0.0) * pi.get(ml.product_id.id, 0.0)"/>
                     </td>
