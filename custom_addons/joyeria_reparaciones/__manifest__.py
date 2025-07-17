@@ -25,7 +25,7 @@
         'report/report_etiqueta_vendedora.xml',
         #'views/wizard_reporte_responsables.xml',
         #'views/res_users_inherit.xml',
-        
+        'views/reparacion_confirm_view.xml',
 
         'report/report_salida_taller_xlsx.xml',
         'report/report_sales_by_store_xlsx.xml',

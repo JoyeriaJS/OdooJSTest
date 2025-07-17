@@ -1,0 +1,19 @@
+<odoo>
+  <data>
+    <!-- Hereda tu vista de form de joyeria.reparacion -->
+    <record id="view_reparacion_form_confirm" model="ir.ui.view">
+      <field name="name">reparacion.form.confirm</field>
+      <field name="model">joyeria.reparacion</field>
+      <field name="inherit_id" ref="joyeria_reparaciones.view_reparacion_form"/>  <!-- Ajusta este ref -->
+      <field name="arch" type="xml">
+        <!-- Localiza el botón de guardar (puede ser el de type="object" o el de estilo default) -->
+        <xpath expr="//header/button[@type='object' and @name='action_confirm']" position="attributes">
+          <!-- Si tu modelo usa otro botón, cambia el selector accordingly -->
+          <attribute name="confirm">
+            ¿Deseas crear esta orden de reparación?
+          </attribute>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>
