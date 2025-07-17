@@ -54,18 +54,13 @@
                     <!-- Suma simple de precios unitarios internos -->
                     <th>
                       <t t-esc="sum([
-                        ml.product_id.standard_price
-                        for ml in o.move_line_ids_without_package
-                      ])"/>
-                    </th>
-                    <!-- Suma de subtotales internos -->
-                    <th>
-                      <t t-esc="sum([
-                       (ml.quantity or 0.0) 
+                        (ml.quantity or 0.0) 
                         * ml.product_id.standard_price
                         for ml in o.move_line_ids_without_package
                       ])"/>
                     </th>
+                    <!-- Suma de subtotales internos -->
+                    
                   </tr>
                 </tfoot>
               </table>
