@@ -33,6 +33,7 @@
                     <td><t t-esc="o.coste"/></td>
                     <td><t t-esc="o.precio_int"/></td>
                     <td><t t-esc="o.subtotal_int"/></td>
+                    <td><t t-esc="o.picking"/></td>
                   </tr>
                 </tbody>
                 <tfoot>
