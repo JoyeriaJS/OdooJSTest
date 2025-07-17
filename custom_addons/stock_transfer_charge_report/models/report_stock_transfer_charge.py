@@ -28,6 +28,7 @@ class StockTransferChargeReport(models.AbstractModel):
                 elif item.applied_on == '1_product' and item.product_tmpl_id:
                     for var in item.product_tmpl_id.product_variant_ids:
                         interno[var.id] = price
+                        
 
         return {
             'doc_ids': pickings.ids,
