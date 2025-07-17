@@ -7,30 +7,25 @@ class StockTransferChargeReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # 1) load the pickings
         pickings = self.env['stock.picking'].browse(docids or [])
 
-        # 2) find the “Interno (CLP)” pricelist
-        pricelist = self.env['product.pricelist'].search(
-            [('name', 'ilike', 'interno')], limit=1)
+        # 1) Buscar exactamente la Pricelist “Interno”
+        interna = self.env['product.pricelist'].search(
+            [('name', '=', 'Interno')], limit=1)
 
-        # 3) build a dict { variant_id: fixed_price }
+        # 2) Calcular precio interno para cada move_line y guardarlo en dict por ml.id
         precios_interno = {}
-        if pricelist:
-            Rule = self.env['product.pricelist.item']
-            internal_rules = Rule.search([
-                ('pricelist_id', '=', pricelist.id),
-                ('applied_on', 'in', ['0_product_variant','1_product']),
-            ])
-            for rule in internal_rules:
-                price = rule.fixed_price or 0.0
-                if rule.applied_on == '0_product_variant' and rule.product_id:
-                    # applies to one specific variant
-                    precios_interno[rule.product_id.id] = price
-                elif rule.applied_on == '1_product' and rule.product_tmpl_id:
-                    # applies to all variants of a template
-                    for var in rule.product_tmpl_id.product_variant_ids:
-                        precios_interno[var.id] = price
+        if interna:
+            for ml in pickings.mapped('move_line_ids_without_package'):
+                # ml.qty_done en Odoo17; si no hay qty_done usamos ml.quantity
+                qty = getattr(ml, 'qty_done', ml.quantity) or 0.0
+                precio = interna.get_product_price(
+                    ml.product_id, 
+                    qty, 
+                    ml.product_uom_id.id,
+                    ml.picking_id.partner_id.id or False
+                )
+                precios_interno[ml.id] = precio
 
         return {
             'doc_model':       'stock.picking',
