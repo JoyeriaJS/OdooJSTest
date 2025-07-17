@@ -1,4 +1,4 @@
-from odoo import models, fields, api,_
+from odoo import models, fields, api
 from odoo.exceptions import ValidationError, UserError
 from dateutil.relativedelta import relativedelta
 import base64
@@ -351,20 +351,6 @@ class Reparacion(models.Model):
 ###create funcional######
     @api.model
     def create(self, vals):
-
-        if not self.env.context.get('_confirming_rma'):
-            return {
-                'name': _("Confirmar nueva orden"),
-                'type': 'ir.actions.act_window',
-                'res_model': 'confirmar.reparacion.wizard',  # modelo de tu wizard
-                'view_mode': 'form',
-                'view_id': self.env.ref('tu_modulo.confirmar_reparacion_wizard_form').id,
-                'target': 'new',
-                'context': {
-                    # Pasamos los vals tal cual para que el wizard los recupere
-                    'default_vals': vals,
-                },
-            }
         ahora = datetime.now(CHILE_TZ).strftime('%d/%m/%Y %H:%M:%S')
         mensajes = []
 
