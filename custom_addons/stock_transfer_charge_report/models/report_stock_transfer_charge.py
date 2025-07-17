@@ -14,7 +14,7 @@ class StockTransferChargeReport(models.AbstractModel):
             [('name', 'ilike', 'Interno')], limit=1
         )
 
-        precios_interno = {}
+        interno = {}
         if pricelist:
             items = self.env['product.pricelist.item'].search([
                 ('pricelist_id', '=', pricelist.id),
@@ -24,14 +24,14 @@ class StockTransferChargeReport(models.AbstractModel):
             for item in items:
                 price = item.fixed_price or 0.0
                 if item.applied_on == '0_product_variant' and item.product_id:
-                    precios_interno[item.product_id.id] = price
+                    interno[item.product_id.id] = price
                 elif item.applied_on == '1_product' and item.product_tmpl_id:
                     for var in item.product_tmpl_id.product_variant_ids:
-                        precios_interno[var.id] = price
+                        interno[var.id] = price
 
         return {
             'doc_ids': pickings.ids,
             'doc_model': 'stock.picking',
             'docs': pickings,
-            'precios_interno': precios_interno,
+            'interno': interno,
         }
