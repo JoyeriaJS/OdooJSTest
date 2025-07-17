@@ -27,8 +27,10 @@ class ReportSalidaTallerXlsx(models.AbstractModel):
 
         # 2) Iterar grupos
         row = 0
+        # Insertamos "Estado" justo después de "RMA"
         headers = [
             "RMA",
+            "Estado",            # ← nueva columna
             "Fecha Recepción",
             "Metal Utilizado",
             "Peso",
@@ -46,7 +48,8 @@ class ReportSalidaTallerXlsx(models.AbstractModel):
             for col, h in enumerate(headers):
                 sheet.write(row, col, h, bold)
             row += 1
-            # 2.3) Filas de detalle y acumuladores
+
+            # Inicializamos acumuladores
             sum_peso           = 0.0
             sum_metales_extra  = 0.0
             sum_cobro_int      = 0.0
@@ -54,43 +57,48 @@ class ReportSalidaTallerXlsx(models.AbstractModel):
             sum_cobros_extra   = 0.0
             sum_total_salida   = 0.0
 
+            # 2.3) Filas de detalle
             for rec in recs:
-                # extraer valores
                 peso        = rec.gramos_utilizado       or 0.0
-                me_extra    = rec.metales_extra     or 0.0
-                cob_int     = rec.cobro_interno     or 0.0
-                hechura     = rec.hechura           or 0.0
-                cob_extra   = rec.cobros_extras     or 0.0
-                total_sal   = rec.total_salida_taller or 0.0
+                me_extra    = rec.metales_extra          or 0.0
+                cob_int     = rec.cobro_interno          or 0.0
+                hechura     = rec.hechura                or 0.0
+                cob_extra   = rec.cobros_extras          or 0.0
+                total_sal   = rec.total_salida_taller    or 0.0
 
                 # acumular
-                sum_peso         += peso
-                sum_metales_extra+= me_extra
-                sum_cobro_int    += cob_int
-                sum_hechura      += hechura
-                sum_cobros_extra += cob_extra
-                sum_total_salida += total_sal
+                sum_peso           += peso
+                sum_metales_extra  += me_extra
+                sum_cobro_int      += cob_int
+                sum_hechura        += hechura
+                sum_cobros_extra   += cob_extra
+                sum_total_salida   += total_sal
 
-                # escribir fila
-                sheet.write(row, 0, rec.name)
-                sheet.write(row, 1, rec.fecha_recepcion.strftime("%Y-%m-%d") if rec.fecha_recepcion else "")
-                sheet.write(row, 2, rec.metal_utilizado or "")
-                sheet.write_number(row, 3, peso, money)
-                sheet.write_number(row, 4, me_extra, money)
-                sheet.write_number(row, 5, cob_int, money)
-                sheet.write_number(row, 6, hechura, money)
-                sheet.write_number(row, 7, cob_extra, money)
-                sheet.write_number(row, 8, total_sal, money)
+                # escribir fila, desplazando un índice después de RMA
+                sheet.write   (row, 0, rec.name)
+                sheet.write   (row, 1, rec.estado or "")  # ← Estado
+                sheet.write   (row, 2, rec.fecha_recepcion.strftime("%Y-%m-%d") if rec.fecha_recepcion else "")
+                sheet.write   (row, 3, rec.metal_utilizado or "")
+                sheet.write_number(row, 4, peso,           money)
+                sheet.write_number(row, 5, me_extra,       money)
+                sheet.write_number(row, 6, cob_int,        money)
+                sheet.write_number(row, 7, hechura,        money)
+                sheet.write_number(row, 8, cob_extra,      money)
+                sheet.write_number(row, 9, total_sal,      money)
                 row += 1
 
             # 2.4) Fila de totales del mes
             sheet.write(row, 0, "Total del mes:", bold)
-            sheet.write_number(row, 3, sum_peso,         money)
-            sheet.write_number(row, 4, sum_metales_extra,money)
-            sheet.write_number(row, 5, sum_cobro_int,    money)
-            sheet.write_number(row, 6, sum_hechura,      money)
-            sheet.write_number(row, 7, sum_cobros_extra, money)
-            sheet.write_number(row, 8, sum_total_salida, money)
+            # Celda vacía para "Estado"
+            sheet.write(row, 1, "", bold)
+            # Espacio extra antes de los totales
+            sheet.write(row, 2, "", bold)
+            sheet.write_number(row, 4, sum_peso,         money)
+            sheet.write_number(row, 5, sum_metales_extra,money)
+            sheet.write_number(row, 6, sum_cobro_int,    money)
+            sheet.write_number(row, 7, sum_hechura,      money)
+            sheet.write_number(row, 8, sum_cobros_extra, money)
+            sheet.write_number(row, 9, sum_total_salida, money)
             row += 2  # espacio antes del siguiente mes
 
         # 3) Auto-ajustar ancho de columnas
