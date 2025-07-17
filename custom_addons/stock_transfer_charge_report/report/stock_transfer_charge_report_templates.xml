@@ -37,7 +37,7 @@
                     <!-- Precio fijo interno según variante -->
                     <td><t t-esc="pi.get(ml.product_id.id, 0.0)"/></td>
                     <td>
-                      <t t-esc="(ml.quantity or 0.0) * pi.get(ml.product_id.standard_price)"/>
+                      <t t-esc="(ml.quantity or 0.0) * (ml.product_id.standard_price)"/>
                     </td>
                   </tr>
                 </tbody>
