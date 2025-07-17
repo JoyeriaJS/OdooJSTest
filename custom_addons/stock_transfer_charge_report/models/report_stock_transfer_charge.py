@@ -7,39 +7,35 @@ class StockTransferChargeReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        # 1) Obtengo los pickings seleccionados
         pickings = self.env['stock.picking'].browse(docids or [])
 
-        # 1) Pricelist “Interno”
-        interna = self.env['product.pricelist'].search(
-            [('name', '=', 'Interno')], limit=1)
+        # 2) Busco la pricelist “Interno (CLP)” (o cualquier que contenga "Interno")
+        pricelist = self.env['product.pricelist'].search(
+            [('name', 'ilike', 'Interno')], limit=1
+        )
 
+        # 3) Recojo todas las reglas de precio internas
         precios_interno = {}
-        quantities       = {}
-
-        # 2) Recorremos todas las move_line_ids_without_package
-        for ml in pickings.mapped('move_line_ids_without_package'):
-            # calculamos la cantidad real (qty_done si existe, si no ml.quantity)
-            qty = getattr(ml, 'qty_done', None)
-            if qty is None:
-                qty = ml.quantity or 0.0
-            quantities[ml.id] = qty
-
-            # calculamos el precio interno
-            if interna:
-                price = interna.get_product_price(
-                    ml.product_id,
-                    qty,
-                    ml.product_uom_id.id,
-                    ml.picking_id.partner_id.id or False
-                )
-            else:
-                price = 0.0
-            precios_interno[ml.id] = price
+        if pricelist:
+            items = self.env['product.pricelist.item'].search([
+                ('pricelist_id', '=', pricelist.id),
+                ('compute_price', '=', 'fixed'),
+                ('applied_on', 'in', ['0_product_variant', '1_product']),
+            ])
+            for item in items:
+                price = item.fixed_price or 0.0
+                # Variante específica
+                if item.applied_on == '0_product_variant' and item.product_id:
+                    precios_interno[item.product_id.id] = price
+                # Toda la plantilla
+                elif item.applied_on == '1_product' and item.product_tmpl_id:
+                    for var in item.product_tmpl_id.product_variant_ids:
+                        precios_interno[var.id] = price
 
         return {
-            'doc_model':       'stock.picking',
-            'doc_ids':         pickings.ids,
-            'docs':            pickings,
+            'doc_ids': pickings.ids,
+            'doc_model': 'stock.picking',
+            'docs': pickings,
             'precios_interno': precios_interno,
-            'quantities':      quantities,
         }
