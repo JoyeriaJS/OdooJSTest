@@ -1,0 +1,18 @@
+<!-- views/confirm_reparacion_wizard_views.xml -->
+<odoo>
+  <record id="view_confirm_reparacion_wizard" model="ir.ui.view">
+    <field name="name">confirm.reparacion.wizard.form</field>
+    <field name="model">confirm.reparacion.wizard</field>
+    <field name="arch" type="xml">
+      <form string="¿Desea crear esta orden de reparación?">
+        <group>
+          <label string="Si pulsa Sí, la orden se creará." colspan="2"/>
+        </group>
+        <footer>
+          <button string="Sí" type="object" name="action_confirm" class="btn-primary"/>
+          <button string="No" type="object" name="action_cancel" class="btn-secondary"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+</odoo>

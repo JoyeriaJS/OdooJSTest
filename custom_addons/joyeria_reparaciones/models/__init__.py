@@ -9,6 +9,7 @@ from . import report_monthly_rma_pos
 from . import report_sales_by_store_xlsx
 from . import report_sales_by_vendedora_xlsx
 from . import report_monthly_rma_pos_xlsx
+from . import confirm_reparacion_wizard
 
 #from . import res_users
 
