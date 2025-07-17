@@ -9,7 +9,7 @@
             <div class="page" style="position: relative; padding-top: 2cm;">
 
               <!-- Firma en esquina superior derecha -->
-              <div style="position: absolute; top: 0.2cm; right: 0.2cm; text-align: right;">
+              <div style="position: absolute; top: 0.0cm; right: 0.2cm; text-align: right;">
                 <p><strong>Entregó:</strong> ____________________</p>
                 <p><strong>Recibió:</strong> ____________________</p>
               </div>
