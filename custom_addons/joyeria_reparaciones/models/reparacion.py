@@ -349,7 +349,7 @@ class Reparacion(models.Model):
                 self.vendedora_id = vendedora.id
 
 ###create funcional######
-    @api.model
+    @api.model_create_multi
     def create(self, vals):
         ahora = datetime.now(CHILE_TZ).strftime('%d/%m/%Y %H:%M:%S')
         mensajes = []
