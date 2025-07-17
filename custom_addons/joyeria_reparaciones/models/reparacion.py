@@ -350,68 +350,64 @@ class Reparacion(models.Model):
 
 ###create funcional######
     @api.model_create_multi
-    def create(self, vals_list):
-        """Override para preguntar confirmación en formulario y ejecutar tu lógica sin romper multi-create."""
-        records = []
+    def create(self, vals):
         ahora = datetime.now(CHILE_TZ).strftime('%d/%m/%Y %H:%M:%S')
+        mensajes = []
 
-        for vals in vals_list:
-            mensajes = []
-            # ✅ Validar peso especial
-            if vals.get('peso') == 'especial' and not vals.get('peso_valor'):
-                raise ValidationError("Debe ingresar un valor para el campo 'Peso' si selecciona tipo de peso 'Especial'.")
+        # ✅ Validar peso especial (usando campo 'peso' y 'peso_valor' como indicaste)
+        if vals.get('peso') == 'especial' and not vals.get('peso_valor'):
+            raise ValidationError("Debe ingresar un valor para el campo 'Peso' si selecciona tipo de peso 'Especial'.")
 
-            # Generar secuencia
-            if vals.get('name', 'Nuevo') == 'Nuevo':
-                seq = self.env['ir.sequence'].next_by_code('joyeria.reparacion')
-                if not seq:
-                    raise ValidationError("No se pudo generar la secuencia.")
-                vals['name'] = seq.replace("'", "-")
+        # Generar secuencia
+        if vals.get('name', 'Nuevo') == 'Nuevo':
+            secuencia = self.env['ir.sequence'].next_by_code('joyeria.reparacion')
+            if not secuencia:
+                raise ValidationError("No se pudo generar la secuencia.")
+            vals['name'] = secuencia.replace("'", "-")
 
-            # Procesar vendedora ANTES de crear
-            if not vals.get('vendedora_id') and vals.get('clave_autenticacion_manual'):
-                clave = self._normalizar_clave(vals['clave_autenticacion_manual'])
-                vend = self.env['joyeria.vendedora'].search([
-                    '|', ('clave_autenticacion','=',clave),
-                         ('codigo_qr','=',clave)
-                ], limit=1)
-                if vend:
-                    vals['vendedora_id'] = vend.id
-                    mensajes.append(f"📦 Recibido por: <b>{vend.name}</b> el <b>{ahora}</b>")
+        # Procesar vendedora ANTES de crear
+        if not vals.get('vendedora_id') and vals.get('clave_autenticacion_manual'):
+            clave = self._normalizar_clave(vals['clave_autenticacion_manual'])
+            vendedora = self.env['joyeria.vendedora'].search([
+                '|', ('clave_autenticacion', '=', clave),
+                    ('codigo_qr', '=', clave)
+            ], limit=1)
+            if vendedora:
+                vals['vendedora_id'] = vendedora.id
+                mensajes.append(f"📦 Recibido por: <b>{vendedora.name}</b> el <b>{ahora}</b>")
 
-            # Crear el registro real
-            rec = super(Reparacion, self).create(vals)
+        # Crear el registro
+        record = super().create(vals)
 
-            # Procesar firma
-            if rec.clave_firma_manual:
-                rec._procesar_firma()
-                if rec.firma_id:
-                    mensajes.append(f"✍️ Firmado por: <b>{rec.firma_id.name}</b> el <b>{ahora}</b>")
+        # Procesar firma
+        if record.clave_firma_manual:
+            record._procesar_firma()
+            if record.firma_id:
+                mensajes.append(f"✍️ Firmado por: <b>{record.firma_id.name}</b> el <b>{ahora}</b>")
 
-            # Generar QR si existe método
-            if hasattr(rec, '_generar_codigo_qr'):
-                rec._generar_codigo_qr()
+        # Generar código QR
+        if hasattr(record, '_generar_codigo_qr'):
+            record._generar_codigo_qr()
 
-            # Resumen general
-            peso_str = str(rec.peso_valor) if rec.peso_valor not in (False,0,0.0) else "No especificado"
-            resumen = (
-                "📌 Resumen generado automáticamente\n"
-                f"🗓️ Vencimiento de la garantía: {rec.vencimiento_garantia or 'No definida'}\n"
-                f"📄 Estado: {rec.estado or 'No definido'}\n"
-                f"🔩 Metal Reparación: {rec.metal or 'No definido'}\n"
-                f"⚖️ Peso del Producto: {peso_str}\n"
-                f"📝 Solicitud del Cliente: {rec.solicitud_cliente or 'No especificada'}\n"
-                f"🕒 Registrado el: {ahora}"
-            )
-            mensajes.append(resumen)
+        # Resumen general
+        peso_str = str(record.peso_valor) if record.peso_valor not in (False, 0, 0.0) else "No especificado"
+        resumen = (
+            "📌 Resumen generado automáticamente\n"
+            f"🗓️ Vencimiento de la garantía: {record.vencimiento_garantia or 'No definida'}\n"
+            f"📄 Estado: {record.estado or 'No definido'}\n"
+            f"🔩 Metal Reparación: {record.metal or 'No definido'}\n"
+            f"⚖️ Peso del Producto: {peso_str}\n"
+            f"📝 Solicitud del Cliente: {record.solicitud_cliente or 'No especificada'}\n"
+            f"🕒 Registrado el: {ahora}"
+        )
+        mensajes.append(resumen)
 
-            # Publicar mensajes en la bitácora
-            for msg in mensajes:
-                rec.message_post(body=msg)
+        # Publicar mensajes en bitácora
+        for msg in mensajes:
+            record.message_post(body=msg)
 
-            records.append(rec)
+        return record
 
-        return self.browse(records)
 
     
 
