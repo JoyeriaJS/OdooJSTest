@@ -1,16 +1,19 @@
-
 <odoo>
   <data>
     <record id="view_reparacion_form_confirm" model="ir.ui.view">
       <field name="name">joyeria.reparacion.form.confirm</field>
       <field name="model">joyeria.reparacion</field>
-      <field name="inherit_id" ref="view_joyeria_reparacion_form"/>  <!-- tu XML ID aquí -->
+      <field name="inherit_id" ref="joyeria_reparaciones.view_reparacion_form"/>
       <field name="arch" type="xml">
-        <!-- Localizamos el botón “Guardar” por su clase CSS -->
-        <xpath expr="//button[contains(@class,'o_form_button_save')]" position="attributes">
-          <attribute name="confirm">
-            ¿Deseas crear esta orden de reparación?
-          </attribute>
+        <!-- Mete esto dentro del header -->
+        <xpath expr="//header" position="inside">
+          <button
+            name="create"
+            type="object"
+            class="btn btn-primary o_form_button_save"
+            string="Guardar"
+            confirm="¿Deseas crear esta orden de reparación?"
+          />
         </xpath>
       </field>
     </record>
