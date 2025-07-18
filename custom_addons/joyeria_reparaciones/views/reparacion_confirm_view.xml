@@ -13,7 +13,7 @@
             class="btn btn-primary o_form_button_save"
             string="Guardar"
             confirm="¿Deseas crear o guardar esta orden de reparación?"
-            style="margin-left:8px;"  <!-- ajusta este valor a tu gusto -->
+            style="margin-left:8px;"  
           />
         </xpath>
         <!-- 2) Eliminamos el que quedaba flotando a la derecha -->
