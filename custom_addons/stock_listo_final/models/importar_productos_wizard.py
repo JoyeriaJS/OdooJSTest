@@ -14,14 +14,17 @@ class ImportarProductosWizard(models.TransientModel):
     filename = fields.Char(string='Nombre del archivo')
 
     def safe_float(self, val):
-        try:    return float(val)
-        except: return 0.0
+        try:
+            return float(val)
+        except:
+            return 0.0
 
     def resize_image_128(self, img_bytes):
         try:
             img = Image.open(BytesIO(img_bytes)).convert("RGB")
             img = img.resize((128,128), Image.LANCZOS)
-            buf = BytesIO(); img.save(buf, 'JPEG')
+            buf = BytesIO()
+            img.save(buf, 'JPEG')
             return base64.b64encode(buf.getvalue())
         except:
             return False
@@ -63,7 +66,6 @@ class ImportarProductosWizard(models.TransientModel):
             'image_url':  16,
             'attr_name':  17,
             'attr_vals':  18,
-            # resto no cambia…
         }
 
         pricelists = self._get_pricelists()
@@ -147,6 +149,9 @@ class ImportarProductosWizard(models.TransientModel):
                 'attribute_line_ids': attr_lines or False,
             })
             imported += 1
+            # Commit cada 20 registros para evitar timeouts
+            if imported % 20 == 0:
+                self.env.cr.commit()
 
             # Crear cada regla de precio (solo si > 0)
             rules = {
@@ -156,10 +161,10 @@ class ImportarProductosWizard(models.TransientModel):
                 'Preferente': pref_pr,
                 'Interno (CLP)': interno_pr,
             }
-            for name, price in rules.items():
+            for name_list, price in rules.items():
                 if price and price > 0.0:
                     PrItem.create({
-                        'pricelist_id':    pricelists[name].id,
+                        'pricelist_id':    pricelists[name_list].id,
                         'product_tmpl_id': tmpl.id,
                         'applied_on':      '1_product',
                         'compute_price':   'fixed',
