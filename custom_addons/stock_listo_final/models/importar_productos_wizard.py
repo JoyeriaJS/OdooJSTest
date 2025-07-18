@@ -57,11 +57,12 @@ class ImportarProductosWizard(models.TransientModel):
             'code':        9,
             'name':        1,
             'weight':      3,
+            'costo':       4,  # columna “Costo” en el Excel
             'pub':         5,
             'pos':         6,
             'mayorista':   7,
             'preferente':  8,
-            'interno':     8,  # si Interno (CLP) está en misma columna que Preferente, usa otro idx
+            'interno':     8,  # si Interno (CLP) está en otra columna, ajusta aquí
             'barcode':    15,
             'image_url':  16,
             'attr_name':  17,
@@ -90,6 +91,7 @@ class ImportarProductosWizard(models.TransientModel):
 
             name       = str(row[cols['name']].value).strip()
             weight     = self.safe_float(row[cols['weight']].value)
+            cost_pr    = self.safe_float(row[cols['costo']].value)
             barcode    = str(row[cols['barcode']].value).strip()
             interno_pr = self.safe_float(row[cols['interno']].value)
             pub_pr     = self.safe_float(row[cols['pub']].value)
@@ -113,7 +115,7 @@ class ImportarProductosWizard(models.TransientModel):
             img_data = False
             if img_url.startswith('http'):
                 try:
-                    r = requests.get(img_url,timeout=5)
+                    r = requests.get(img_url, timeout=5)
                     if r.ok:
                         img_data = self.resize_image_128(r.content)
                 except:
@@ -143,7 +145,7 @@ class ImportarProductosWizard(models.TransientModel):
                 'type':           'product',
                 'barcode':        barcode,
                 'list_price':     pub_pr,
-                'standard_price': interno_pr,
+                'standard_price': cost_pr,      # asignamos el costo
                 'weight':         weight,
                 'image_1920':     img_data,
                 'attribute_line_ids': attr_lines or False,
@@ -155,10 +157,10 @@ class ImportarProductosWizard(models.TransientModel):
 
             # Crear cada regla de precio (solo si > 0)
             rules = {
-                'Pública':    pub_pr,
+                'Pública':       pub_pr,
                 'Punto de venta': pos_pr,
-                'Mayorista':  may_pr,
-                'Preferente': pref_pr,
+                'Mayorista':     may_pr,
+                'Preferente':    pref_pr,
                 'Interno (CLP)': interno_pr,
             }
             for name_list, price in rules.items():
