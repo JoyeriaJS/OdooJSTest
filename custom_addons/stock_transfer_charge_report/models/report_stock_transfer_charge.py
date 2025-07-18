@@ -11,7 +11,7 @@ class StockTransferChargeReport(models.AbstractModel):
         pickings = self.env['stock.picking'].browse(docids or []).sorted('date_done')
 
         pricelist = self.env['product.pricelist'].search(
-            [('name', 'ilike', 'Interno')], limit=1)
+            [('name', 'ilike', 'Interno', 'Interno (CLP) (CLP)')], limit=1)
 
         precios_interno = {}
         if pricelist:
