@@ -10,10 +10,9 @@
         <xpath expr="//form/sheet" position="before">
           <header>
             <button
-              name="create"
-              type="object"
-              class="oe_highlight"
               string="Guardar"
+              class="oe_highlight"
+              special="save"
               confirm="¿Deseas crear o guardar esta orden de reparación?"
             />
           </header>
