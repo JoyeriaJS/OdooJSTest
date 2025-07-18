@@ -1,5 +1,5 @@
 # report_stock_transfer_charge.py
-# -*- coding: utf-8 -*-
+
 from odoo import api, models
 
 class StockTransferChargeReport(models.AbstractModel):
@@ -8,15 +8,11 @@ class StockTransferChargeReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # 1) Cargo los pickings seleccionados y los ordeno por fecha efectiva
-        pickings = self.env['stock.picking'].browse(docids or [])
-        pickings = pickings.sorted('date_done')
+        pickings = self.env['stock.picking'].browse(docids or []).sorted('date_done')
 
-        # 2) Busco la pricelist que contenga “Interno”
         pricelist = self.env['product.pricelist'].search(
             [('name', 'ilike', 'Interno')], limit=1)
 
-        # 3) Construyo un dict { variant_id: precio_interno_fijo }
         precios_interno = {}
         if pricelist:
             items = self.env['product.pricelist.item'].search([

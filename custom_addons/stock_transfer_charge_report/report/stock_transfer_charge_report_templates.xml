@@ -5,27 +5,8 @@
       <t t-call="web.html_container">
         <t t-foreach="docs" t-as="o">
           <t t-call="web.external_layout">
-            <!-- contenedor principal -->
             <div class="page" style="position: relative; padding-top: 2cm;">
-
-              <!-- Firma en esquina superior derecha -->
-              <div style="position: absolute; top: 0.0cm; right: 0.2cm; text-align: right;">
-                <p><strong>Entregó:</strong> ____________________</p>
-                <p><strong>Recibió:</strong> ____________________</p>
-              </div>
-
-              <h2 class="text-center">
-                Traspaso: <t t-esc="o.name"/>
-              </h2>
-              <p><strong>Origen:</strong>  <t t-esc="o.location_id.display_name"/></p>
-              <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
-              <p><strong>Estado:</strong>  <t t-esc="o.state"/></p>
-              <p><strong>Tipo:</strong>    <t t-esc="o.picking_type_code"/></p>
-              <!-- Fecha efectiva justo debajo de Tipo -->
-              <p>
-                <strong>Fecha Efectiva:</strong>
-                <t t-esc="o.date_done and o.date_done.strftime('%d/%m/%Y %H:%M:%S') or ''"/>
-              </p>
+              <!-- ... tu cabecera igual ... -->
 
               <!-- Asigno el dict a una variable local -->
               <t t-set="pi" t-value="precios_interno or {}"/>
@@ -37,7 +18,7 @@
                     <th>Cantidad</th>
                     <th>UoM</th>
                     <th>Peso (g)</th>
-                    <th>Costo</th>
+                    <th>Costo Interno</th>  <!-- renombrado para mayor claridad -->
                   </tr>
                 </thead>
                 <tbody>
@@ -47,7 +28,8 @@
                     <td><t t-esc="ml.product_uom_id.name"/></td>
                     <td><t t-esc="ml.product_id.weight or 0.0"/></td>
                     <td>
-                      <t t-esc="(ml.quantity or 0.0) * (ml.product_id.standard_price)"/>
+                      <!-- Multiplica cantidad por precio interno (o fallback a standard_price) -->
+                      <t t-esc="(ml.quantity or 0.0) * pi.get(ml.product_id.id, ml.product_id.standard_price)"/>
                     </td>
                   </tr>
                 </tbody>
@@ -64,7 +46,7 @@
                     <!-- Total costo interno -->
                     <th>
                       <t t-esc="sum([
-                        (ml.quantity or 0.0) * (ml.product_id.standard_price)
+                        (ml.quantity or 0.0) * pi.get(ml.product_id.id, ml.product_id.standard_price)
                         for ml in o.move_line_ids_without_package
                       ])"/>
                     </th>
