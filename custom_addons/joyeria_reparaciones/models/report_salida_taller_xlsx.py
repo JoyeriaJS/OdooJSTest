@@ -11,6 +11,8 @@ class ReportSalidaTallerXlsx(models.AbstractModel):
     def generate_xlsx_report(self, workbook, data, records):
         if not self.env.user.has_group('base.group_system'):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
+        # Filtrar solo órdenes en estado 'confirmado'
+        records = records.filtered(lambda r: r.estado == 'confirmado')
         
         sheet = workbook.add_worksheet("Salida Taller")
         bold  = workbook.add_format({'bold': True})
