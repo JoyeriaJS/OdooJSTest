@@ -3,19 +3,22 @@
     <record id="view_reparacion_form_confirm" model="ir.ui.view">
       <field name="name">joyeria.reparacion.form.confirm</field>
       <field name="model">joyeria.reparacion</field>
+      <!-- usa aquí el XML-ID exacto de tu vista form original -->
       <field name="inherit_id" ref="joyeria_reparaciones.view_joyeria_reparacion_form"/>
       <field name="arch" type="xml">
-        <!-- 1) Insertamos tu botón dentro del header estándar -->
-        <xpath expr="//form/header" position="inside">
-          <button
-            name="create"
-            type="object"
-            class="btn btn-primary o_form_button_save"
-            string="Guardar"
-            confirm="¿Deseas crear esta orden de reparación?"
-          />
+        <!-- 1) Creamos el header **antes** del sheet -->
+        <xpath expr="//form/sheet" position="before">
+          <header>
+            <button
+              name="create"
+              type="object"
+              class="btn btn-primary o_form_button_save"
+              string="Guardar"
+              confirm="¿Deseas crear o guardar esta orden de reparación?"
+            />
+          </header>
         </xpath>
-        <!-- 2) Quitamos el mismo botón que ya estaba a la derecha -->
+        <!-- 2) Quitamos el botón duplicado en la esquina derecha -->
         <xpath expr="//div[contains(@class,'o_cp_right')]/button[@name='create']"
                position="replace"/>
       </field>
