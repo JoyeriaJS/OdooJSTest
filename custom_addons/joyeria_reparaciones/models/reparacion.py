@@ -355,7 +355,7 @@ class Reparacion(models.Model):
         mensajes = []
 
         # ✅ Validar peso especial (usando campo 'peso' y 'peso_valor' como indicaste)
-        if vals.get('peso') == 'especial' and not vals.get('peso_valor'):
+        if vals('peso') == 'especial' and not vals('peso_valor'):
             raise ValidationError("Debe ingresar un valor para el campo 'Peso' si selecciona tipo de peso 'Especial'.")
 
         # Generar secuencia
