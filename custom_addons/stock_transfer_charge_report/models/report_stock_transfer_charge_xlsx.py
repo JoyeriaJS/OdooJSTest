@@ -29,7 +29,7 @@ class ReportStockTransferChargeXlsx(models.AbstractModel):
 
         # 1) Obtener la pricelist “Interno”
         pricelist = self.env['product.pricelist'].search(
-            [('name', 'ilike', 'Interno (CLP) (CLP)')], limit=1)
+            [('name', 'ilike', 'Interno', )], limit=1)
 
         # 2) Construir mapeo {variant_id: precio_fijo}
         precios_interno = {}
