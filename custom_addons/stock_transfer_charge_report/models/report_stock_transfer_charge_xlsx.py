@@ -13,7 +13,7 @@ class ReportStockTransferChargeXlsx(models.AbstractModel):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
 
         # Formatos
-        bold = workbook.add_format({'bold': True})
+        bold  = workbook.add_format({'bold': True})
         money = workbook.add_format({'num_format': '#,##0.00'})
 
         # Hoja
@@ -22,26 +22,38 @@ class ReportStockTransferChargeXlsx(models.AbstractModel):
         # Encabezados
         headers = [
             'Picking', 'Producto', 'Cantidad', 'UoM', 'Peso (g)',
-            'Precio Interno', 'Costo Interno'
+            'Precio Interno', 'Costo Interno',
         ]
         for col, title in enumerate(headers):
             sheet.write(0, col, title, bold)
 
-        # Obtener pricelist interno
+        # 1) Obtener la pricelist “Interno”
         pricelist = self.env['product.pricelist'].search(
             [('name', 'ilike', 'Interno')], limit=1)
 
-        # Filas de datos
+        # 2) Construir mapeo {variant_id: precio_fijo}
+        precios_interno = {}
+        if pricelist:
+            items = self.env['product.pricelist.item'].search([
+                ('pricelist_id', '=', pricelist.id),
+                ('applied_on',    'in', ['0_product_variant', '1_product']),
+            ])
+            for item in items:
+                price = item.fixed_price or 0.0
+                if item.applied_on == '0_product_variant' and item.product_id:
+                    precios_interno[item.product_id.id] = price
+                elif item.applied_on == '1_product' and item.product_tmpl_id:
+                    for var in item.product_tmpl_id.product_variant_ids:
+                        precios_interno[var.id] = price
+
+        # 3) Llenar filas
         row = 1
         for pick in pickings:
             for ml in pick.move_line_ids_without_package:
                 qty = ml.quantity or 0.0
-                unit_price = 0.0
-                if pricelist:
-                    # get_product_price(variant, qty, uom)
-                    unit_price = pricelist.get_product_price(
-                        ml.product_id, 1, ml.product_uom_id)
-                cost = qty * unit_price
+                # Tomamos el precio interno desde el mapeo
+                unit_price = precios_interno.get(ml.product_id.id, 0.0)
+                cost       = qty * unit_price
 
                 sheet.write(row, 0, pick.name)
                 sheet.write(row, 1, ml.product_id.display_name)
@@ -52,11 +64,11 @@ class ReportStockTransferChargeXlsx(models.AbstractModel):
                 sheet.write_number(row, 6, cost, money)
                 row += 1
 
-        # Totales generales
+        # 4) Totales generales
         sheet.write(row, 0, 'Totales:', bold)
-        # Suma columna Costo Interno (col 6, filas 2 a row)
+        # sumatoria de la columna de costos (índice 6, de fila 2 a fila 'row')
         sheet.write_formula(row, 6, f'=SUM(G2:G{row})', money)
 
-        # Ajustar ancho automático
+        # 5) Auto-ajustar ancho
         for idx in range(len(headers)):
             sheet.set_column(idx, idx, 18)
