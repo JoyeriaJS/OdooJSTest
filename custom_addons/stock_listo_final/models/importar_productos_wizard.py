@@ -54,19 +54,19 @@ class ImportarProductosWizard(models.TransientModel):
 
         # Columnas de tu hoja (ajusta índices si cambien)
         cols = {
-            'code':      9,
-            'name':      1,
-            'weight':    3,
-            'costo':     4,
-            'pub':       5,
-            'mayorista': 7,
-            'preferente':8,
-            'interno':   8,
-            'barcode':  15,
-            'image_url':16,
-            'attr_name':17,
-            'attr_vals':18,
-            'pos':      19,
+            'code':       9,
+            'name':       1,
+            'weight':     3,
+            'costo':      4,
+            'pub':        5,
+            'mayorista':  6,
+            'preferente': 7,
+            'interno':    8,
+            'barcode':   15,
+            'image_url': 16,
+            'attr_name': 17,
+            'attr_vals': 18,
+            'pos':       19,
         }
 
         pricelists    = self._get_pricelists()
