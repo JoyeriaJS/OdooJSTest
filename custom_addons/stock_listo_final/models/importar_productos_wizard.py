@@ -36,7 +36,7 @@ class ImportarProductosWizard(models.TransientModel):
         PrList = self.env['product.pricelist']
         res = {}
         for name in names:
-            pl = PrList.search([('name','=',name)],limit=1)
+            pl = PrList.search([('name','=',name)], limit=1)
             if not pl:
                 pl = PrList.create({
                     'name':        name,
@@ -52,32 +52,34 @@ class ImportarProductosWizard(models.TransientModel):
         book = xlrd.open_workbook(file_contents=data)
         sheet = book.sheet_by_name("Productos") if "Productos" in book.sheet_names() else book.sheet_by_index(0)
 
-        # Columnas de tu hoja (ajusta índices si cambian)
+        # Columnas de tu hoja (ajusta índices si cambien)
         cols = {
-            'code':        9,
-            'name':        1,
-            'weight':      3,
-            'costo':       4,  # columna “Costo” en el Excel
-            'pub':         5,
-            'pos':         6,
-            'mayorista':   7,
-            'preferente':  8,
-            'interno':     8,  # si Interno (CLP) está en otra columna, ajusta aquí
-            'barcode':    15,
-            'image_url':  16,
-            'attr_name':  17,
-            'attr_vals':  18,
+            'code':      9,
+            'name':      1,
+            'weight':    3,
+            'costo':     4,  # columna “Costo” en el Excel
+            'pub':       5,
+            'pos':       6,
+            'mayorista': 7,
+            'preferente':8,
+            'interno':   8,  # si Interno (CLP) está en otra columna, ajusta aquí
+            'barcode':  15,
+            'image_url':16,
+            'attr_name':17,
+            'attr_vals':18,
         }
 
         pricelists = self._get_pricelists()
         Product    = self.env['product.template']
+        ProdVar    = self.env['product.product']
         Category   = self.env['product.category']
         Attr       = self.env['product.attribute']
         AttrVal    = self.env['product.attribute.value']
         PrItem     = self.env['product.pricelist.item']
 
-        duplicates = set()
-        imported   = 0
+        duplicates_code    = set()
+        duplicates_barcode = set()
+        imported           = 0
 
         for row_idx in range(3, sheet.nrows):
             row = sheet.row(row_idx)
@@ -85,14 +87,20 @@ class ImportarProductosWizard(models.TransientModel):
             if not code or code.lower().startswith('code'):
                 continue
 
-            if Product.search([('default_code','=',code)],limit=1):
-                duplicates.add(code)
+            # Saltar códigos duplicados
+            if Product.search([('default_code','=',code)], limit=1):
+                duplicates_code.add(code)
+                continue
+
+            barcode = str(row[cols['barcode']].value).strip()
+            # Saltar barcodes duplicados
+            if barcode and ProdVar.search([('barcode','=', barcode)], limit=1):
+                duplicates_barcode.add(barcode)
                 continue
 
             name       = str(row[cols['name']].value).strip()
             weight     = self.safe_float(row[cols['weight']].value)
             cost_pr    = self.safe_float(row[cols['costo']].value)
-            barcode    = str(row[cols['barcode']].value).strip()
             interno_pr = self.safe_float(row[cols['interno']].value)
             pub_pr     = self.safe_float(row[cols['pub']].value)
             pos_pr     = self.safe_float(row[cols['pos']].value)
@@ -108,8 +116,8 @@ class ImportarProductosWizard(models.TransientModel):
             externa = str(row[12].value).strip()
             tipo    = str(row[14].value).strip()
             cat_name = f"{metal} / {nacimp} / {externa} / {tipo}"
-            categ = Category.search([('name','=',cat_name)],limit=1) \
-                    or Category.create({'name':cat_name})
+            categ = Category.search([('name','=',cat_name)], limit=1) \
+                    or Category.create({'name': cat_name})
 
             # Imagen
             img_data = False
@@ -124,30 +132,35 @@ class ImportarProductosWizard(models.TransientModel):
             # Atributos
             attr_lines = []
             if attr_name and attr_vals:
-                att = Attr.search([('name','=',attr_name)],limit=1) \
-                      or Attr.create({'name':attr_name})
+                att = Attr.search([('name','=', attr_name)], limit=1) \
+                      or Attr.create({'name': attr_name})
                 val_ids = []
                 for v in [x.strip() for x in attr_vals.split(',') if x.strip()]:
-                    av = AttrVal.search([('name','=',v),('attribute_id','=',att.id)],limit=1) \
-                         or AttrVal.create({'name':v,'attribute_id':att.id})
+                    av = AttrVal.search([
+                        ('name','=', v),
+                        ('attribute_id','=', att.id)
+                    ], limit=1) or AttrVal.create({
+                        'name': v,
+                        'attribute_id': att.id
+                    })
                     val_ids.append(av.id)
                 if val_ids:
-                    attr_lines = [(0,0,{
+                    attr_lines = [(0, 0, {
                         'attribute_id': att.id,
-                        'value_ids': [(6,0,val_ids)]
+                        'value_ids': [(6, 0, val_ids)]
                     })]
 
             # Crear template
             tmpl = Product.create({
-                'default_code':   code,
-                'name':           name,
-                'categ_id':       categ.id,
-                'type':           'product',
-                'barcode':        barcode,
-                'list_price':     pub_pr,
-                'standard_price': cost_pr,      # asignamos el costo
-                'weight':         weight,
-                'image_1920':     img_data,
+                'default_code':      code,
+                'name':              name,
+                'categ_id':          categ.id,
+                'type':              'product',
+                'barcode':           barcode,
+                'list_price':        pub_pr,
+                'standard_price':    cost_pr,
+                'weight':            weight,
+                'image_1920':        img_data,
                 'attribute_line_ids': attr_lines or False,
             })
             imported += 1
@@ -164,7 +177,7 @@ class ImportarProductosWizard(models.TransientModel):
                 'Interno (CLP)': interno_pr,
             }
             for name_list, price in rules.items():
-                if price and price > 0.0:
+                if price > 0.0:
                     PrItem.create({
                         'pricelist_id':    pricelists[name_list].id,
                         'product_tmpl_id': tmpl.id,
@@ -175,8 +188,10 @@ class ImportarProductosWizard(models.TransientModel):
 
         # Notificación
         msg = _("%d productos importados.") % imported
-        if duplicates:
-            msg += _(" Se omitieron duplicados: %s") % ', '.join(sorted(duplicates))
+        if duplicates_code:
+            msg += _(" Se omitieron códigos duplicados: %s") % ', '.join(sorted(duplicates_code))
+        if duplicates_barcode:
+            msg += _(" Se omitieron barcodes duplicados: %s") % ', '.join(sorted(duplicates_barcode))
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
