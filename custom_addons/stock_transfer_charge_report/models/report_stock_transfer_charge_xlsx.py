@@ -8,7 +8,7 @@ class ReportStockTransferChargeXlsx(models.AbstractModel):
     _description = 'Cargos entre locales (Excel)'
 
     def generate_xlsx_report(self, workbook, data, pickings):
-        # Sólo administradores
+        # Verificar permisos
         if not self.env.user.has_group('base.group_system'):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
 
@@ -16,27 +16,25 @@ class ReportStockTransferChargeXlsx(models.AbstractModel):
         bold  = workbook.add_format({'bold': True})
         money = workbook.add_format({'num_format': '#,##0.00'})
 
-        # Hoja
+        # Crear hoja
         sheet = workbook.add_worksheet("Cargos Locales")
 
-        # Encabezados
+        # Encabezados con Origen y Destino
         headers = [
-            'Picking', 'Producto', 'Cantidad', 'UoM', 'Peso (g)',
-            'Precio Interno', 'Costo Interno',
+            'Picking', 'Origen', 'Destino', 'Producto', 'Cantidad',
+            'UoM', 'Peso (g)', 'Precio Interno', 'Costo Interno'
         ]
         for col, title in enumerate(headers):
             sheet.write(0, col, title, bold)
 
-        # 1) Obtener la pricelist “Interno”
+        # Construir mapeo de precios internos
         pricelist = self.env['product.pricelist'].search(
-            [('name', 'ilike', 'Interno (CLP)', )], limit=1)
-
-        # 2) Construir mapeo {variant_id: precio_fijo}
+            [('name', 'ilike', 'Interno (CLP)')], limit=1)
         precios_interno = {}
         if pricelist:
             items = self.env['product.pricelist.item'].search([
                 ('pricelist_id', '=', pricelist.id),
-                ('applied_on',    'in', ['0_product_variant', '1_product']),
+                ('applied_on', 'in', ['0_product_variant', '1_product']),
             ])
             for item in items:
                 price = item.fixed_price or 0.0
@@ -46,29 +44,32 @@ class ReportStockTransferChargeXlsx(models.AbstractModel):
                     for var in item.product_tmpl_id.product_variant_ids:
                         precios_interno[var.id] = price
 
-        # 3) Llenar filas
+        # Filas y totales por traspaso
         row = 1
         for pick in pickings:
+            total_pick = 0.0
             for ml in pick.move_line_ids_without_package:
                 qty = ml.quantity or 0.0
-                # Tomamos el precio interno desde el mapeo
                 unit_price = precios_interno.get(ml.product_id.id, 0.0)
-                cost       = qty * unit_price
+                cost = qty * unit_price
+                total_pick += cost
 
                 sheet.write(row, 0, pick.name)
-                sheet.write(row, 1, ml.product_id.display_name)
-                sheet.write_number(row, 2, qty)
-                sheet.write(row, 3, ml.product_uom_id.name)
-                sheet.write_number(row, 4, ml.product_id.weight or 0.0)
-                sheet.write_number(row, 5, unit_price, money)
-                sheet.write_number(row, 6, cost, money)
+                sheet.write(row, 1, pick.location_id.display_name)
+                sheet.write(row, 2, pick.location_dest_id.display_name)
+                sheet.write(row, 3, ml.product_id.display_name)
+                sheet.write_number(row, 4, qty)
+                sheet.write(row, 5, ml.product_uom_id.name)
+                sheet.write_number(row, 6, ml.product_id.weight or 0.0)
+                sheet.write_number(row, 7, unit_price, money)
+                sheet.write_number(row, 8, cost, money)
                 row += 1
 
-        # 4) Totales generales
-        sheet.write(row, 0, 'Totales:', bold)
-        # sumatoria de la columna de costos (índice 6, de fila 2 a fila 'row')
-        sheet.write_formula(row, 6, f'=SUM(G2:G{row})', money)
+            # Fila de total del picking
+            sheet.write(row, 0, f"Total {pick.name}", bold)
+            sheet.write_number(row, 8, total_pick, money)
+            row += 2  # espacio antes del siguiente traspaso
 
-        # 5) Auto-ajustar ancho
+        # Ajustar ancho de columnas
         for idx in range(len(headers)):
             sheet.set_column(idx, idx, 18)
