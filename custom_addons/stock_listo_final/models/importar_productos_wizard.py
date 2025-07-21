@@ -62,7 +62,7 @@ class ImportarProductosWizard(models.TransientModel):
             'pos':       6,
             'mayorista': 7,
             'preferente':8,
-            'interno':   9,
+            'interno':   8,
             'barcode':  15,
             'image_url':16,
             'attr_name':17,
