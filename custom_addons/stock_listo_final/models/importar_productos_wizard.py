@@ -54,29 +54,29 @@ class ImportarProductosWizard(models.TransientModel):
 
         # Columnas de tu hoja (ajusta índices si cambien)
         cols = {
-            'code':        9,
-            'name':        1,
-            'weight':      3,
-            'costo':       4,  # columna “Costo” en el Excel
-            'pub':         5,
-            'pos':         6,
-            'mayorista':   7,
-            'preferente':  8,
-            'interno':     8,  # si Interno (CLP) está en otra columna, ajusta aquí
-            'barcode':    15,
-            'image_url':  16,
-            'attr_name':  17,
-            'attr_vals':  18,
+            'code':      9,
+            'name':      1,
+            'weight':    3,
+            'costo':     4,
+            'pub':       5,
+            'pos':       6,
+            'mayorista': 7,
+            'preferente':8,
+            'interno':   8,
+            'barcode':  15,
+            'image_url':16,
+            'attr_name':17,
+            'attr_vals':18,
         }
 
-        pricelists = self._get_pricelists()
-        Product    = self.env['product.template']
-        ProdVar    = self.env['product.product']
-        Category   = self.env['product.category']
-        PosCateg   = self.env['pos.category']
-        Attr       = self.env['product.attribute']
-        AttrVal    = self.env['product.attribute.value']
-        PrItem     = self.env['product.pricelist.item']
+        pricelists    = self._get_pricelists()
+        Product       = self.env['product.template']
+        ProdVar       = self.env['product.product']
+        Category      = self.env['product.category']
+        PosCateg      = self.env['pos.category']
+        Attr          = self.env['product.attribute']
+        AttrVal       = self.env['product.attribute.value']
+        PrItem        = self.env['product.pricelist.item']
 
         duplicates_code    = set()
         duplicates_barcode = set()
@@ -111,20 +111,17 @@ class ImportarProductosWizard(models.TransientModel):
             attr_name  = str(row[cols['attr_name']].value).strip()
             attr_vals  = str(row[cols['attr_vals']].value).strip()
 
-            # Categoría compuesta (ajusta si cambia)
+            # Categoría compuesta
             metal   = str(row[10].value).strip()
             nacimp  = str(row[11].value).strip()
             externa = str(row[12].value).strip()
             tipo    = str(row[14].value).strip()
             cat_name = f"{metal} / {nacimp} / {externa} / {tipo}"
 
-            categ = Category.search([('name','=', cat_name)], limit=1) \
-                   or Category.create({'name': cat_name})
-            # Crear/asegurar categoría POS igual
-            pos_categ = PosCateg.search([('name','=', cat_name)], limit=1) \
-                       or PosCateg.create({'name': cat_name})
+            categ = Category.search([('name','=', cat_name)], limit=1) or Category.create({'name': cat_name})
+            pos_categ = PosCateg.search([('name','=', cat_name)], limit=1) or PosCateg.create({'name': cat_name})
 
-            # Imagen
+            # Procesar imagen
             img_data = False
             if img_url.startswith('http'):
                 try:
@@ -134,31 +131,23 @@ class ImportarProductosWizard(models.TransientModel):
                 except:
                     pass
 
-            # Atributos
+            # Procesar atributos
             attr_lines = []
             if attr_name and attr_vals:
-                att = Attr.search([('name','=', attr_name)], limit=1) \
-                      or Attr.create({'name': attr_name})
+                att = Attr.search([('name','=', attr_name)], limit=1) or Attr.create({'name': attr_name})
                 val_ids = []
-                for v in [x.strip() for x in attr_vals.split(',') if x.strip()]:
-                    av = AttrVal.search([
-                        ('name','=', v),
-                        ('attribute_id','=', att.id)
-                    ], limit=1) \
+                for v in (x.strip() for x in attr_vals.split(',') if x.strip()):
+                    av = AttrVal.search([('name','=', v), ('attribute_id','=', att.id)], limit=1) \
                          or AttrVal.create({'name': v, 'attribute_id': att.id})
                     val_ids.append(av.id)
                 if val_ids:
-                    attr_lines = [(0, 0, {
-                        'attribute_id': att.id,
-                        'value_ids': [(6, 0, val_ids)]
-                    })]
+                    attr_lines = [(0, 0, {'attribute_id': att.id, 'value_ids': [(6, 0, val_ids)]})]
 
-            # Crear template
-            tmpl = Product.create({
+            # Construir valores para la plantilla
+            tmpl_vals = {
                 'default_code':      code,
                 'name':              name,
                 'categ_id':          categ.id,
-                'pos_categ_id':      pos_categ.id,
                 'type':              'product',
                 'barcode':           barcode,
                 'list_price':        pub_pr,
@@ -167,13 +156,17 @@ class ImportarProductosWizard(models.TransientModel):
                 'available_in_pos':  True,
                 'image_1920':        img_data,
                 'attribute_line_ids': attr_lines or False,
-            })
+            }
+            # Asignar categoría POS si el campo existe
+            if 'pos_categ_id' in Product._fields:
+                tmpl_vals['pos_categ_id'] = pos_categ.id
+            # Crear la plantilla
+            tmpl = Product.create(tmpl_vals)
             imported += 1
-            # Commit cada 20 registros para evitar timeouts
             if imported % 20 == 0:
                 self.env.cr.commit()
 
-            # Crear cada regla de precio (solo si > 0)
+            # Crear reglas de precio
             rules = {
                 'Pública':       pub_pr,
                 'Punto de venta': pos_pr,
@@ -191,7 +184,7 @@ class ImportarProductosWizard(models.TransientModel):
                         'fixed_price':     price,
                     })
 
-        # Notificación
+        # Notificación final
         msg = _("%d productos importados.") % imported
         if duplicates_code:
             msg += _(" Se omitieron códigos duplicados: %s") % ', '.join(sorted(duplicates_code))
