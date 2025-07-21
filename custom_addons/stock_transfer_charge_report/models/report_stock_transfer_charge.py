@@ -1,5 +1,4 @@
 # report_stock_transfer_charge.py
-
 from odoo import api, models
 from odoo.exceptions import AccessError
 
