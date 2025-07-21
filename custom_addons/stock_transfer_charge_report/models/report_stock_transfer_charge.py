@@ -8,16 +8,28 @@ class StockTransferChargeReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        # 1) Cargamos y ordenamos los pickings por fecha de ejecución
         pickings = self.env['stock.picking'].browse(docids or []).sorted('date_done')
 
-        # 2) Obtenemos la pricelist "Interno"
         pricelist = self.env['product.pricelist'].search(
-            [('name', 'ilike', 'Interno (CLP) (CLP)')], limit=1)
+            [('name', 'ilike', 'Interno', 'Interno (CLP) (CLP)', 'interno')], limit=1)
+
+        precios_interno = {}
+        if pricelist:
+            items = self.env['product.pricelist.item'].search([
+                ('pricelist_id', '=', pricelist.id),
+                ('applied_on',    'in', ['0_product_variant', '1_product']),
+            ])
+            for item in items:
+                price = item.fixed_price or 0.0
+                if item.applied_on == '0_product_variant' and item.product_id:
+                    precios_interno[item.product_id.id] = price
+                elif item.applied_on == '1_product' and item.product_tmpl_id:
+                    for var in item.product_tmpl_id.product_variant_ids:
+                        precios_interno[var.id] = price
 
         return {
-            'doc_model': 'stock.picking',
-            'doc_ids': pickings.ids,
-            'docs': pickings,
-            'pricelist': pricelist,
+            'doc_model':       'stock.picking',
+            'doc_ids':         pickings.ids,
+            'docs':            pickings,
+            'precios_interno': precios_interno,
         }
