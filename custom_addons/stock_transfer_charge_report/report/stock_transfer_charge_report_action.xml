@@ -1,4 +1,5 @@
 <odoo>
+  <data>
     <report
         id="action_stock_transfer_charge_report"
         model="stock.picking"
@@ -18,4 +19,5 @@
       file="mi_modulo.report_stock_transfer_charge_xlsx"
       attachment_use="False"
     />
+  </data>
 </odoo>
