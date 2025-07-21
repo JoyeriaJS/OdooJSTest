@@ -8,7 +8,11 @@
         <!-- Buscamos sus reparaciones, ordenadas por entrega más cercana primero -->
         <t t-set="reparaciones"
            t-value="env['joyeria.reparacion'].sudo().search(
-             [('responsable_id','=', usuario.id), ('fecha_entrega','!=', False)],
+             [
+               ('responsable_id','=', usuario.id),
+               ('fecha_entrega','!=', False),
+               ('estado','!=','reparado'),
+             ],
              order='fecha_entrega asc'
            )"/>
         <div class="page">
