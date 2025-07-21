@@ -257,11 +257,13 @@ class Reparacion(models.Model):
     ###Validacion teléfono
     @api.constrains('telefono')
     def _check_telefono_format(self):
+        pattern = r'^\+56\s9\s\d{4}\s\d{4}$'
         for record in self:
-            if record.telefono:
-                telefono_regex = r"^\+56\d{8,9}$"
-                if not re.match(telefono_regex, record.telefono):
-                    raise ValidationError("El teléfono debe comenzar con +56 seguido de 8 o 9 dígitos. Ejemplo: +56912345678")
+            if record.telefono and not re.match(pattern, record.telefono):
+                raise ValidationError(
+                    "El teléfono debe tener el formato “+56 9 XXXX XXXX”, "
+                    "por ejemplo: +56 9 XXXX XXXX"
+                )
 
 
 
