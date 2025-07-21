@@ -1,6 +1,7 @@
 # report_stock_transfer_charge.py
 
 from odoo import api, models
+from odoo.exceptions import AccessError
 
 class StockTransferChargeReport(models.AbstractModel):
     _name = 'report.mi_modulo.stock_transfer_charge'
@@ -8,6 +9,10 @@ class StockTransferChargeReport(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
+        # Sólo administradores
+        if not self.env.user.has_group('base.group_system'):
+            raise AccessError("Sólo los administradores pueden generar este reporte.")
+        
         pickings = self.env['stock.picking'].browse(docids or []).sorted('date_done')
 
         pricelist = self.env['product.pricelist'].search(
