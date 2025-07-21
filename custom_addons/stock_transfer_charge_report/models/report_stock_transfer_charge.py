@@ -1,5 +1,4 @@
 # report_stock_transfer_charge.py
-
 from odoo import api, models
 
 class StockTransferChargeReport(models.AbstractModel):
@@ -11,8 +10,9 @@ class StockTransferChargeReport(models.AbstractModel):
         pickings = self.env['stock.picking'].browse(docids or []).sorted('date_done')
 
         pricelist = self.env['product.pricelist'].search(
-            [('name', 'ilike', 'Interno', 'Interno (CLP) (CLP)', 'interno')], limit=1)
+            [('name', 'ilike', 'Interno')], limit=1)
 
+        # construye el mapping si quieres seguir teniéndolo
         precios_interno = {}
         if pricelist:
             items = self.env['product.pricelist.item'].search([
@@ -32,4 +32,5 @@ class StockTransferChargeReport(models.AbstractModel):
             'doc_ids':         pickings.ids,
             'docs':            pickings,
             'precios_interno': precios_interno,
+            'pricelist':       pricelist,           # ← lo pasamos aquí
         }

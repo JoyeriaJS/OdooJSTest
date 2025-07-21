@@ -5,17 +5,17 @@
       <t t-call="web.html_container">
         <t t-foreach="docs" t-as="o">
           <t t-call="web.external_layout">
-            <div class="page" style="position: relative; padding-top: 2cm;">
+            <div class="page" style="position:relative; padding-top:2cm;">
 
-              <!-- Firma en esquina superior derecha -->
-              <div style="position: absolute; top: 0; right: 0; text-align: right;">
+              <!-- Firma superior -->
+              <div style="position:absolute; top:0; right:0; text-align:right;">
                 <p><strong>Entregó:</strong> ____________________</p>
                 <p><strong>Recibió:</strong> ____________________</p>
               </div>
 
-              <!-- Diccionario de precios internos -->
-              <t t-set="pi" t-value="precios_interno or {}"/>
-
+              <!-- Contexto de precios -->
+              <t t-set="pr" t-value="pricelist"/>
+              
               <table class="table table-sm" border="1" cellpadding="4" cellspacing="0">
                 <thead>
                   <tr>
@@ -23,8 +23,8 @@
                     <th>Cantidad</th>
                     <th>UoM</th>
                     <th>Peso (g)</th>
-                    <th>Precio Interno</th>     <!-- NUEVO: precio unitario -->
-                    <th>Costo Interno</th>      <!-- ahora cost = qty * precio interno -->
+                    <th>Precio Interno</th>
+                    <th>Costo Interno</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -33,25 +33,23 @@
                     <td><t t-esc="ml.quantity or 0.0"/></td>
                     <td><t t-esc="ml.product_uom_id.name"/></td>
                     <td><t t-esc="ml.product_id.weight or 0.0"/></td>
-                    <!-- Precio unitario interno (0.0 si no está definido) -->
+                    <!-- Obtenemos el precio interno unitario desde el pricelist -->
                     <td>
-                      <t t-esc="pi.get(ml.product_id.id, 0.0)"/>
+                      <t t-esc="pr and pr.get_product_price(ml.product_id, ml.quantity or 0.0, False) or 0.0"/>
                     </td>
-                    <!-- Costo interno = cantidad * precio unitario -->
+                    <!-- Coste = cantidad * precio interno -->
                     <td>
-                      <t t-esc="(ml.quantity or 0.0) * pi.get(ml.product_id.id, 0.0)"/>
+                      <t t-esc="(ml.quantity or 0.0) * (pr and pr.get_product_price(ml.product_id, ml.quantity or 0.0, False) or 0.0)"/>
                     </td>
                   </tr>
                 </tbody>
                 <tfoot>
                   <tr>
                     <th colspan="4" style="text-align:right;">Totales:</th>
-                    <!-- omite total de precio unitario -->
                     <th></th>
-                    <!-- Total costo interno -->
                     <th>
                       <t t-esc="sum([
-                        (ml.quantity or 0.0) * pi.get(ml.product_id.id, 0.0)
+                        (ml.quantity or 0.0) * (pr and pr.get_product_price(ml.product_id, ml.quantity or 0.0, False) or 0.0)
                         for ml in o.move_line_ids_without_package
                       ])"/>
                     </th>
