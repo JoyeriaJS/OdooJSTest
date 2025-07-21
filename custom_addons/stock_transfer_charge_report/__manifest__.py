@@ -6,6 +6,8 @@
     'category': 'Inventory',
     'description': 'Reporte de cargos entre locales a través de traspasos internos',
     'data': [
+
+        'security/ir.model.access.csv',
         'report/stock_transfer_charge_report_action.xml',
         'report/stock_transfer_charge_report_templates.xml',
     ],
