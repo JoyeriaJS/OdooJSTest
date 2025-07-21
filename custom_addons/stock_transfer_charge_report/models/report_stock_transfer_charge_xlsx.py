@@ -3,7 +3,7 @@ from odoo import api, models
 from odoo.exceptions import AccessError
 
 class ReportStockTransferChargeXlsx(models.AbstractModel):
-    _name = 'report.mi_modulo.stock_transfer_charge_xlsx'
+    _name = 'report.stock_transfer_charge_report.stock_transfer_charge_xlsx'
     _inherit = 'report.report_xlsx.abstract'
     _description = 'Cargos entre locales (Excel)'
 
