@@ -59,7 +59,6 @@ class ImportarProductosWizard(models.TransientModel):
             'weight':    3,
             'costo':     4,
             'pub':       5,
-            'pos':       6,
             'mayorista': 7,
             'preferente':8,
             'interno':   8,
@@ -67,6 +66,7 @@ class ImportarProductosWizard(models.TransientModel):
             'image_url':16,
             'attr_name':17,
             'attr_vals':18,
+            'pos':      19,
         }
 
         pricelists    = self._get_pricelists()
