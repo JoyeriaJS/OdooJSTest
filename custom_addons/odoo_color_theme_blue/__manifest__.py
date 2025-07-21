@@ -2,7 +2,7 @@
     "name": "Color Corporativo Azul",
     "version": "17.0.1.0.0",
     "summary": "Tema azul corporativo personalizado para Odoo 17",
-    "author": "ChatGPT",
+    "author": "DR",
     "category": "Theme/Backend",
     "depends": ["web"],
     "assets": {
