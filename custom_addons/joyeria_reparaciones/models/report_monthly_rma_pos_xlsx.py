@@ -17,15 +17,15 @@ class ReportMonthlyRmaPosXlsx(models.AbstractModel):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
 
         # Reutilizamos la lógica del reporte QWeb
-        report_qweb = self.env['report.joyeria_reparaciones.report_monthly_rma_pos_template']
-        vals      = report_qweb._get_report_values([], data)
-        date_start = vals['date_start']
-        date_end   = vals['date_end']
-        lines      = vals['lines']
+        report_qweb  = self.env['report.joyeria_reparaciones.report_monthly_rma_pos_template']
+        vals         = report_qweb._get_report_values([], data)
+        date_start   = vals['date_start']
+        date_end     = vals['date_end']
+        lines        = vals['lines']
 
-        # Formatos
-        bold  = workbook.add_format({'bold': True})
-        money = workbook.add_format({'num_format': '#,##0.00'})
+        # Formatos: negrita y moneda sin decimales con signo $
+        bold     = workbook.add_format({'bold': True})
+        currency = workbook.add_format({'num_format': '"$"#,##0'})
 
         sheet = workbook.add_worksheet("RMA+POS Consolidado")
         # Título y rango
@@ -42,9 +42,11 @@ class ReportMonthlyRmaPosXlsx(models.AbstractModel):
         # Filas
         for line in lines:
             sheet.write(row, 0, line['month_name'])
-            sheet.write_number(row, 1, line['rma_total'], money)
-            sheet.write_number(row, 2, line['pos_total'], money)
-            sheet.write_number(row, 3, line['rma_total'] + line['pos_total'], money)
+            # Escribimos enteros con $ y sin decimales
+            sheet.write_number(row, 1, int(line['rma_total']), currency)
+            sheet.write_number(row, 2, int(line['pos_total']), currency)
+            total = line['rma_total'] + line['pos_total']
+            sheet.write_number(row, 3, int(total), currency)
             row += 1
 
         # Auto-ajustar ancho
