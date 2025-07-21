@@ -5,7 +5,7 @@
     'summary': 'Importa productos desde Excel al stock estándar de Odoo',
     'category': 'Inventory',
     'author': 'Joyería Sebastián',
-    'depends': ['stock'],
+    'depends': ['stock','point_of_sale'],
     'data': [
         'security/ir.model.access.csv',
         'views/import_product_btn.xml',

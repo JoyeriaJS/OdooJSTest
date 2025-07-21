@@ -159,8 +159,9 @@ class ImportarProductosWizard(models.TransientModel):
             }
             # Crear la plantilla
             tmpl = Product.create(tmpl_vals)
-            # Asignar categoría POS a cada variante
-            tmpl.product_variant_ids.write({'pos_categ_id': pos_categ.id})
+            # Asignar categoría POS al template a través de pos_categ_ids
+            if 'pos_categ_ids' in Product._fields:
+                tmpl.write({'pos_categ_ids': [(4, pos_categ.id)]})
             imported += 1
             if imported % 20 == 0:
                 self.env.cr.commit()
