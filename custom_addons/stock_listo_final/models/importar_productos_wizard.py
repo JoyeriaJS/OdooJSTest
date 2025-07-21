@@ -36,7 +36,7 @@ class ImportarProductosWizard(models.TransientModel):
         PrList = self.env['product.pricelist']
         res = {}
         for name in names:
-            pl = PrList.search([('name','=',name)], limit=1)
+            pl = PrList.search([('name','=', name)], limit=1)
             if not pl:
                 pl = PrList.create({
                     'name':        name,
@@ -54,25 +54,26 @@ class ImportarProductosWizard(models.TransientModel):
 
         # Columnas de tu hoja (ajusta índices si cambien)
         cols = {
-            'code':      9,
-            'name':      1,
-            'weight':    3,
-            'costo':     4,  # columna “Costo” en el Excel
-            'pub':       5,
-            'pos':       6,
-            'mayorista': 7,
-            'preferente':8,
-            'interno':   8,  # si Interno (CLP) está en otra columna, ajusta aquí
-            'barcode':  15,
-            'image_url':16,
-            'attr_name':17,
-            'attr_vals':18,
+            'code':        9,
+            'name':        1,
+            'weight':      3,
+            'costo':       4,  # columna “Costo” en el Excel
+            'pub':         5,
+            'pos':         6,
+            'mayorista':   7,
+            'preferente':  8,
+            'interno':     8,  # si Interno (CLP) está en otra columna, ajusta aquí
+            'barcode':    15,
+            'image_url':  16,
+            'attr_name':  17,
+            'attr_vals':  18,
         }
 
         pricelists = self._get_pricelists()
         Product    = self.env['product.template']
         ProdVar    = self.env['product.product']
         Category   = self.env['product.category']
+        PosCateg   = self.env['pos.category']
         Attr       = self.env['product.attribute']
         AttrVal    = self.env['product.attribute.value']
         PrItem     = self.env['product.pricelist.item']
@@ -88,7 +89,7 @@ class ImportarProductosWizard(models.TransientModel):
                 continue
 
             # Saltar códigos duplicados
-            if Product.search([('default_code','=',code)], limit=1):
+            if Product.search([('default_code','=', code)], limit=1):
                 duplicates_code.add(code)
                 continue
 
@@ -116,8 +117,12 @@ class ImportarProductosWizard(models.TransientModel):
             externa = str(row[12].value).strip()
             tipo    = str(row[14].value).strip()
             cat_name = f"{metal} / {nacimp} / {externa} / {tipo}"
-            categ = Category.search([('name','=',cat_name)], limit=1) \
-                    or Category.create({'name': cat_name})
+
+            categ = Category.search([('name','=', cat_name)], limit=1) \
+                   or Category.create({'name': cat_name})
+            # Crear/asegurar categoría POS igual
+            pos_categ = PosCateg.search([('name','=', cat_name)], limit=1) \
+                       or PosCateg.create({'name': cat_name})
 
             # Imagen
             img_data = False
@@ -139,10 +144,8 @@ class ImportarProductosWizard(models.TransientModel):
                     av = AttrVal.search([
                         ('name','=', v),
                         ('attribute_id','=', att.id)
-                    ], limit=1) or AttrVal.create({
-                        'name': v,
-                        'attribute_id': att.id
-                    })
+                    ], limit=1) \
+                         or AttrVal.create({'name': v, 'attribute_id': att.id})
                     val_ids.append(av.id)
                 if val_ids:
                     attr_lines = [(0, 0, {
@@ -155,11 +158,13 @@ class ImportarProductosWizard(models.TransientModel):
                 'default_code':      code,
                 'name':              name,
                 'categ_id':          categ.id,
+                'pos_categ_id':      pos_categ.id,
                 'type':              'product',
                 'barcode':           barcode,
                 'list_price':        pub_pr,
                 'standard_price':    cost_pr,
                 'weight':            weight,
+                'available_in_pos':  True,
                 'image_1920':        img_data,
                 'attribute_line_ids': attr_lines or False,
             })
