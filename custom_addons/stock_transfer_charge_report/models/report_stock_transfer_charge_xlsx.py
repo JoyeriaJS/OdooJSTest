@@ -29,7 +29,7 @@ class ReportStockTransferChargeXlsx(models.AbstractModel):
 
         # Construir mapeo de precios internos
         pricelist = self.env['product.pricelist'].search(
-            [('name', 'ilike', 'Interno (CLP)')], limit=1)
+            [('name', 'ilike', 'Interno')], limit=1)
         precios_interno = {}
         if pricelist:
             items = self.env['product.pricelist.item'].search([
@@ -47,12 +47,15 @@ class ReportStockTransferChargeXlsx(models.AbstractModel):
         # Filas y totales por traspaso
         row = 1
         for pick in pickings:
-            total_pick = 0.0
+            total_cost = 0.0
+            total_weight = 0.0
             for ml in pick.move_line_ids_without_package:
                 qty = ml.quantity or 0.0
+                weight = (ml.product_id.weight or 0.0) * qty
                 unit_price = precios_interno.get(ml.product_id.id, 0.0)
                 cost = qty * unit_price
-                total_pick += cost
+                total_cost += cost
+                total_weight += weight
 
                 sheet.write(row, 0, pick.name)
                 sheet.write(row, 1, pick.location_id.display_name)
@@ -60,14 +63,15 @@ class ReportStockTransferChargeXlsx(models.AbstractModel):
                 sheet.write(row, 3, ml.product_id.display_name)
                 sheet.write_number(row, 4, qty)
                 sheet.write(row, 5, ml.product_uom_id.name)
-                sheet.write_number(row, 6, ml.product_id.weight or 0.0)
+                sheet.write_number(row, 6, weight)
                 sheet.write_number(row, 7, unit_price, money)
                 sheet.write_number(row, 8, cost, money)
                 row += 1
 
-            # Fila de total del picking
+            # Fila de totales del picking
             sheet.write(row, 0, f"Total {pick.name}", bold)
-            sheet.write_number(row, 8, total_pick, money)
+            sheet.write_number(row, 6, total_weight)
+            sheet.write_number(row, 8, total_cost, money)
             row += 2  # espacio antes del siguiente traspaso
 
         # Ajustar ancho de columnas
