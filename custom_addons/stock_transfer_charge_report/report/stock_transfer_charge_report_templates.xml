@@ -6,8 +6,13 @@
         <t t-foreach="docs" t-as="o">
           <t t-call="web.external_layout">
             <div class="page" style="position: relative; padding-top: 2cm;">
-              <!-- ... tu cabecera igual ... -->
-
+              
+              <!-- Firma en esquina superior derecha -->
+              <div style="position: absolute; top: 0.2cm; right: 0.2cm; text-align: right;">
+                <p><strong>Entregó:</strong> ____________________</p>
+                <p><strong>Recibió:</strong> ____________________</p>
+              </div>
+              
               <!-- Asigno el dict a una variable local -->
               <t t-set="pi" t-value="precios_interno or {}"/>
 
@@ -18,7 +23,7 @@
                     <th>Cantidad</th>
                     <th>UoM</th>
                     <th>Peso (g)</th>
-                    <th>Costo Interno</th>  <!-- renombrado para mayor claridad -->
+                    <th>Costo Interno</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -28,7 +33,6 @@
                     <td><t t-esc="ml.product_uom_id.name"/></td>
                     <td><t t-esc="ml.product_id.weight or 0.0"/></td>
                     <td>
-                      <!-- Multiplica cantidad por precio interno (o fallback a standard_price) -->
                       <t t-esc="(ml.quantity or 0.0) * pi.get(ml.product_id.id, ml.product_id.standard_price)"/>
                     </td>
                   </tr>
