@@ -5,6 +5,7 @@ from PIL import Image
 
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
+from odoo.exceptions import AccessError
 
 class ImportarProductosWizard(models.TransientModel):
     _name = 'importar.productos.wizard'
@@ -14,12 +15,18 @@ class ImportarProductosWizard(models.TransientModel):
     filename = fields.Char(string='Nombre del archivo')
 
     def safe_float(self, val):
+        # Sólo administradores
+        if not self.env.user.has_group('base.group_system'):
+            raise AccessError("Sólo los administradores pueden generar este reporte.")
         try:
             return float(val)
         except:
             return 0.0
 
     def resize_image_128(self, img_bytes):
+        # Sólo administradores
+        if not self.env.user.has_group('base.group_system'):
+            raise AccessError("Sólo los administradores pueden generar este reporte.")
         try:
             img = Image.open(BytesIO(img_bytes)).convert("RGB")
             img = img.resize((128,128), Image.LANCZOS)
@@ -31,6 +38,9 @@ class ImportarProductosWizard(models.TransientModel):
 
     @api.model
     def _get_pricelists(self):
+        # Sólo administradores
+        if not self.env.user.has_group('base.group_system'):
+            raise AccessError("Sólo los administradores pueden generar este reporte.")
         """Garantiza existencia de cada pricelist y las devuelve."""
         names = ['Pública','Punto de venta','Mayorista','Preferente','Interno (CLP)']
         PrList = self.env['product.pricelist']
@@ -46,6 +56,9 @@ class ImportarProductosWizard(models.TransientModel):
         return res
 
     def importar_productos(self):
+        # Sólo administradores
+        if not self.env.user.has_group('base.group_system'):
+            raise AccessError("Sólo los administradores pueden generar este reporte.")
         if not self.archivo:
             raise UserError(_("Adjunta primero un archivo Excel."))
         data = base64.b64decode(self.archivo)
