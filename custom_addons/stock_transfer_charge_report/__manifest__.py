@@ -10,6 +10,7 @@
         'security/ir.model.access.csv',
         'report/stock_transfer_charge_report_action.xml',
         'report/stock_transfer_charge_report_templates.xml',
+        'report/report_product_label_templates.xml',
     ],
 
     
