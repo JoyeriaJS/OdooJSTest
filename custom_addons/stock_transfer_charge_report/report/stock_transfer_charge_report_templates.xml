@@ -12,7 +12,15 @@
                 <p><strong>Entregó:</strong> ____________________</p>
                 <p><strong>Recibió:</strong> ____________________</p>
               </div>
-              
+
+              <!-- Datos del traspaso -->
+              <div style="margin-bottom: 1em;">
+                <p><strong>Número de Traspaso:</strong> <t t-esc="o.name"/></p>
+                <p><strong>Origen:</strong> <t t-esc="o.location_id.display_name"/></p>
+                <p><strong>Destino:</strong> <t t-esc="o.location_dest_id.display_name"/></p>
+                <p><strong>Fecha Efectiva:</strong> <t t-esc="o.date_done and o.date_done.strftime('%d/%m/%Y %H:%M:%S') or ''"/></p>
+              </div>
+
               <!-- Asigno el dict a una variable local -->
               <t t-set="pi" t-value="precios_interno or {}"/>
 
