@@ -1,36 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
   <data>
-    <!-- Acción para imprimir etiquetas de producto.template -->
-    <record id="action_report_product_label" model="ir.actions.report">
-      <field name="name">Etiquetas de Producto</field>
+    <!-- Acción para imprimir etiquetas 2×2 cm -->
+    <record id="action_report_product_label_2x2" model="ir.actions.report">
+      <field name="name">Etiquetas 2×2 cm</field>
       <field name="model">product.template</field>
       <field name="report_type">qweb-pdf</field>
-      <field name="report_name">product_label_printer.report_product_label</field>
-      <field name="report_file">product_label_printer.report_product_label</field>
+      <!-- Nota cómo cambia el report_name para apuntar al nuevo template -->
+      <field name="report_name">product_label_printer.report_product_label_2x2</field>
+      <field name="report_file">product_label_printer.report_product_label_2x2</field>
       <field name="binding_model_id" ref="product.model_product_template"/>
       <field name="binding_type">report</field>
     </record>
 
     <!-- Plantilla QWeb para etiquetas 2×2 cm con barras Code128 -->
-    <template id="report_product_label">
+    <template id="report_product_label_2x2">
       <t t-call="web.html_container">
-        <t t-foreach="docs.exists()" t-as="template">
-          <!-- Determinar el código -->
-          <t t-set="code" t-value="template.barcode 
-                                    or (template.product_variant_ids 
-                                        and template.product_variant_ids[0].barcode) 
-                                    or ''"/>
-          <div style="width:2cm; height:2cm; display:inline-block;
-                      margin:1mm; border:1px solid #000; text-align:center;
-                      padding:2px; page-break-inside:avoid;">
+        <t t-foreach="docs" t-as="template">
+          <!-- Determinar el código: del template o de la primera variante -->
+          <t t-set="code"
+             t-value="template.barcode
+                      or (template.product_variant_ids
+                          and template.product_variant_ids[0].barcode)
+                      or ''"/>
+          <div style="width:2cm;
+                      height:2cm;
+                      display:inline-block;
+                      margin:1mm;
+                      border:1px solid #000;
+                      text-align:center;
+                      padding:2px;
+                      page-break-inside:avoid;">
             <t t-if="code">
-              <!-- Genera la imagen de barras -->
-              <img t-att-src="
-                '/report/barcode?type=code128&amp;value=%s&amp;width=200&amp;height=60' % code
-              " style="max-width:100%; max-height:1cm;"/>
+              <!-- Imagen de código de barras (Code128) -->
+              <img t-att-src="'/report/barcode?type=code128&amp;value=%s&amp;width=200&amp;height=60' % code"
+                   style="max-width:100%; max-height:1cm;"/>
               <!-- Número debajo -->
-              <div style="font-size:6px; line-height:1em; margin-top:2px;">
+              <div style="font-size:6px;
+                          line-height:1em;
+                          margin-top:2px;">
                 <t t-esc="code"/>
               </div>
             </t>
