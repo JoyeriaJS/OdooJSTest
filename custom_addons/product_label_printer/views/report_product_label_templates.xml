@@ -12,17 +12,21 @@
       <field name="binding_type">report</field>
     </record>
 
-    <!-- Plantilla QWeb 2×2 cm con Code128 -->
+    <!-- Plantilla QWeb 2×2 cm con Code128 y box-sizing para mantener tamaño exacto -->
     <template id="report_product_label_2x2">
       <t t-call="web.html_container">
         <t t-foreach="docs" t-as="template">
-          <!-- Tomamos la primera variante para tener un campo real -->
+          <!-- Primera variante para campo real -->
           <t t-set="var" t-value="template.product_variant_ids and template.product_variant_ids[0] or False"/>
           <div style="
-              width:2cm; height:2cm;
-              display:inline-block; margin:1mm;
+              width:2cm;
+              height:2cm;
+              box-sizing:border-box;
+              display:inline-block;
+              margin:1mm;
               border:1px solid #000;
-              text-align:center; padding:2px;
+              text-align:center;
+              padding:2px;
               page-break-inside:avoid;
             ">
             <t t-if="var and var.barcode">
@@ -42,5 +46,6 @@
         </t>
       </t>
     </template>
+
   </data>
 </odoo>
