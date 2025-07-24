@@ -24,8 +24,7 @@
                       padding:2px; page-break-inside:avoid;">
             <t t-if="code">
               <!-- Imagen de código de barras -->
-              <img t-att-src="'/web/binary/barcode?barcode=%s&amp;barcode_type=EAN13&amp;width=150&amp;height=60' % code"
-                   style="max-width:100%;"/>
+              <img t-att-src="'/report/barcode?type=EAN13&amp;value=%s&amp;width=150&amp;height=60' % code" style="max-width:100%;"/>
               <!-- Número debajo -->
               <div style="font-size:8px; line-height:1em; margin-top:2px;">
                 <t t-esc="code"/>
