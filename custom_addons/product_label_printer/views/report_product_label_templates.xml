@@ -17,9 +17,9 @@
     <template id="report_product_label_2x2">
       <t t-call="web.html_container">
         <t t-foreach="docs" t-as="template">
-          <!-- Extraemos el código de barras de la primera variante -->
+          <!-- Obtenemos el barcode de la primera variante -->
           <t t-set="code"
-               t-value="(template.product_variant_ids and template.product_variant_ids[0].barcode) or ''"/>
+             t-value="(template.product_variant_ids and template.product_variant_ids[0].barcode) or ''"/>
           <div style="
               width:2cm; height:2cm;
               display:inline-block; margin:1mm;
@@ -30,7 +30,7 @@
             <t t-if="code">
               <!-- Imagen de barras Code128 -->
               <img t-att-src="
-                '/report/barcode?type=code128&amp;value=%s&amp;width=160&amp;height=60' % code
+                '/report/barcode?type=Code128&amp;value=%s&amp;width=160&amp;height=60' % code
               "
               style="max-width:100%; max-height:1cm;"/>
               <!-- Número debajo -->
