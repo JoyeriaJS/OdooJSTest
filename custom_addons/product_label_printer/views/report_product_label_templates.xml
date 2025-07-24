@@ -4,7 +4,7 @@
     <!-- Action para imprimir etiquetas de producto -->
     <record id="action_report_product_label" model="ir.actions.report">
       <field name="name">Etiquetas de Producto</field>
-      <field name="model">product.product</field>
+      <field name="model">product.template</field>
       <field name="report_type">qweb-pdf</field>
       <field name="report_name">product_label_printer.report_product_label</field>
       <field name="report_file">product_label_printer.report_product_label</field>
