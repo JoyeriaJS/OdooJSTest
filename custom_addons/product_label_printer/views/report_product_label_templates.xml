@@ -14,15 +14,20 @@
     <!-- Plantilla QWeb para etiquetas -->
     <template id="report_product_label">
       <t t-call="web.html_container">
-        <t t-foreach="docs" t-as="product">
+        <t t-foreach="docs.exists()" t-as="product">
           <div class="page"
                style="width:2cm; height:2cm; display:inline-block;
                       margin:1mm; border:1px solid #000; text-align:center;
                       padding:2px; page-break-inside:avoid;">
+            <t t-if="product.barcode">
             <div style="margin-bottom:1px;">
               <span t-field="product.barcode"
                     t-field-options="{'widget':'barcode', 'barcode_type':'EAN13', 'height':40}"/>
             </div>
+            <div style="font-size:8px; line-height:1em;">
+              <t t-esc="product.barcode"/>
+            </div>
+          </t>
             <div style="font-size:8px; line-height:1em;">
               <t t-esc="product.barcode"/>
             </div>
