@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
   <data>
-    <!-- Acción ligada a product.template -->
+
+    <!-- Acción para imprimir etiquetas 2×2 cm desde plantillas -->
     <record id="action_report_product_label_2x2" model="ir.actions.report">
       <field name="name">Etiquetas 2×2 cm</field>
       <field name="model">product.template</field>
@@ -12,29 +13,44 @@
       <field name="binding_type">report</field>
     </record>
 
-    <!-- Plantilla QWeb 2×2 cm con Code128 -->
+    <!-- Plantilla QWeb para etiquetas 2×2 cm con tamaño exacto -->
     <template id="report_product_label_2x2">
       <t t-call="web.html_container">
         <t t-foreach="docs" t-as="template">
-          <!-- Tomamos la primera variante para tener un campo real -->
+          <!-- Extraemos el código de barras de la primera variante -->
           <t t-set="var" t-value="template.product_variant_ids and template.product_variant_ids[0] or False"/>
           <div style="
-              width:2cm; height:2cm;
-              display:inline-block; margin:1mm;
+              width:2cm;
+              height:2cm;
+              box-sizing:border-box;
+              display:inline-block;
+              margin:0.5mm;
               border:1px solid #000;
-              text-align:center; padding:2px;
+              text-align:center;
+              position:relative;
               page-break-inside:avoid;
             ">
             <t t-if="var and var.barcode">
-              <!-- Línea de barras Code128 -->
-              <span t-field="var.barcode"
-                    t-options="{
-                      'widget': 'barcode',
-                      'symbology': 'Code128',
-                      'img_style': 'width:100%; height:60%'
-                    }"/>
-              <!-- Número debajo -->
-              <div style="font-size:6px; line-height:1em; margin-top:2px;">
+              <!-- Imagen de barras Code128 ajustada -->
+              <img t-att-src="
+                '/report/barcode?type=Code128&amp;value=%s&amp;width=200&amp;height=60' % var.barcode
+              "
+              style="
+                width:100%;
+                height:auto;
+                max-height:1.2cm;
+                display:block;
+                margin:0.2cm auto 0;
+              "/>
+              <!-- Número debajo, centrado -->
+              <div style="
+                  font-size:6px;
+                  line-height:1em;
+                  position:absolute;
+                  bottom:2px;
+                  width:100%;
+                  text-align:center;
+                ">
                 <t t-esc="var.barcode"/>
               </div>
             </t>
@@ -42,5 +58,6 @@
         </t>
       </t>
     </template>
+
   </data>
 </odoo>
