@@ -48,8 +48,8 @@
                   line-height:1em;
                   position:absolute;
                   bottom:12px;
-                  width:100%;
-                  text-align:center;
+                  left:2px;
+                  text-align:left;
                 ">
                 <t t-esc="var.barcode"/>
               </div>
