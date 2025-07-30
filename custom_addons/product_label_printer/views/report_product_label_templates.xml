@@ -33,7 +33,7 @@
             <t t-if="var and var.barcode">
               <!-- Nombre del producto arriba -->
               <div style="font-size:6px; line-height:1em; margin-bottom:2px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">
-                <t t-esc="template.name"/>
+                <t t-esc="template.default_code"/>
               </div>
               <!-- Código de barras Code128 -->
               <span t-field="var.barcode"
