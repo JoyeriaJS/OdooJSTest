@@ -53,18 +53,6 @@
               </div>
 
               <!-- DERECHA: precio al centro vertical -->
-              <div style="
-                  width:20mm;
-                  min-width:20mm;
-                  font-size:7px;
-                  font-weight:bold;
-                  display:flex;
-                  justify-content:center;
-                  align-items:center;
-                  height:100%;
-                  padding-left:2mm;
-                  text-align:center;
-                ">
                 <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
               </div>
             </t>
