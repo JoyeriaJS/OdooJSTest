@@ -54,15 +54,9 @@
                 </div>
 
                 <!-- Precio (centrado) -->
-                <div style="
-                  font-size:6px;
-                  line-height:1em;
-                  position:absolute;
-                  bottom:2px;
-                  width:100%;
-                  text-align:center;
-                ">
-                <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
+                <!-- Precio (centrado, visible) -->
+                <div style="font-size:6px; line-height:1em; margin-top:1px; text-align:center;">
+                <t t-esc="'$ {:,.0f}'.format(template.list_price or 0).replace(',', '.')"/>
                 </div>
               </t>
             </div>
