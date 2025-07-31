@@ -57,13 +57,10 @@
                   width:60mm;
                   min-width:60mm;
                   font-size:30px;
-                  font-weight:bold;
                   display:flex;
-                  justify-content:center;
                   align-items:center;
                   height:200%;
                   padding-left:4mm;
-                  text-align:center;
                 ">
                 <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
               </div>
