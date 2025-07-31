@@ -54,9 +54,9 @@
 
               <!-- DERECHA: precio al centro vertical -->
               <div style="
-                  width:20mm;
-                  min-width:20mm;
-                  font-size:7px;
+                  width:16mm;
+                  min-width:16mm;
+                  font-size:5px;
                   font-weight:bold;
                   display:flex;
                   justify-content:center;
