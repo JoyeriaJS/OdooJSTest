@@ -46,8 +46,8 @@
                         }"/>
                 </div>
 
-                <!-- Número de código debajo, centrado -->
-                <div style="font-size:6px; margin-top:0.5mm;">
+                <!-- Número de código debajo, centrado y más arriba -->
+                <div style="font-size:6px; margin-top:-1mm;">
                   <t t-esc="var.barcode"/>
                 </div>
 
