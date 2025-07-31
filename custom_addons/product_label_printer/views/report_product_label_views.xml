@@ -63,6 +63,7 @@
                   text-align:center;
                 ">
                 $<t t-esc="template.list_price"/>
+                </div>
               </t>
             </div>
           </div>
