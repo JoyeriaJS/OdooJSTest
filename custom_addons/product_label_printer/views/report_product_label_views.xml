@@ -22,16 +22,17 @@
               width:75.95mm;
               height:10.01mm;
               box-sizing:border-box;
-              display:inline-block;
-              margin:1mm;
+              display:block;
+              margin-bottom:4mm;
               border:1px solid #000;
               text-align:center;
               padding:1mm;
               page-break-inside:avoid;
+              font-family:Arial, sans-serif;
             ">
             <t t-if="var and var.barcode">
               <!-- Referencia interna -->
-              <div style="font-size:8px; font-weight:bold;">
+              <div style="font-size:8px; font-weight:bold; text-align:center;">
                 <t t-esc="var.default_code or ''"/>
               </div>
 
@@ -44,12 +45,12 @@
                     }"/>
 
               <!-- Número debajo del código de barras -->
-              <div style="font-size:7px; margin-top:1px;">
+              <div style="font-size:7px; margin-top:1px; text-align:center;">
                 <t t-esc="var.barcode"/>
               </div>
 
               <!-- Precio centrado -->
-              <div t-if="var.lst_price" style="font-size:9px; font-weight:bold; margin-top:1px;">
+              <div t-if="var.lst_price" style="font-size:9px; font-weight:bold; margin-top:1px; text-align:center;">
                 <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
               </div>
             </t>
@@ -57,6 +58,5 @@
         </t>
       </t>
     </template>
-
   </data>
 </odoo>
