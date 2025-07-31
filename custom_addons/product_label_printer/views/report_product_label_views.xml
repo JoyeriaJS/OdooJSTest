@@ -23,37 +23,46 @@
               height:10.01mm;
               box-sizing:border-box;
               display:block;
-              margin-bottom:4mm;
+              margin-bottom:2mm;
               border:1px solid #000;
-              text-align:center;
-              padding:1mm;
-              page-break-inside:avoid;
               font-family:Arial, sans-serif;
+              overflow:hidden;
+              page-break-inside:avoid;
             ">
-            <t t-if="var and var.barcode">
-              <!-- Referencia interna -->
-              <div style="font-size:8px; font-weight:bold; text-align:center;">
-                <t t-esc="var.default_code or ''"/>
-              </div>
+            <div style="
+                width:100%;
+                height:100%;
+                display:flex;
+                flex-direction:column;
+                justify-content:space-between;
+                align-items:center;
+                padding:0 1mm;
+              ">
+              <t t-if="var and var.barcode">
+                <!-- Referencia interna (arriba) -->
+                <div style="font-size:7px; font-weight:bold; text-align:center;">
+                  <t t-esc="var.default_code or ''"/>
+                </div>
 
-              <!-- Código de barras -->
-              <span t-field="var.barcode"
-                    t-options="{
-                      'widget': 'barcode',
-                      'symbology': 'Code128',
-                      'img_style': 'width:100%; height:6mm'
-                    }"/>
+                <!-- Código de barras (centro) -->
+                <span t-field="var.barcode"
+                      t-options="{
+                        'widget': 'barcode',
+                        'symbology': 'Code128',
+                        'img_style': 'width:100%; height:5mm'
+                      }"/>
 
-              <!-- Número debajo del código de barras -->
-              <div style="font-size:7px; margin-top:1px; text-align:center;">
-                <t t-esc="var.barcode"/>
-              </div>
+                <!-- Número debajo del código (centrado) -->
+                <div style="font-size:6px; text-align:center;">
+                  <t t-esc="var.barcode"/>
+                </div>
 
-              <!-- Precio centrado -->
-              <div t-if="var.lst_price" style="font-size:9px; font-weight:bold; margin-top:1px; text-align:center;">
-                <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
-              </div>
-            </t>
+                <!-- Precio (abajo, centrado) -->
+                <div style="font-size:7px; font-weight:bold; text-align:center;">
+                  <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
+                </div>
+              </t>
+            </div>
           </div>
         </t>
       </t>
