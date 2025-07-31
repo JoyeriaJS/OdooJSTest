@@ -54,9 +54,15 @@
                 </div>
 
                 <!-- Precio (centrado) -->
-                <div t-if="var.lst_price" style="font-size:7px; font-weight:bold; text-align:center;">
-                  <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
-                </div>
+                <div style="
+                  font-size:6px;
+                  line-height:1em;
+                  position:absolute;
+                  bottom:2px;
+                  width:100%;
+                  text-align:center;
+                ">
+                $<t t-esc="template.list_price"/>
               </t>
             </div>
           </div>
