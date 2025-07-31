@@ -53,18 +53,21 @@
               </div>
 
               <!-- DERECHA: precio al centro vertical -->
-              <div style="
-                width:60mm;
-                min-width:60mm;
-                font-size:30px;
+              <!-- DERECHA: precio alineado arriba al centro -->
+            <div style="
+                width:20mm;
+                min-width:20mm;
+                font-size:6px;
+                font-weight:bold;
                 display:flex;
+                justify-content:center;
                 align-items:flex-start;
-                justify-content:flex-start;
                 height:100%;
-                padding-left:4mm;
+                padding-left:2mm;
                 padding-top:1mm;
+                text-align:center;
             ">
-            <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
+                <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
             </div>
             </t>
           </div>
