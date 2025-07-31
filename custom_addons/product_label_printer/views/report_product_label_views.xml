@@ -54,16 +54,18 @@
 
               <!-- DERECHA: precio al centro vertical -->
               <div style="
-                  width:60mm;
-                  min-width:60mm;
-                  font-size:30px;
-                  display:flex;
-                  align-items:center;
-                  height:200%;
-                  padding-left:4mm;
-                ">
-                <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
-              </div>
+                width:60mm;
+                min-width:60mm;
+                font-size:30px;
+                display:flex;
+                align-items:flex-start;
+                justify-content:flex-start;
+                height:100%;
+                padding-left:4mm;
+                padding-top:1mm;
+            ">
+            <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
+            </div>
             </t>
           </div>
         </t>
