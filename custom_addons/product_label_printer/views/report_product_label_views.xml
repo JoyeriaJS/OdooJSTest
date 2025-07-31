@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
   <data>
-
-    <!-- Acción para imprimir etiquetas de anillo 75,95x10,01mm -->
+    <!-- Acción para imprimir etiqueta de anillo 75,95 x 10,01 mm -->
     <record id="action_report_product_label_ring" model="ir.actions.report">
       <field name="name">Etiqueta Anillo 75,95x10,01mm</field>
       <field name="model">product.template</field>
@@ -13,7 +12,7 @@
       <field name="binding_type">report</field>
     </record>
 
-    <!-- Plantilla QWeb para etiquetas de anillo 75,95x10,01mm -->
+    <!-- Plantilla 75,95 x 10,01 mm -->
     <template id="report_product_label_ring">
       <t t-call="web.html_container">
         <t t-foreach="docs" t-as="template">
@@ -27,28 +26,31 @@
               border:1px solid #000;
               text-align:center;
               padding:1mm;
+              font-family:Arial, sans-serif;
               page-break-inside:avoid;
             ">
             <t t-if="var and var.barcode">
-              <!-- Referencia interna -->
-              <div style="font-size:8px; font-weight:bold;">
+              <!-- Referencia interna centrada -->
+              <div style="font-size:8px; font-weight:bold; margin-bottom:1mm;">
                 <t t-esc="var.default_code or ''"/>
               </div>
 
-              <!-- Código de barras -->
-              <span t-field="var.barcode"
-                    t-options="{
-                      'widget': 'barcode',
-                      'symbology': 'Code128',
-                      'img_style': 'width:100%; height:6mm'
-                    }"/>
+              <!-- Código de barras centrado y grande -->
+              <div>
+                <span t-field="var.barcode"
+                      t-options="{
+                        'widget': 'barcode',
+                        'symbology': 'Code128',
+                        'img_style': 'width:65mm; height:7mm; display:block; margin:0 auto;'
+                      }"/>
+              </div>
 
-              <!-- Número debajo del código de barras -->
+              <!-- Número de código debajo, centrado -->
               <div style="font-size:7px; margin-top:1px;">
                 <t t-esc="var.barcode"/>
               </div>
 
-              <!-- Precio centrado -->
+              <!-- Precio debajo, centrado -->
               <div t-if="var.lst_price" style="font-size:9px; font-weight:bold; margin-top:1px;">
                 <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
               </div>
@@ -57,6 +59,5 @@
         </t>
       </t>
     </template>
-
   </data>
 </odoo>
