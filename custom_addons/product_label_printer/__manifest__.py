@@ -8,6 +8,7 @@
     "depends": ["base", "stock"],
     "data": [
         "views/report_product_label_templates.xml",
+        "views/report_product_label_views.xml",
     ],
     "installable": True,
     "application": False,
