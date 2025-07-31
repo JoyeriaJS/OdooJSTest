@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
   <data>
-    <!-- Acción para imprimir etiqueta de anillo 75,95 x 10,01 mm -->
     <record id="action_report_product_label_ring" model="ir.actions.report">
       <field name="name">Etiqueta Anillo 75,95x10,01mm</field>
       <field name="model">product.template</field>
@@ -12,50 +11,54 @@
       <field name="binding_type">report</field>
     </record>
 
-    <!-- Plantilla 75,95 x 10,01 mm -->
     <template id="report_product_label_ring">
       <t t-call="web.html_container">
         <t t-foreach="docs" t-as="template">
           <t t-set="var" t-value="template.product_variant_ids and template.product_variant_ids[0] or False"/>
           <div style="
-            width:75.95mm;
-            height:10.01mm;
-            box-sizing:border-box;
-            display:block;
-            margin:0 0 1mm 0;
-            border:1px solid #000;
-            text-align:center;
-            padding:0.5mm 1mm;
-            font-family:Arial, sans-serif;
-            page-break-inside:avoid;
-            overflow:hidden;
-        ">
-            <t t-if="var and var.barcode">
-              <!-- Referencia interna centrada -->
-              <div style="font-size:8px; font-weight:bold; margin-bottom:1mm;">
-                <t t-esc="var.default_code or ''"/>
-              </div>
+              width:75.95mm;
+              height:10.01mm;
+              box-sizing:border-box;
+              display:block;
+              margin-bottom:2mm;
+              border:1px solid #000;
+              page-break-inside:avoid;
+              font-family:Arial, sans-serif;
+              overflow:hidden;
+            ">
+            <div style="
+                display:flex;
+                flex-direction:column;
+                justify-content:space-between;
+                align-items:center;
+                height:100%;
+                padding:0 1mm;
+              ">
+              <t t-if="var and var.barcode">
+                <!-- Referencia interna -->
+                <div style="font-size:8px; font-weight:bold;">
+                  <t t-esc="var.default_code or ''"/>
+                </div>
 
-              <!-- Código de barras centrado y grande -->
-              <div>
+                <!-- Código de barras -->
                 <span t-field="var.barcode"
                       t-options="{
                         'widget': 'barcode',
                         'symbology': 'Code128',
-                        'img_style': 'width:65mm; height:7mm; display:block; margin:0 auto;'
+                        'img_style': 'width:100%; height:5mm'
                       }"/>
-              </div>
 
-              <!-- Número de código debajo, centrado -->
-              <div style="font-size:7px; margin-top:1px;">
-                <t t-esc="var.barcode"/>
-              </div>
+                <!-- Número de código de barra -->
+                <div style="font-size:6px;">
+                  <t t-esc="var.barcode"/>
+                </div>
 
-              <!-- Precio debajo, centrado -->
-              <div t-if="var.lst_price" style="font-size:9px; font-weight:bold; margin-top:1px;">
-                <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
-              </div>
-            </t>
+                <!-- Precio centrado -->
+                <div t-if="var.lst_price" style="font-size:7px; font-weight:bold;">
+                  <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
+                </div>
+              </t>
+            </div>
           </div>
         </t>
       </t>
