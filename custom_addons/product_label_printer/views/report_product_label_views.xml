@@ -62,7 +62,7 @@
                   width:100%;
                   text-align:center;
                 ">
-                $<t t-esc="template.list_price"/>
+                <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
                 </div>
               </t>
             </div>
