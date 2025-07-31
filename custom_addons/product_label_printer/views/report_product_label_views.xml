@@ -18,17 +18,18 @@
         <t t-foreach="docs" t-as="template">
           <t t-set="var" t-value="template.product_variant_ids and template.product_variant_ids[0] or False"/>
           <div style="
-              width:75.95mm;
-              height:10.01mm;
-              box-sizing:border-box;
-              display:inline-block;
-              margin:1mm;
-              border:1px solid #000;
-              text-align:center;
-              padding:1mm;
-              font-family:Arial, sans-serif;
-              page-break-inside:avoid;
-            ">
+            width:75.95mm;
+            height:10.01mm;
+            box-sizing:border-box;
+            display:block;
+            margin:0 0 1mm 0;
+            border:1px solid #000;
+            text-align:center;
+            padding:0.5mm 1mm;
+            font-family:Arial, sans-serif;
+            page-break-inside:avoid;
+            overflow:hidden;
+        ">
             <t t-if="var and var.barcode">
               <!-- Referencia interna centrada -->
               <div style="font-size:8px; font-weight:bold; margin-bottom:1mm;">
