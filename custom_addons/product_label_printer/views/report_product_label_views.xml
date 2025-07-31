@@ -67,7 +67,7 @@
                 padding-top:1mm;
                 text-align:center;
             ">
-                <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
+            <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
             </div>
             </t>
           </div>
