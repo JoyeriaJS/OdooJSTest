@@ -26,41 +26,46 @@
               overflow:hidden;
               page-break-inside:avoid;
               display:flex;
-              flex-direction:column;
+              flex-direction:row;
               align-items:center;
-              padding:1mm 2mm;
+              padding:0 1mm;
             ">
             <t t-if="var and var.barcode">
-              <!-- Referencia interna (arriba, centrada) -->
-              <div style="font-size:7px; font-weight:bold; text-align:center;">
-                <t t-esc="var.default_code or ''"/>
-              </div>
+              <!-- IZQUIERDA: contenido del producto -->
+              <div style="flex:1; text-align:center;">
+                <!-- Referencia interna -->
+                <div style="font-size:7px; font-weight:bold;">
+                  <t t-esc="var.default_code or ''"/>
+                </div>
 
-              <!-- Código de barras -->
-              <span t-field="var.barcode"
-                    t-options="{
-                      'widget': 'barcode',
-                      'symbology': 'Code128',
-                      'img_style': 'width:100%; height:5mm'
-                    }"/>
+                <!-- Código de barras -->
+                <span t-field="var.barcode"
+                      t-options="{
+                        'widget': 'barcode',
+                        'symbology': 'Code128',
+                        'img_style': 'width:100%; height:5mm'
+                      }"/>
 
-              <!-- Número de barra + precio alineados horizontalmente -->
-              <div style="
-                  display:flex;
-                  justify-content:space-between;
-                  align-items:center;
-                  width:100%;
-                  margin-top:0px;
-                ">
                 <!-- Número del código de barras -->
-                <div style="font-size:6px;">
+                <div style="font-size:6px; margin-top:0px;">
                   <t t-esc="var.barcode"/>
                 </div>
+              </div>
 
-                <!-- Precio a la derecha -->
-                <div style="font-size:6.5px; font-weight:bold;">
-                  <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
-                </div>
+              <!-- DERECHA: precio al centro vertical -->
+              <div style="
+                  width:20mm;
+                  min-width:20mm;
+                  font-size:7px;
+                  font-weight:bold;
+                  display:flex;
+                  justify-content:center;
+                  align-items:center;
+                  height:100%;
+                  padding-left:2mm;
+                  text-align:center;
+                ">
+                <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
               </div>
             </t>
           </div>
