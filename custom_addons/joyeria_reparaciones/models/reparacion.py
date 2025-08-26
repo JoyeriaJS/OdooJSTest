@@ -12,7 +12,7 @@ import pytz
 from  pytz import utc
 from pytz import timezone
 from datetime import datetime, timedelta
-
+import unicodedata
 
 
 CHILE_TZ = pytz.timezone('America/Santiago')
@@ -415,6 +415,94 @@ class Reparacion(models.Model):
 
 
     
+
+
+def _normalize_person_name(text):
+    """Normaliza nombre: minúsculas, sin tildes, espacios simples, sin signos raros."""
+    if not text:
+        return ''
+    # quita tildes
+    text = ''.join(
+        c for c in unicodedata.normalize('NFKD', text)
+        if not unicodedata.combining(c)
+    )
+    # minúsculas
+    text = text.lower()
+    # reemplaza cualquier separador por un espacio
+    text = re.sub(r'[\s\-_/.,]+', ' ', text)
+    # quita espacios extremos y dobles
+    text = ' '.join(text.split())
+    return text
+
+class ResPartner(models.Model):
+    _inherit = 'res.partner'
+
+    name_normalized = fields.Char(
+        string='Nombre normalizado',
+        compute='_compute_name_normalized',
+        store=True,
+        index=True
+    )
+
+    @api.depends('name')
+    def _compute_name_normalized(self):
+        for rec in self:
+            rec.name_normalized = _normalize_person_name(rec.name)
+
+    @api.constrains('name_normalized', 'is_company', 'active', 'company_id')
+    def _check_unique_person_name(self):
+        """Bloquea creación/edición si existe otra PERSONA activa con igual nombre normalizado."""
+        for rec in self:
+            # Solo aplica a personas (no empresas) y con nombre no vacío
+            if rec.is_company or not rec.name_normalized:
+                continue
+
+            # Si manejas multi-empresa y quieres que el control sea por compañía, descomenta siguiente línea
+            # domain = [('id', '!=', rec.id), ('is_company', '=', False), ('active', '=', True), ('company_id', '=', rec.company_id.id), ('name_normalized', '=', rec.name_normalized)]
+            domain = [
+                ('id', '!=', rec.id),
+                ('is_company', '=', False),
+                ('active', '=', True),
+                ('name_normalized', '=', rec.name_normalized),
+            ]
+
+            if self.search_count(domain):
+                # Mensaje claro sugiriendo buscar/combinar
+                raise ValidationError(
+                    "Ya existe un cliente con el mismo nombre y apellido: «%s».\n"
+                    "Sugerencia: busca el cliente existente y usa 'Acción → Combinar' si corresponde."
+                    % (rec.name or '')
+                )
+
+    @api.onchange('name')
+    def _onchange_name_warn_duplicate(self):
+        """Aviso temprano en la UI (no bloquea por sí solo)."""
+        if not self.name or self.is_company:
+            return
+        normalized = _normalize_person_name(self.name)
+        if not normalized:
+            return
+
+        # ver si hay alguno con el mismo nombre normalizado
+        domain = [
+            ('is_company', '=', False),
+            ('active', '=', True),
+            ('name_normalized', '=', normalized),
+        ]
+        dup = self.env['res.partner'].search(domain, limit=1)
+        if dup:
+            return {
+                'warning': {
+                    'title': "Posible duplicado",
+                    'message': (
+                        "Ya existe un cliente con el mismo nombre: «%s» (ID %s). "
+                        "Revisa antes de crear un duplicado."
+                    ) % (dup.name, dup.id)
+                }
+            }
+
+
+
 
 
 
