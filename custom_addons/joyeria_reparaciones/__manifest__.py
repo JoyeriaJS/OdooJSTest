@@ -41,20 +41,7 @@
         'report/report_sales_by_vendedora_template.xml',
 
         'report/report_monthly_rma_pos_action.xml',
-        'report/report_monthly_rma_pos_template.xml',
-        
-
-
-
-        
-
-
-
-        
-        
-
-        
-    
+        'report/report_monthly_rma_pos_template.xml',  
         
     ],
     'installable': True,
