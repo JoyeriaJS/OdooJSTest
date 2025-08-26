@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, SUPERUSER_ID, _
 from odoo.exceptions import ValidationError, UserError
 from dateutil.relativedelta import relativedelta
 import base64
@@ -351,13 +351,16 @@ class Reparacion(models.Model):
                 self.vendedora_id = vendedora.id
 
 ###create funcional######
+   # ###create funcional######
     @api.model
     def create(self, vals):
         ahora = datetime.now(CHILE_TZ).strftime('%d/%m/%Y %H:%M:%S')
         mensajes = []
 
-        # ✅ Validar peso especial (usando campo 'peso' y 'peso_valor' como indicaste)
-        if vals.get('peso') == 'especial' and not vals.get('peso_valor'):
+        is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
+
+        # ✅ Validar peso especial (solo si NO es admin)
+        if (not is_admin) and vals.get('peso') == 'especial' and not vals.get('peso_valor'):
             raise ValidationError("Debe ingresar un valor para el campo 'Peso' si selecciona tipo de peso 'Especial'.")
 
         # Generar secuencia
@@ -372,7 +375,7 @@ class Reparacion(models.Model):
             clave = self._normalizar_clave(vals['clave_autenticacion_manual'])
             vendedora = self.env['joyeria.vendedora'].search([
                 '|', ('clave_autenticacion', '=', clave),
-                    ('codigo_qr', '=', clave)
+                     ('codigo_qr', '=', clave)
             ], limit=1)
             if vendedora:
                 vals['vendedora_id'] = vendedora.id
@@ -455,16 +458,18 @@ class Reparacion(models.Model):
 
 ###write funcional"""""""""
     def write(self, vals):
-        for rec in self:
-            # Validar que no se cambie el tipo de peso una vez creado
-            if 'peso' in vals and vals['peso'] != rec.peso:
-                raise ValidationError("No se permite cambiar el tipo de peso una vez creado el registro.")
+        is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
 
-            # Validar que no se cambie el valor del peso una vez creado
-            #if 'peso_valor' in vals and vals['peso_valor'] != rec.peso_valor:
-            #    raise ValidationError("No se permite modificar el valor del peso una vez creado el registro.")
+        # Validaciones SOLO para usuarios NO admin
+        if not is_admin:
+            for rec in self:
+                # No permitir cambiar el tipo de peso una vez creado
+                if 'peso' in vals and vals['peso'] != rec.peso:
+                    raise ValidationError("No se permite cambiar el tipo de peso una vez creado el registro.")
+                # Si en el futuro reactivas la validación de peso_valor, quedaría aquí análoga
 
         res = super().write(vals)
+
         for rec in self:
             # ✍️ Procesar firma si se ingresó clave
             if vals.get('clave_firma_manual'):
@@ -473,6 +478,7 @@ class Reparacion(models.Model):
             # 📦 Procesar vendedora si se ingresó clave
             if vals.get('clave_autenticacion_manual'):
                 rec._procesar_vendedora()
+
         return res
 
 
