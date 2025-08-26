@@ -35,7 +35,7 @@ class Reparacion(models.Model):
 
     producto_id = fields.Many2one('joyeria.producto', string='Producto a reparar', required=False)
     modelo = fields.Char(string='Modelo', required=False)
-    cliente_id = fields.Many2one('res.partner', string='Nombre y apellido del Cliente', required=True)
+    cliente_id = fields.Many2one( string='Nombre y apellido del Cliente', required=True)
     nombre_cliente = fields.Char(string='Nombre y apellido del cliente', required=False)
     apellido_cliente = fields.Char(string="Apellido del cliente", required=False)
     correo_cliente = fields.Char(string="Correo electrónico")
@@ -350,73 +350,27 @@ class Reparacion(models.Model):
             if vendedora:
                 self.vendedora_id = vendedora.id
 
-
-
-def _norm(txt):
-    if not txt:
-        return ''
-    return re.sub(r'\s+', ' ', txt.strip()).lower()
-
 ###create funcional######
-    def _is_admin_user(self):
-        return self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
-
-    def _partner_fullname(self, partner):
-        """Intenta armar 'Nombre Apellido'. Si no hay apellido custom, usa solo name."""
-        name = (partner.name or '').strip()
-        # si tu partner tiene x_lastname, lo usamos; si no, solo name
-        last = (getattr(partner, 'x_lastname', '') or '').strip()
-        return (name + (' ' + last if last else '')).strip()
-
-    def _find_duplicate_partner(self, partner):
-        """Busca otro res.partner con el mismo nombre+apellido normalizado."""
-        fullname = self._partner_fullname(partner)
-        if not fullname:
-            return self.env['res.partner'].browse()  # vacío
-        n = _norm(fullname)
-
-        # Buscamos por coincidencia exacta normalizada.
-        # Soportamos tanto esquema con x_lastname como sin él.
-        Partner = self.env['res.partner']
-        # candidatos por name cercano
-        candidates = Partner.search([('id', '!=', partner.id)], limit=2000)  # acotado razonable
-        for cand in candidates:
-            if _norm(self._partner_fullname(cand)) == n:
-                return cand
-        return Partner.browse()
-
-    # ========== TU create (añadimos bloque de validación) ==========
+   # ###create funcional######
     @api.model
     def create(self, vals):
-        # >>>> BLOQUE NUEVO: validar duplicados de cliente para NO admin
-        if vals.get('cliente_id'):
-            partner = self.env['res.partner'].browse(vals['cliente_id'])
-            if partner.exists():
-                dup = self._find_duplicate_partner(partner)
-                if dup and dup.exists() and not self.env.user.has_group('base.group_system') and self.env.uid != SUPERUSER_ID:
-                    # Si el partner seleccionado es "duplicado" respecto a otro existente
-                    # (mismo nombre+apellido normalizado), bloqueamos para no-admin.
-                    raise ValidationError(_(
-                        "Ya existe un cliente con el mismo Nombre y Apellido: %s (ID %s). "
-                        "Selecciona el cliente existente o solicita a un administrador la edición."
-                    ) % (self._partner_fullname(dup), dup.id))
-        # <<<< FIN BLOQUE NUEVO
-
-        # --------- AQUÍ SIGUE TU LÓGICA TAL CUAL ---------
         ahora = datetime.now(CHILE_TZ).strftime('%d/%m/%Y %H:%M:%S')
         mensajes = []
 
-        if vals.get('peso') == 'especial' and not vals.get('peso_valor'):
-            # admin salta validación
-            if not (self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')):
-                raise ValidationError("Debe ingresar un valor para el campo 'Peso' si selecciona tipo de peso 'Especial'.")
+        is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
 
+        # ✅ Validar peso especial (solo si NO es admin)
+        if (not is_admin) and vals.get('peso') == 'especial' and not vals.get('peso_valor'):
+            raise ValidationError("Debe ingresar un valor para el campo 'Peso' si selecciona tipo de peso 'Especial'.")
+
+        # Generar secuencia
         if vals.get('name', 'Nuevo') == 'Nuevo':
             secuencia = self.env['ir.sequence'].next_by_code('joyeria.reparacion')
             if not secuencia:
                 raise ValidationError("No se pudo generar la secuencia.")
             vals['name'] = secuencia.replace("'", "-")
 
+        # Procesar vendedora ANTES de crear
         if not vals.get('vendedora_id') and vals.get('clave_autenticacion_manual'):
             clave = self._normalizar_clave(vals['clave_autenticacion_manual'])
             vendedora = self.env['joyeria.vendedora'].search([
@@ -427,16 +381,20 @@ def _norm(txt):
                 vals['vendedora_id'] = vendedora.id
                 mensajes.append(f"📦 Recibido por: <b>{vendedora.name}</b> el <b>{ahora}</b>")
 
+        # Crear el registro
         record = super().create(vals)
 
+        # Procesar firma
         if record.clave_firma_manual:
             record._procesar_firma()
             if record.firma_id:
                 mensajes.append(f"✍️ Firmado por: <b>{record.firma_id.name}</b> el <b>{ahora}</b>")
 
+        # Generar código QR
         if hasattr(record, '_generar_codigo_qr'):
             record._generar_codigo_qr()
 
+        # Resumen general
         peso_str = str(record.peso_valor) if record.peso_valor not in (False, 0, 0.0) else "No especificado"
         resumen = (
             "📌 Resumen generado automáticamente\n"
@@ -448,12 +406,12 @@ def _norm(txt):
             f"🕒 Registrado el: {ahora}"
         )
         mensajes.append(resumen)
+
+        # Publicar mensajes en bitácora
         for msg in mensajes:
             record.message_post(body=msg)
+
         return record
-
-
-   
 
 
     
@@ -502,15 +460,6 @@ def _norm(txt):
     def write(self, vals):
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
 
-        if 'cliente_id' in vals and vals['cliente_id']:
-            partner = self.env['res.partner'].browse(vals['cliente_id'])
-            if partner.exists():
-                dup = self._find_duplicate_partner(partner)
-                if dup and dup.exists() and not self._is_admin_user():
-                    raise ValidationError(_(
-                        "Ya existe un cliente con el mismo Nombre y Apellido: %s (ID %s). "
-                        "Selecciona el cliente existente o solicita a un administrador la edición."
-                    ) % (self._partner_fullname(dup), dup.id))
         # Validaciones SOLO para usuarios NO admin
         if not is_admin:
             for rec in self:
