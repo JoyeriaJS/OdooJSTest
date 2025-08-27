@@ -135,7 +135,7 @@ class Reparacion(models.Model):
     ], string='Estado', default='presupuesto', tracking=True, required=True, store=True, readonly=False)
 
 
-    clave_autenticacion_manual = fields.Char(string='Clave de Autenticación', tracking=False)
+    clave_autenticacion_manual = fields.Char(string='QR de quien recibe', tracking=False)
 
     # NUEVOS CAMPOS
     metal_utilizado = fields.Selection([
