@@ -217,6 +217,22 @@ class Reparacion(models.Model):
     
 
 
+    def init(self):
+        # Evita duplicados por nombre de PERSONAS activas por compañía (insensible a mayúsculas)
+        self.env.cr.execute("""
+            CREATE UNIQUE INDEX IF NOT EXISTS partner_unique_person_name_per_company
+            ON res_partner (COALESCE(company_id, 0), lower(name))
+            WHERE is_company = false AND active = true;
+        """)
+        # Si quieres que también ignore tildes (á= a, é = e, etc.) y puedes habilitar la extensión:
+        # self.env.cr.execute("CREATE EXTENSION IF NOT EXISTS unaccent;")
+        # self.env.cr.execute("""
+        #     CREATE UNIQUE INDEX IF NOT EXISTS partner_unique_person_name_unaccent_per_company
+        #     ON res_partner (COALESCE(company_id, 0), lower(unaccent(name)))
+        #     WHERE is_company = false AND active = true;
+        # """)
+
+
 
     
     @api.model
