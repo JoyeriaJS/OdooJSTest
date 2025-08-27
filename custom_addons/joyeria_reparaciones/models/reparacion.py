@@ -12,7 +12,7 @@ import pytz
 from  pytz import utc
 from pytz import timezone
 from datetime import datetime, timedelta
-
+import unicodedata
 
 
 CHILE_TZ = pytz.timezone('America/Santiago')
@@ -170,7 +170,46 @@ class Reparacion(models.Model):
     clave_firma_manual = fields.Char(string='QR de quien retira')
 
 
-    
+    @staticmethod
+    def _normalize_name(name):
+        """Normaliza el nombre: minúsculas, sin tildes, espacios simples."""
+        if not name:
+            return ''
+        s = ''.join(c for c in unicodedata.normalize('NFKD', name) if not unicodedata.combining(c))
+        s = s.lower()
+        s = re.sub(r'\s+', ' ', s).strip()
+        return s
+
+    @api.constrains('cliente_id')
+    def _check_cliente_id_unique_name(self):
+        """
+        Valida que el cliente asignado en cliente_id no duplique el nombre
+        de otro cliente (persona activa sin ser usuario del sistema).
+        """
+        for rec in self:
+            cliente = rec.cliente_id
+            if not cliente or not cliente.active or cliente.is_company:
+                continue
+
+            nombre_normalizado = rec._normalize_name(cliente.name)
+
+            # Buscar otros partners con el mismo nombre canónico
+            duplicates = self.env['res.partner'].search([
+                ('id', '!=', cliente.id),
+                ('active', '=', True),
+                ('is_company', '=', False),
+            ], limit=50)
+
+            for dup in duplicates:
+                if rec._normalize_name(dup.name) == nombre_normalizado:
+                    # Si el duplicado tiene usuario, lo ignoramos (puede ser responsable del sistema)
+                    tiene_usuario = self.env['res.users'].search_count([('partner_id', '=', dup.id)], limit=1)
+                    if not tiene_usuario:
+                        raise ValidationError(
+                            "El cliente «%s» ya existe con el mismo nombre y apellido.\n"
+                            "Por favor selecciona el cliente existente o combina los contactos."
+                            % (dup.name,)
+                        )
 
 
     @api.depends('fecha_recepcion')
@@ -437,7 +476,7 @@ class Reparacion(models.Model):
 
 
 
-
+    
 
     
     
