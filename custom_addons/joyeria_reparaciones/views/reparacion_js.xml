@@ -69,6 +69,7 @@
                             <field name="precio_unitario" />
                             <field name="extra"/>
                             <field name="extra2"/>
+                            <field name="extra3"/>
                             <field name="subtotal" readonly="1"/>
                             <field name="abono"/>
                             <field name="saldo" readonly="1"/>
