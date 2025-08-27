@@ -136,6 +136,15 @@
         <field name="binding_type">action</field>
         <field name="state">code</field>
         <field name="code">
+            action = {
+                "type": "ir.actions.act_window",
+                "res_model": "wizard.set.precio.oros",
+                "view_mode": "form",
+                "target": "new",
+                "context": {
+                    "active_ids": records.ids,
+                }
+            }
         </field>
     </record>
 
