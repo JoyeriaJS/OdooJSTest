@@ -69,6 +69,7 @@
                             <field name="precio_unitario" />
                             <field name="extra"/>
                             <field name="extra2"/>
+                            <field name="extra3"/>
                             <field name="subtotal" readonly="1"/>
                             <field name="abono"/>
                             <field name="saldo" readonly="1"/>
@@ -135,15 +136,6 @@
         <field name="binding_type">action</field>
         <field name="state">code</field>
         <field name="code">
-            action = {
-                "type": "ir.actions.act_window",
-                "res_model": "wizard.set.precio.oros",
-                "view_mode": "form",
-                "target": "new",
-                "context": {
-                    "active_ids": records.ids,
-                }
-            }
         </field>
     </record>
 

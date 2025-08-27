@@ -281,10 +281,10 @@ class Reparacion(models.Model):
                 rec.estado = rec.estado  # No cambia el valor, pero evita la edición
 
 
-    @api.depends('cantidad', 'precio_unitario', 'extra', 'extra2')
+    @api.depends('cantidad', 'precio_unitario', 'extra', 'extra2', 'extra3')
     def _compute_subtotal(self):
         for rec in self:
-            rec.subtotal = rec.cantidad * rec.precio_unitario + rec.extra + rec.extra2
+            rec.subtotal = rec.cantidad * rec.precio_unitario + rec.extra + rec.extra2 + rec.extra3
 
     @api.depends('subtotal', 'abono')
     def _compute_saldo(self):
