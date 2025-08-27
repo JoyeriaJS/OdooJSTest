@@ -12,6 +12,7 @@ import pytz
 from  pytz import utc
 from pytz import timezone
 from datetime import datetime, timedelta
+import unicodedata
 
 
 
@@ -169,6 +170,97 @@ class Reparacion(models.Model):
     clave_firma_manual = fields.Char(string='Clave o QR para firma')
 
 
+
+
+
+
+    # === PÉGALO DENTRO DE LA CLASE Reparacion ===
+
+@staticmethod
+def _canon_name(txt):
+    """Minúsculas, sin tildes, espacios simples; solo para comparar nombres."""
+    if not txt:
+        return ''
+    s = ''.join(c for c in unicodedata.normalize('NFKD', txt) if not unicodedata.combining(c))
+    s = s.lower()
+    s = re.sub(r'[\s\-_/.,]+', ' ', s)
+    return ' '.join(s.split())
+
+def _partner_has_user(self, partner):
+    """True si este partner está vinculado a alguna cuenta de usuario activa (res.users)."""
+    return bool(self.env['res.users'].search_count([
+        ('partner_id', '=', partner.id),
+        ('active', '=', True),
+    ]))
+
+@api.constrains('cliente_id')
+def _check_cliente_id_no_duplicate_name(self):
+    """
+    Evita asignar en cliente_id un contacto que duplique el nombre de otro cliente (persona activa),
+    pero permite duplicados si el otro contacto está vinculado a un usuario (responsable del sistema).
+    No toca res.partner ni otras pantallas.
+    """
+    for rec in self:
+        partner = rec.cliente_id
+        if not partner or not partner.active or partner.is_company:
+            continue
+
+        canon = rec._canon_name(partner.name)
+        if not canon:
+            continue
+
+        # Prefiltro rápido y comparación canónica después
+        candidates = self.env['res.partner'].search([
+            ('id', '!=', partner.id),
+            ('active', '=', True),
+            ('is_company', '=', False),
+            ('name', 'ilike', partner.name),
+        ], limit=100)
+
+        for p in candidates:
+            if rec._canon_name(p.name) == canon:
+                # Ignorar si el "duplicado" tiene usuario (responsable)
+                if rec._partner_has_user(p):
+                    continue
+                # Duplicado real de cliente
+                raise ValidationError(
+                    "Ya existe un cliente con el mismo nombre y apellido: «%s». "
+                    "Selecciona el existente o combina los contactos en Contactos (Acción → Combinar)."
+                    % (p.name,)
+                )
+
+@api.onchange('cliente_id')
+def _onchange_cliente_id_warn(self):
+    """Aviso temprano en la UI si parece duplicado (no bloquea por sí solo)."""
+    partner = self.cliente_id
+    if not partner or not partner.active or partner.is_company:
+        return
+
+    canon = self._canon_name(partner.name)
+    if not canon:
+        return
+
+    candidates = self.env['res.partner'].search([
+        ('id', '!=', partner.id),
+        ('active', '=', True),
+        ('is_company', '=', False),
+        ('name', 'ilike', partner.name),
+    ], limit=1)
+
+    if candidates:
+        p = candidates[0]
+        # Si el posible duplicado tiene usuario (responsable), no avisamos
+        if self._partner_has_user(p):
+            return
+        return {
+            'warning': {
+                'title': "Posible cliente duplicado",
+                'message': "Ya existe un cliente llamado «%s». Revisa antes de continuar." % p.name
+            }
+        }
+
+
+
     @api.depends('fecha_recepcion')
     def _compute_vencimiento_garantia(self):
         for rec in self:
@@ -215,23 +307,11 @@ class Reparacion(models.Model):
         else:
             self.vendedora_id = False
     
+    
+    
 
 
-    def init(self):
-        # Evita duplicados por nombre de PERSONAS activas por compañía (insensible a mayúsculas)
-        self.env.cr.execute("""
-            CREATE UNIQUE INDEX IF NOT EXISTS partner_unique_person_name_per_company
-            ON res_partner (COALESCE(company_id, 0), lower(name))
-            WHERE is_company = false AND active = true;
-        """)
-        # Si quieres que también ignore tildes (á= a, é = e, etc.) y puedes habilitar la extensión:
-        # self.env.cr.execute("CREATE EXTENSION IF NOT EXISTS unaccent;")
-        # self.env.cr.execute("""
-        #     CREATE UNIQUE INDEX IF NOT EXISTS partner_unique_person_name_unaccent_per_company
-        #     ON res_partner (COALESCE(company_id, 0), lower(unaccent(name)))
-        #     WHERE is_company = false AND active = true;
-        # """)
-
+    
 
 
     
