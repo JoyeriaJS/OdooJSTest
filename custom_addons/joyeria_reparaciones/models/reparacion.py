@@ -176,7 +176,7 @@ class Reparacion(models.Model):
         self.env.cr.execute("""
             CREATE UNIQUE INDEX IF NOT EXISTS partner_unique_person_name_per_company
             ON res_partner (COALESCE(company_id, 0), lower(name))
-            WHERE is_company = false AND active = true;
+            WHERE is_company = false AND active = false;
         """)
         # Si quieres que también ignore tildes (á= a, é = e, etc.) y puedes habilitar la extensión:
         # self.env.cr.execute("CREATE EXTENSION IF NOT EXISTS unaccent;")
