@@ -165,9 +165,9 @@ class Reparacion(models.Model):
 
     #firma_salida_id = fields.Many2one('joyeria.vendedora', string="Firma salida del taller", readonly=True)
     #fecha_salida_taller = fields.Datetime("🕒 Fecha y hora de salida", readonly=True)
-    firma_id = fields.Many2one('joyeria.vendedora', string='Firmado por', readonly=True, tracking=True)
+    firma_id = fields.Many2one('joyeria.vendedora', string='Retirado por', readonly=True, tracking=True)
     fecha_firma = fields.Datetime(string='Fecha de firma', readonly=True)
-    clave_firma_manual = fields.Char(string='Clave o QR para firma')
+    clave_firma_manual = fields.Char(string='QR de quien retira')
 
 
     
