@@ -43,7 +43,7 @@
                             <field name="hechura" groups="base.group_system"/>
                             <field name="cobros_extras" groups="base.group_system"/>
                             <field name="total_salida_taller" groups="base.group_system" readonly="1"/>
-                            <field name="clave_firma_manual" password="True" groups="base.group_system" placeholder="Escanear o ingresar clave"/>
+                            <field name="QR DE QUIEN RETIRA" password="True" groups="base.group_system" placeholder="Escanear o ingresar clave"/>
                             <field name="firma_id" readonly="1" groups="base.group_system"/>
                             <field name="fecha_firma" readonly="1" groups="base.group_system"/>
                         </group>
@@ -51,10 +51,9 @@
                         <!-- Recepción y Entrega -->
                         <group string="Recepción y Entrega" col="2">
                             <field name="vendedora_id"
-                                   placeholder="Escanea el QR de la vendedora"
+                                   placeholder="QR DE QUIEN RECIBE"
                                    options="{'no_open': True, 'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"
-                                   readonly="1"
-                                   groups="base.group_system"/>
+                                   readonly="1"/>
                             <field name="clave_autenticacion_manual" password="True" placeholder="Escanea el QR o ingresa la clave" groups="base.group_system"/>
                             <field name="local_tienda"/>
                             <field name="fecha_recepcion" readonly="1"/>
