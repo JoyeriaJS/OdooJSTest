@@ -222,7 +222,14 @@ class Reparacion(models.Model):
     
     
 
-
+    @api.onchange('responsable_id')
+    def _onchange_responsable_auto_confirm_first_time(self):
+        for rec in self:
+            # Valor "persistido" antes del cambio (lo que hay en la BD)
+            prev_tenía_responsable = bool(rec._origin.responsable_id) if rec._origin and rec._origin.id else False
+            # Si no tenía responsable en BD y ahora sí se asignó, auto-confirmar
+            if (not prev_tenía_responsable) and rec.responsable_id and rec.estado != 'confirmado':
+                rec.estado = 'confirmado'
     
 
 
