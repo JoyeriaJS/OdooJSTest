@@ -56,20 +56,20 @@
                 </t>
                 <!-- Fila de datos -->
                 <tr>
-                  <td style="border:1px solid #000;padding:4px;"><t t-esc="r.name"/></td>
-                  <td style="border:1px solid #000;padding:4px;"><t t-esc="r.cantidad or 0"/></td>
-                  <td style="border:1px solid #000;padding:4px;"><t t-esc="r.tipo_joya or ''"/></td>
-                  <td style="border:1px solid #000;padding:4px;"><t t-esc="r.modelo or ''"/></td>
-                  <td style="border:1px solid #000;padding:4px;"><t t-esc="r.metal or ''"/></td>
-                  <td style="border:1px solid #000;padding:4px;">
+                  <td style="border:1px solid #000;padding:1px;"><t t-esc="r.name"/></td>
+                  <td style="border:1px solid #000;padding:1px;"><t t-esc="r.cantidad or 0"/></td>
+                  <td style="border:1px solid #000;padding:1px;"><t t-esc="r.tipo_joya or ''"/></td>
+                  <td style="border:1px solid #000;padding:1px;"><t t-esc="r.modelo or ''"/></td>
+                  <td style="border:1px solid #000;padding:1px;"><t t-esc="r.metal or ''"/></td>
+                  <td style="border:1px solid #000;padding:1px;">
                     <t t-esc="r.n_cm_fabricacion or r.n_cm_reparacion or ''"/>
                   </td>
-                  <td style="border:1px solid #000;padding:4px;"><t t-esc="r.peso_valor or 0"/></td>
-                  <td style="border:1px solid #000;padding:75px;"><t t-esc="r.solicitud_cliente or ''"/></td>
-                  <td style="border:1px solid #000;padding:4px;">
+                  <td style="border:1px solid #000;padding:1px;"><t t-esc="r.peso_valor or 0"/></td>
+                  <td style="border:1px solid #000;padding:32px;"><t t-esc="r.solicitud_cliente or ''"/></td>
+                  <td style="border:1px solid #000;padding:1px;">
                     <t t-esc="r.fecha_entrega and r.fecha_entrega.strftime('%d/%m/%Y') or ''"/>
                   </td>
-                  <td style="border:1px solid #000;padding:4px;"><t t-esc="''"/></td>
+                  <td style="border:1px solid #000;padding:1px;"><t t-esc="''"/></td>
                 </tr>
               </t>
             </tbody>
