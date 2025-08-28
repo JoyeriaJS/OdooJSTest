@@ -5,6 +5,8 @@
     'author': 'DR',
     'category': 'Operations',
     'depends': ['base', 'product', 'sale', 'contacts','point_of_sale', 'report_xlsx','mail'],
+    "post_init_hook": "post_remove_partner_name_unique_index",
+
     'data': [
         'security/joyeria_security.xml',
         'security/ir.model.access.csv',
