@@ -404,17 +404,18 @@ class Reparacion(models.Model):
             if vendedora:
                 self.vendedora_id = vendedora.id
 
-###create funcional######
-   # ###create funcional######
+# ###create funcional######
     @api.model
     def create(self, vals):
         ahora = datetime.now(CHILE_TZ).strftime('%d/%m/%Y %H:%M:%S')
         mensajes = []
 
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
+        # ✅ Detectar importación (wizard de importar Odoo)
+        is_import = bool(self.env.context.get('import_file') or self.env.context.get('from_import'))
 
-        # ✅ Validar peso especial (solo si NO es admin)
-        if (not is_admin) and vals.get('peso') == 'especial' and not vals.get('peso_valor'):
+        # ✅ Validar peso especial (solo si NO es admin y NO es importación)
+        if (not is_admin) and (not is_import) and vals.get('peso') == 'especial' and not vals.get('peso_valor'):
             raise ValidationError("Debe ingresar un valor para el campo 'Peso' si selecciona tipo de peso 'Especial'.")
 
         # Generar secuencia
@@ -429,7 +430,7 @@ class Reparacion(models.Model):
             clave = self._normalizar_clave(vals['clave_autenticacion_manual'])
             vendedora = self.env['joyeria.vendedora'].search([
                 '|', ('clave_autenticacion', '=', clave),
-                     ('codigo_qr', '=', clave)
+                    ('codigo_qr', '=', clave)
             ], limit=1)
             if vendedora:
                 vals['vendedora_id'] = vendedora.id
