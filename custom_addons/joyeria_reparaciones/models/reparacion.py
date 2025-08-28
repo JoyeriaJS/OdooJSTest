@@ -78,7 +78,7 @@ class Reparacion(models.Model):
         ('especial', 'Especial')
     ], string='Tipo de peso', required=True, tracking=True)
 
-    peso_valor = fields.Float(string='Peso', required=True, tracking=True)
+    peso_valor = fields.Float(string='Peso', required=False, tracking=True)
     vendedora_id= fields.Many2one('joyeria.vendedora', string='Recibido por', readonly=True, tracking=True)
 
 
