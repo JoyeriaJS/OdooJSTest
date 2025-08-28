@@ -471,24 +471,24 @@ class Reparacion(models.Model):
     class ResPartnerRestrictWriteForRMAClients(models.Model):
         _inherit = 'res.partner'
 
-    def _is_admin(self):
-        return self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
+        def _is_admin(self):
+            return self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
 
-    def write(self, vals):
-        # Admin siempre puede editar
-        if self._is_admin():
+        def write(self, vals):
+            # Admin siempre puede editar
+            if self._is_admin():
+                return super().write(vals)
+
+            # ¿Alguno de estos partners es/ha sido usado como cliente en una reparación?
+            # (Si sí, solo admin puede editar su información)
+            Reparacion = self.env['joyeria.reparacion'].sudo()
+            if Reparacion.search_count([('cliente_id', 'in', self.ids)]) > 0:
+                raise ValidationError(
+                    "Solo los administradores pueden editar la información de clientes asociados a reparaciones."
+                )
+
+            # Si no están vinculados a reparaciones, permitir edición normal
             return super().write(vals)
-
-        # ¿Alguno de estos partners es/ha sido usado como cliente en una reparación?
-        # (Si sí, solo admin puede editar su información)
-        Reparacion = self.env['joyeria.reparacion'].sudo()
-        if Reparacion.search_count([('cliente_id', 'in', self.ids)]) > 0:
-            raise ValidationError(
-                "Solo los administradores pueden editar la información de clientes asociados a reparaciones."
-            )
-
-        # Si no están vinculados a reparaciones, permitir edición normal
-        return super().write(vals)
 
     
 
