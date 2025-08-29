@@ -562,16 +562,6 @@ class Reparacion(models.Model):
 
         return res
 
-
-
-    
-
-
-
-
-    
-
-
     def imprimir_reporte_responsables(self):
         # Rango de fechas fijo, puedes cambiarlo más adelante a dinámico
         fecha_inicio = datetime.strptime('2024-01-01', '%Y-%m-%d')
@@ -591,14 +581,10 @@ class Reparacion(models.Model):
         )
     
     
-    
-    
     def copy(self, default=None):
         if self.env.user.has_group('joyeria_reparaciones.grupo_gestion_estado_reparacion'):
             raise UserError("No tienes permiso para duplicar órdenes de reparación.")
         return super(Reparacion, self).copy(default)
-
-
 
 
     def _generar_codigo_qr(self):
@@ -610,11 +596,6 @@ class Reparacion(models.Model):
                 qr_img.save(buffer, format="PNG")
                 record.qr = base64.b64encode(buffer.getvalue())
     
-
-
-    
-
-
 
     def unlink(self):
         if self.env.user.has_group('joyeria_reparaciones.grupo_gestion_estado_reparacion'):
@@ -733,10 +714,3 @@ class Vendedora(models.Model):
     def imprimir_etiqueta_vendedora(self):
         return self.env.ref('joyeria_reparaciones.action_report_etiqueta_vendedora').report_action(self)
 
-
-
-
-            
-
-
-  

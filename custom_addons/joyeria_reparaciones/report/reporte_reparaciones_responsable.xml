@@ -9,7 +9,7 @@
           width: 100%;
           border-collapse: collapse;
           table-layout: fixed;        /* fuerza distribución ajustada */
-          font-size: 10px;            /* más pequeño */
+          font-size: 12px;            /* más pequeño */
           line-height: 1.15;          /* filas más bajas */
         }
         .tbl-compact th, .tbl-compact td {
