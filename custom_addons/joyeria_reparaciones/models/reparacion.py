@@ -31,9 +31,8 @@ class Reparacion(models.Model):
         readonly=True,
         default='Nuevo'
     )
-
-
     producto_id = fields.Many2one('joyeria.producto', string='Producto a reparar', required=False)
+    
     modelo = fields.Char(string='Modelo', required=False)
     cliente_id = fields.Many2one('res.partner', string='Nombre y apellido del Cliente', required=True)
     nombre_cliente = fields.Char(string='Nombre y apellido del cliente', required=False)
@@ -50,6 +49,14 @@ class Reparacion(models.Model):
         default=lambda self: fields.Datetime.now(),
         readonly=True
     )
+
+    tipo_cliente= fields.Selection([
+        ('cliente normal', 'Cliente Normal'),
+        ('cliente mayorista', 'Cliente Mayorista'),
+        ('cliente preferente', 'Cliente Preferente')
+
+    ], string='Tipo Cliente', required=True, tracking=True)
+
     tipo_joya = fields.Selection([
         ('anillo', 'Anillo'),
         ('argolla', 'Argolla'),
@@ -60,6 +67,7 @@ class Reparacion(models.Model):
         ('pulsera', 'Pulsera'),
         ('otro', 'Otro')
     ], string='Tipo de joya', required=True)
+    
     metal = fields.Selection([
         ('oro 14k', 'Oro 14K'),
         ('oro 18k rosado', 'Oro 18K Rosado'),
@@ -77,11 +85,8 @@ class Reparacion(models.Model):
         ('estandar', 'Estándar'),
         ('especial', 'Especial')
     ], string='Tipo de peso', required=True, tracking=True)
-
     peso_valor = fields.Float(string='Peso', required=False, tracking=True)
     vendedora_id= fields.Many2one('joyeria.vendedora', string='Recibido por', readonly=True, tracking=True)
-
-
     servicio = fields.Selection([
         ('reparacion', 'Reparación'),
         ('fabricacion', 'Fabricación')
@@ -92,7 +97,6 @@ class Reparacion(models.Model):
     #    ('gr', 'Gramo'),
      #   ('kg', 'Kilogramo'),
     #], string='Unidades', required=True)
-
     n_cm_reparacion = fields.Char(string='N° CM Reparación')
     n_cm_fabricacion = fields.Char(string='N° CM Fabricación')
     cantidad = fields.Float(string='Cantidad', required=True, tracking=True)
@@ -107,10 +111,6 @@ class Reparacion(models.Model):
         ('local maipu', 'Local Maipú'),
         ('local 921', 'Local 921'),
     ], string='Tienda', required=True)
-    
-
-
-
     precio_unitario = fields.Float(string='Precio unitario', tracking=True)
     extra = fields.Float(string='Extra', tracking=True)
     extra2 = fields.Float(string='Extra 2', tracking=True)
@@ -130,12 +130,12 @@ class Reparacion(models.Model):
     estado = fields.Selection([
         ('presupuesto', 'Presupuesto'),
         ('reparado', 'Reparado'),
-        ('cancelado', 'Cancelado'),
+        ('reparado y entregado', 'Reparado y Entregado'),
         ('confirmado', 'Confirmado')
     ], string='Estado', default='presupuesto', tracking=True, required=True, store=True, readonly=False)
 
 
-    clave_autenticacion_manual = fields.Char(string='QR de quien recibe', tracking=False)
+    clave_autenticacion_manual = fields.Char(string='QR de quien recibe', required=True)
 
     # NUEVOS CAMPOS
     metal_utilizado = fields.Selection([
@@ -156,11 +156,11 @@ class Reparacion(models.Model):
 
     metales_extra = fields.Float("Metales extra(gr)")
 
-    cobro_interno = fields.Float("🛠️ Cobro interno")
-    hechura = fields.Float("🔨 Hechura")
-    cobros_extras = fields.Float("➕ Cobros extras")
-    total_salida_taller = fields.Float("💰 Total salida del taller", compute="_compute_total_salida", store=True)
-    peso_total = fields.Float("💰 Peso total", compute="_compute_peso_total", store=True)
+    cobro_interno = fields.Float("Cobro interno")
+    hechura = fields.Float("Hechura")
+    cobros_extras = fields.Float("Cobros extras")
+    total_salida_taller = fields.Float("Total salida del taller", compute="_compute_total_salida", store=True)
+    peso_total = fields.Float("Peso total", compute="_compute_peso_total", store=True)
 
 
     #firma_salida_id = fields.Many2one('joyeria.vendedora', string="Firma salida del taller", readonly=True)
@@ -168,7 +168,6 @@ class Reparacion(models.Model):
     firma_id = fields.Many2one('joyeria.vendedora', string='Retirado por', readonly=True, tracking=True)
     fecha_firma = fields.Datetime(string='Fecha de firma', readonly=True)
     clave_firma_manual = fields.Char(string='QR de quien retira')
-
 
     @staticmethod
     def _normalize_name(name):
@@ -270,6 +269,15 @@ class Reparacion(models.Model):
             if (not prev_tenía_responsable) and rec.responsable_id and rec.estado != 'confirmado':
                 rec.estado = 'confirmado'
     
+    @api.onchange('clave_firma_manual')
+    def _onchange_firma_auto_entregado_first_time(self):
+        for rec in self:
+            # ¿Tenía firma antes en la BD?
+            prev_tenia_firma = bool(rec._origin.firma_id) if rec._origin and rec._origin.id else False
+            # Si ahora hay clave (se escaneó) y ya quedó asignada la firma (tu onchange actual la setea),
+            # y antes NO tenía firma, entonces es la primera vez -> pasar a "reparado y entregado".
+            if (not prev_tenia_firma) and rec.clave_firma_manual and rec.firma_id and rec.estado != 'reparado y entregado':
+                rec.estado = 'reparado y entregado'
 
 
     
@@ -319,14 +327,11 @@ class Reparacion(models.Model):
                     "por ejemplo: +56 9 XXXX XXXX"
                 )
 
-
-
     @api.depends()
     def _compute_estado(self):
         for rec in self:
             if not self.env.user.has_group('joyeria_reparaciones.grupo_gestion_estado_reparacion'):
                 rec.estado = rec.estado  # No cambia el valor, pero evita la edición
-
 
     @api.depends('cantidad', 'precio_unitario', 'extra', 'extra2', 'extra3')
     def _compute_subtotal(self):
@@ -344,12 +349,6 @@ class Reparacion(models.Model):
         for rec in self:
             rec.peso_total = rec.gramos_utilizado + rec.metales_extra
 
-    
-
-    
-    
-
-
     #def write(self, vals):
      #   for rec in self:
       #      peso = vals.get('peso', rec.peso)
@@ -358,8 +357,6 @@ class Reparacion(models.Model):
          #       raise ValidationError("Debe ingresar un valor para el peso si selecciona tipo 'Especial'.")
         #return super().write(vals)
 
-
-    
     @api.depends('cobro_interno', 'hechura', 'cobros_extras')
     def _compute_total_salida(self):
         for rec in self:
@@ -369,7 +366,6 @@ class Reparacion(models.Model):
     def _onchange_clave_firma_manual(self):
         self._procesar_firma()
 
-    
 
     def _procesar_firma(self):
         if self.clave_firma_manual:
@@ -496,14 +492,6 @@ class Reparacion(models.Model):
 
 
 
-
-    
-
-    
-    
-
-
-
     def write(self, vals):
         for record in self:
             ya_tiene_vendedora = bool(record.vendedora_id)
@@ -627,6 +615,22 @@ class Reparacion(models.Model):
         return self.search(args, limit=limit).name_get()
 
 
+class ResPartnerRequirePhoneAlways(models.Model):
+    _inherit = 'res.partner'
+
+    @api.constrains('phone', 'mobile', 'is_company', 'active')
+    def _check_phone_required_for_person(self):
+        """
+        Obliga a ingresar teléfono (phone o mobile) para PERSONAS activas.
+        Se ejecuta en create/write y es independiente del contexto del popup.
+        """
+        for rec in self:
+            # Sólo aplica a clientes/personas (no empresas) y activos
+            if rec.active and not rec.is_company:
+                if not (rec.phone and rec.phone.strip()) and not (rec.mobile and rec.mobile.strip()):
+                    raise ValidationError(
+                        "Debe ingresar un número de teléfono (Teléfono o Móvil) para crear/guardar el cliente."
+                    )
 
 
 class Operacion(models.Model):

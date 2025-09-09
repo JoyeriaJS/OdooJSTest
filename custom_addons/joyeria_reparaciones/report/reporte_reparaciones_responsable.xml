@@ -9,7 +9,7 @@
           width: 100%;
           border-collapse: collapse;
           table-layout: fixed;        /* fuerza distribución ajustada */
-          font-size: 12px;            /* más pequeño */
+          font-size: 13px;            /* más pequeño */
           line-height: 1.15;          /* filas más bajas */
         }
         .tbl-compact th, .tbl-compact td {
@@ -32,7 +32,7 @@
         .tbl-compact col.c-ncm      { width: 9%; }
         .tbl-compact col.c-peso     { width: 7%; }
         .tbl-compact col.c-op       { width: 20%; }  /* OPERACION: texto largo, pero ajustado */
-        .tbl-compact col.c-fecha    { width: 8%; }
+        .tbl-compact col.c-fecha    { width: 9%; }
         .tbl-compact col.c-gr       { width: 7%; }
         /* Título más compacto */
         .rep-title {
@@ -57,6 +57,7 @@
                ('responsable_id','=', usuario.id),
                ('fecha_entrega','!=', False),
                ('estado','!=','reparado'),
+               ('estado','!=','reparado y entregado'),
              ],
              order='fecha_entrega asc'
            )"/>
