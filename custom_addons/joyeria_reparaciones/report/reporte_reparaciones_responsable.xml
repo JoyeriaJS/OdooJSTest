@@ -3,57 +3,44 @@
   <template id="reporte_reparaciones_responsable">
     <t t-call="web.html_container">
 
-      <!-- 👇 Fuerza fuente con cobertura Unicode amplia -->
-      <style type="text/css">
-        /* DejaVu Sans está disponible en la imagen de Odoo y wkhtmltopdf;
-           mantiene acentos/ñ/diacríticos sin deformar. */
-        html, body, .page, .tbl-compact, .tbl-compact th, .tbl-compact td,
-        .rep-title, .group-row td {
-          font-family: "DejaVu Sans", "Lato", Arial, sans-serif !important;
-          font-kerning: normal;
-          font-variant-ligatures: none; /* evita ligaduras raras en PDF */
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* Evita cortes feos de caracteres combinados (tildes) */
-        .tbl-compact th, .tbl-compact td {
-          word-break: normal;           /* menos agresivo que break-word */
-          overflow-wrap: break-word;    /* solo si es necesario */
-          white-space: normal;
-        }
-      </style>
-
-      <!-- Estilos compactos para el PDF (igual que tenías) -->
+      <!-- Estilos compactos para el PDF -->
       <style type="text/css">
         .tbl-compact {
           width: 100%;
           border-collapse: collapse;
-          table-layout: fixed;
-          font-size: 13px;
-          line-height: 1.15;
+          table-layout: fixed;        /* fuerza distribución ajustada */
+          font-size: 13px;            /* más pequeño */
+          line-height: 1.15;          /* filas más bajas */
         }
         .tbl-compact th, .tbl-compact td {
           border: 1px solid #000;
-          padding: 2px 3px;
-          vertical-align: top;
+          padding: 2px 3px;           /* menos padding (alto y ancho) */
+          vertical-align: top;        /* evita celdas altas por baseline */
+          word-break: break-word;
+          overflow-wrap: anywhere;
+          white-space: normal;        /* permite salto de línea */
         }
-        .tbl-compact thead th { background: #f2f2f2; }
-        .tbl-compact col.c-rma    { width: 9%; }
-        .tbl-compact col.c-cant   { width: 6%; }
-        .tbl-compact col.c-prod   { width: 12%; }
-        .tbl-compact col.c-modelo { width: 12%; }
-        .tbl-compact col.c-metal  { width: 10%; }
-        .tbl-compact col.c-ncm    { width: 9%; }
-        .tbl-compact col.c-peso   { width: 7%; }
-        .tbl-compact col.c-op     { width: 20%; }
-        .tbl-compact col.c-fecha  { width: 9%; }
-        .tbl-compact col.c-gr     { width: 7%; }
+        .tbl-compact thead th {
+          background: #f2f2f2;
+        }
+        /* Anchos por columna (10 columnas) */
+        .tbl-compact col.c-rma      { width: 9%; }
+        .tbl-compact col.c-cant     { width: 6%; }
+        .tbl-compact col.c-prod     { width: 12%; }
+        .tbl-compact col.c-modelo   { width: 12%; }
+        .tbl-compact col.c-metal    { width: 10%; }
+        .tbl-compact col.c-ncm      { width: 9%; }
+        .tbl-compact col.c-peso     { width: 7%; }
+        .tbl-compact col.c-op       { width: 20%; }  /* OPERACION: texto largo, pero ajustado */
+        .tbl-compact col.c-fecha    { width: 9%; }
+        .tbl-compact col.c-gr       { width: 7%; }
+        /* Título más compacto */
         .rep-title {
           text-align: center;
           margin: 0 0 6px 0;
           font-size: 14px;
         }
+        /* Cabecera de mes más compacta */
         .group-row td {
           padding: 3px !important;
           background: #ddd;
@@ -77,13 +64,14 @@
 
         <div class="page">
           <h2 class="rep-title">
-            Órdenes de Reparación para <t t-esc="responsable"/>
+            Ordenes de Reparacion para <t t-esc="responsable"/>
           </h2>
 
           <t t-set="prev_year" t-value="None"/>
           <t t-set="prev_month" t-value="None"/>
 
           <table class="tbl-compact">
+            <!-- Definición de anchos de columnas -->
             <colgroup>
               <col class="c-rma"/>
               <col class="c-cant"/>
@@ -106,7 +94,7 @@
                 <th>METAL</th>
                 <th>N/CM</th>
                 <th>PESO</th>
-                <th>OPERACIÓN</th>
+                <th>OPERACION</th>
                 <th>FECHA ENTREGA</th>
                 <th>GR</th>
               </tr>
@@ -114,6 +102,7 @@
 
             <tbody>
               <t t-foreach="reparaciones" t-as="r">
+                <!-- Cabecera de mes/año al cambiar -->
                 <t t-if="
                   r.fecha_entrega
                   and (prev_year != r.fecha_entrega.year or prev_month != r.fecha_entrega.month)
@@ -123,10 +112,11 @@
                       Mes: <t t-esc="r.fecha_entrega.strftime('%m/%Y')"/>
                     </td>
                   </tr>
-                  <t t-set="prev_year"  t-value="r.fecha_entrega.year"/>
+                  <t t-set="prev_year" t-value="r.fecha_entrega.year"/>
                   <t t-set="prev_month" t-value="r.fecha_entrega.month"/>
                 </t>
 
+                <!-- Fila de datos (contenido intacto) -->
                 <tr>
                   <td><t t-esc="r.name"/></td>
                   <td><t t-esc="r.cantidad or 0"/></td>
@@ -135,6 +125,7 @@
                   <td><t t-esc="r.metal or ''"/></td>
                   <td><t t-esc="r.n_cm_fabricacion or r.n_cm_reparacion or ''"/></td>
                   <td><t t-esc="r.peso_valor or 0"/></td>
+                  <!-- OJO: antes tenía padding:75px; se compacta para no inflar la fila -->
                   <td><t t-esc="r.solicitud_cliente or ''"/></td>
                   <td><t t-esc="r.fecha_entrega and r.fecha_entrega.strftime('%d/%m/%Y') or ''"/></td>
                   <td><t t-esc="''"/></td>
