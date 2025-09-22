@@ -58,6 +58,7 @@
                ('fecha_entrega','!=', False),
                ('estado','!=','reparado'),
                ('estado','!=','reparado y entregado'),
+               ('estado','!=','cancelado'),
              ],
              order='fecha_entrega asc'
            )"/>
@@ -129,7 +130,7 @@
                   <td><t t-esc="r.solicitud_cliente or ''"/></td>
                   <td><t t-esc="r.fecha_entrega and r.fecha_entrega.strftime('%d/%m/%Y') or ''"/></td>
                   <td><t t-esc="''"/></td>
-                  
+
                 </tr>
               </t>
             </tbody>

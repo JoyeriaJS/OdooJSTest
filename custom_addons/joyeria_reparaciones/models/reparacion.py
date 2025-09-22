@@ -131,7 +131,8 @@ class Reparacion(models.Model):
         ('presupuesto', 'Presupuesto'),
         ('reparado', 'Reparado'),
         ('reparado y entregado', 'Reparado y Entregado'),
-        ('confirmado', 'Confirmado')
+        ('confirmado', 'Confirmado'),
+        ('cancelado', 'Cancelado')
     ], string='Estado', default='presupuesto', tracking=True, required=True, store=True, readonly=False)
 
 
