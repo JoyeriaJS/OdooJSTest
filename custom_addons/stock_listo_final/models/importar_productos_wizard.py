@@ -36,6 +36,30 @@ class ImportarProductosWizard(models.TransientModel):
         except:
             return False
 
+    # --- NUEVO: normalizador mínimo para CodBar del Excel ---
+    def _normalize_barcode(self, val):
+        """Convierte el valor de Excel a un string de dígitos (sin .0, sin espacios)."""
+        if val is None:
+            return ''
+        # Si viene como número (float/int), convertir a entero si es xx.0
+        if isinstance(val, (int, float)):
+            try:
+                if float(val).is_integer():
+                    val = int(val)
+            except Exception:
+                pass
+            s = str(val).strip()
+        else:
+            s = str(val).strip()
+
+        # Casos típicos: '1812001.0' -> '1812001'
+        if s.endswith('.0'):
+            s = s[:-2]
+
+        # Quitar espacios y dejar sólo dígitos
+        s = ''.join(ch for ch in s if ch.isdigit())
+        return s
+
     @api.model
     def _get_pricelists(self):
         # Sólo administradores
@@ -106,8 +130,11 @@ class ImportarProductosWizard(models.TransientModel):
                 duplicates_code.add(code)
                 continue
 
-            barcode = str(row[cols['barcode']].value).strip()
-            # Saltar barcodes duplicados
+            # --- CAMBIO: normalizar el barcode leído del Excel ---
+            raw_barcode = row[cols['barcode']].value
+            barcode = self._normalize_barcode(raw_barcode)
+
+            # Saltar barcodes duplicados (si existe y está normalizado)
             if barcode and ProdVar.search([('barcode','=', barcode)], limit=1):
                 duplicates_barcode.add(barcode)
                 continue
@@ -158,16 +185,16 @@ class ImportarProductosWizard(models.TransientModel):
 
             # Construir valores para la plantilla
             tmpl_vals = {
-                'default_code':      code,
-                'name':              name,
-                'categ_id':          categ.id,
-                'type':              'product',
-                'barcode':           barcode,
-                'list_price':        pub_pr,
-                'standard_price':    cost_pr,
-                'weight':            weight,
-                'available_in_pos':  True,
-                'image_1920':        img_data,
+                'default_code':       code,
+                'name':               name,
+                'categ_id':           categ.id,
+                'type':               'product',
+                'barcode':            barcode,     # <- ya normalizado
+                'list_price':         pub_pr,
+                'standard_price':     cost_pr,
+                'weight':             weight,
+                'available_in_pos':   True,
+                'image_1920':         img_data,
                 'attribute_line_ids': attr_lines or False,
             }
             # Crear la plantilla
@@ -179,13 +206,18 @@ class ImportarProductosWizard(models.TransientModel):
             if imported % 20 == 0:
                 self.env.cr.commit()
 
+            # --- NUEVO: Propagar barcode a la variante única (para etiquetas) ---
+            if barcode and getattr(tmpl, 'product_variant_count', 0) == 1:
+                if not tmpl.product_variant_id.barcode:
+                    tmpl.product_variant_id.barcode = barcode
+
             # Crear reglas de precio
             rules = {
-                'Pública':       pub_pr,
+                'Pública':        pub_pr,
                 'Punto de venta': pos_pr,
-                'Mayorista':     may_pr,
-                'Preferente':    pref_pr,
-                'Interno (CLP)': interno_pr,
+                'Mayorista':      may_pr,
+                'Preferente':     pref_pr,
+                'Interno (CLP)':  interno_pr,
             }
             for name_list, price in rules.items():
                 if price > 0.0:
