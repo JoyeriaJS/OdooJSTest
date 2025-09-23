@@ -4,8 +4,7 @@ from io import BytesIO
 from PIL import Image
 
 from odoo import api, models, fields, _
-from odoo.exceptions import UserError
-from odoo.exceptions import AccessError
+from odoo.exceptions import UserError, AccessError
 
 class ImportarProductosWizard(models.TransientModel):
     _name = 'importar.productos.wizard'
@@ -14,17 +13,18 @@ class ImportarProductosWizard(models.TransientModel):
     archivo  = fields.Binary(string='Archivo Excel', required=True)
     filename = fields.Char(string='Nombre del archivo')
 
+    # -----------------------
+    # Helpers
+    # -----------------------
     def safe_float(self, val):
-        # Sólo administradores
         if not self.env.user.has_group('base.group_system'):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
         try:
             return float(val)
-        except:
+        except Exception:
             return 0.0
 
     def resize_image_128(self, img_bytes):
-        # Sólo administradores
         if not self.env.user.has_group('base.group_system'):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
         try:
@@ -33,39 +33,42 @@ class ImportarProductosWizard(models.TransientModel):
             buf = BytesIO()
             img.save(buf, 'JPEG')
             return base64.b64encode(buf.getvalue())
-        except:
+        except Exception:
             return False
 
-    # --- NUEVO: normalizador mínimo para CodBar del Excel ---
     def _normalize_barcode(self, val):
-        """Convierte el valor de Excel a un string de dígitos (sin .0, sin espacios)."""
+        """Convierte el valor del Excel a un string: quita .0 y espacios; preserva dígitos.
+        Si el código es alfanumérico, se conserva tal cual (sin recortar a solo dígitos)."""
         if val is None:
             return ''
-        # Si viene como número (float/int), convertir a entero si es xx.0
-        if isinstance(val, (int, float)):
-            try:
-                if float(val).is_integer():
-                    val = int(val)
-            except Exception:
-                pass
-            s = str(val).strip()
-        else:
-            s = str(val).strip()
-
-        # Casos típicos: '1812001.0' -> '1812001'
+        s = str(int(val)).strip() if isinstance(val, float) and float(val).is_integer() else str(val).strip()
+        # Quitar sufijo “.0” (ej: '1812001.0' -> '1812001')
         if s.endswith('.0'):
             s = s[:-2]
-
-        # Quitar espacios y dejar sólo dígitos
-        s = ''.join(ch for ch in s if ch.isdigit())
+        # No elimino letras por si usas códigos alfanuméricos (EAN/UPC suelen ser numéricos, pero por si acaso)
         return s
+
+    def _find_col(self, sheet, candidates, default_idx):
+        """Intenta encontrar la columna por encabezado (en las primeras 3 filas). 
+        candidates: lista de posibles encabezados (case-insensitive).
+        default_idx: índice por defecto si no encuentra nada.
+        """
+        cand_lower = [c.lower() for c in candidates]
+        top_rows = min(3, sheet.nrows)
+        for r in range(top_rows):
+            for c in range(sheet.ncols):
+                try:
+                    text = str(sheet.cell_value(r, c)).strip().lower()
+                except Exception:
+                    text = ''
+                if text in cand_lower:
+                    return c
+        return default_idx
 
     @api.model
     def _get_pricelists(self):
-        # Sólo administradores
         if not self.env.user.has_group('base.group_system'):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
-        """Garantiza existencia de cada pricelist y las devuelve."""
         names = ['Pública','Punto de venta','Mayorista','Preferente','Interno (CLP)']
         PrList = self.env['product.pricelist']
         res = {}
@@ -79,17 +82,20 @@ class ImportarProductosWizard(models.TransientModel):
             res[name] = pl
         return res
 
+    # -----------------------
+    # Acción principal
+    # -----------------------
     def importar_productos(self):
-        # Sólo administradores
         if not self.env.user.has_group('base.group_system'):
             raise AccessError("Sólo los administradores pueden generar este reporte.")
         if not self.archivo:
             raise UserError(_("Adjunta primero un archivo Excel."))
+
         data = base64.b64decode(self.archivo)
         book = xlrd.open_workbook(file_contents=data)
         sheet = book.sheet_by_name("Productos") if "Productos" in book.sheet_names() else book.sheet_by_index(0)
 
-        # Columnas de tu hoja (ajusta índices si cambien)
+        # Índices base (los tuyos)
         cols = {
             'code':       9,
             'name':       1,
@@ -99,26 +105,34 @@ class ImportarProductosWizard(models.TransientModel):
             'mayorista':  6,
             'preferente': 7,
             'interno':    8,
-            'barcode':   15,
+            'barcode':   15,   # asumido, pero lo recalculamos abajo si está movido
             'image_url': 16,
             'attr_name': 17,
             'attr_vals': 18,
             'pos':       19,
         }
 
-        pricelists    = self._get_pricelists()
-        Product       = self.env['product.template']
-        ProdVar       = self.env['product.product']
-        Category      = self.env['product.category']
-        PosCateg      = self.env['pos.category']
-        Attr          = self.env['product.attribute']
-        AttrVal       = self.env['product.attribute.value']
-        PrItem        = self.env['product.pricelist.item']
+        # >>> Ajuste robusto: si cambiaron las columnas, detectar por encabezado <<<
+        cols['barcode'] = self._find_col(
+            sheet,
+            candidates=['codbar', 'códbar', 'codigo de barras', 'código de barras', 'barcode', 'ean13'],
+            default_idx=cols['barcode']
+        )
+
+        pricelists = self._get_pricelists()
+        Product    = self.env['product.template']
+        ProdVar    = self.env['product.product']
+        Category   = self.env['product.category']
+        PosCateg   = self.env['pos.category']
+        Attr       = self.env['product.attribute']
+        AttrVal    = self.env['product.attribute.value']
+        PrItem     = self.env['product.pricelist.item']
 
         duplicates_code    = set()
         duplicates_barcode = set()
         imported           = 0
 
+        # Datos desde la fila 3 (0-based = 3) como ya tenías
         for row_idx in range(3, sheet.nrows):
             row = sheet.row(row_idx)
             code = str(row[cols['code']].value).strip().upper()
@@ -126,18 +140,19 @@ class ImportarProductosWizard(models.TransientModel):
                 continue
 
             # Saltar códigos duplicados
-            if Product.search([('default_code','=', code)], limit=1):
+            if Product.search([('default_code', '=', code)], limit=1):
                 duplicates_code.add(code)
                 continue
 
-            # --- CAMBIO: normalizar el barcode leído del Excel ---
-            raw_barcode = row[cols['barcode']].value
+            # Leer y normalizar BARCODE
+            raw_barcode = row[cols['barcode']].value if cols['barcode'] < sheet.ncols else ''
             barcode = self._normalize_barcode(raw_barcode)
 
-            # Saltar barcodes duplicados (si existe y está normalizado)
-            if barcode and ProdVar.search([('barcode','=', barcode)], limit=1):
+            # Saltar barcodes duplicados (si existe)
+            if barcode and ProdVar.search([('barcode', '=', barcode)], limit=1):
                 duplicates_barcode.add(barcode)
-                continue
+                barcode = ''  # evita fallo y sigue creando el producto sin codbar
+                # (si prefieres saltar el producto, usa "continue")
 
             name       = str(row[cols['name']].value).strip()
             weight     = self.safe_float(row[cols['weight']].value)
@@ -158,8 +173,8 @@ class ImportarProductosWizard(models.TransientModel):
             tipo    = str(row[14].value).strip()
             cat_name = f"{metal} / {nacimp} / {externa} / {tipo}"
 
-            categ = Category.search([('name','=', cat_name)], limit=1) or Category.create({'name': cat_name})
-            pos_categ = PosCateg.search([('name','=', cat_name)], limit=1) or PosCateg.create({'name': cat_name})
+            categ = Category.search([('name', '=', cat_name)], limit=1) or Category.create({'name': cat_name})
+            pos_categ = PosCateg.search([('name', '=', cat_name)], limit=1) or PosCateg.create({'name': cat_name})
 
             # Procesar imagen
             img_data = False
@@ -168,28 +183,28 @@ class ImportarProductosWizard(models.TransientModel):
                     r = requests.get(img_url, timeout=5)
                     if r.ok:
                         img_data = self.resize_image_128(r.content)
-                except:
+                except Exception:
                     pass
 
-            # Procesar atributos
+            # Procesar atributos (si tu Excel trae muchos valores en una fila, generará varias variantes)
             attr_lines = []
             if attr_name and attr_vals:
-                att = Attr.search([('name','=', attr_name)], limit=1) or Attr.create({'name': attr_name})
+                att = Attr.search([('name', '=', attr_name)], limit=1) or Attr.create({'name': attr_name})
                 val_ids = []
                 for v in (x.strip() for x in attr_vals.split(',') if x.strip()):
-                    av = AttrVal.search([('name','=', v), ('attribute_id','=', att.id)], limit=1) \
+                    av = AttrVal.search([('name', '=', v), ('attribute_id', '=', att.id)], limit=1) \
                          or AttrVal.create({'name': v, 'attribute_id': att.id})
                     val_ids.append(av.id)
                 if val_ids:
                     attr_lines = [(0, 0, {'attribute_id': att.id, 'value_ids': [(6, 0, val_ids)]})]
 
-            # Construir valores para la plantilla
+            # Crear plantilla
             tmpl_vals = {
                 'default_code':       code,
                 'name':               name,
                 'categ_id':           categ.id,
                 'type':               'product',
-                'barcode':            barcode,     # <- ya normalizado
+                'barcode':            barcode,   # lo dejamos también en template (no molesta)
                 'list_price':         pub_pr,
                 'standard_price':     cost_pr,
                 'weight':             weight,
@@ -197,21 +212,22 @@ class ImportarProductosWizard(models.TransientModel):
                 'image_1920':         img_data,
                 'attribute_line_ids': attr_lines or False,
             }
-            # Crear la plantilla
             tmpl = Product.create(tmpl_vals)
-            # Asignar categoría POS al template a través de pos_categ_ids
+
+            # POS categoría
             if 'pos_categ_ids' in Product._fields:
                 tmpl.write({'pos_categ_ids': [(4, pos_categ.id)]})
+
             imported += 1
             if imported % 20 == 0:
                 self.env.cr.commit()
 
-            # --- NUEVO: Propagar barcode a la variante única (para etiquetas) ---
+            # Propagar barcode a la variante única (para que lo veas en la UI y en etiquetas)
             if barcode and getattr(tmpl, 'product_variant_count', 0) == 1:
                 if not tmpl.product_variant_id.barcode:
                     tmpl.product_variant_id.barcode = barcode
 
-            # Crear reglas de precio
+            # Reglas de precio
             rules = {
                 'Pública':        pub_pr,
                 'Punto de venta': pos_pr,
@@ -229,7 +245,7 @@ class ImportarProductosWizard(models.TransientModel):
                         'fixed_price':     price,
                     })
 
-        # Notificación final
+        # Notificación
         msg = _("%d productos importados.") % imported
         if duplicates_code:
             msg += _(" Se omitieron códigos duplicados: %s") % ', '.join(sorted(duplicates_code))
