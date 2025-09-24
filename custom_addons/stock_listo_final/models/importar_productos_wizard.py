@@ -22,7 +22,44 @@ class ImportarProductosWizard(models.TransientModel):
         try:
             return float(val)
         except Exception:
-            return 0.0
+            return 0.
+        
+    def _ean13_check_digit(self, body12: str) -> int:
+        """Calcula dígito verificador EAN-13 para 12 dígitos."""
+        assert len(body12) == 12 and body12.isdigit()
+        odd = sum(int(body12[i]) for i in range(0, 12, 2))
+        even = sum(int(body12[i]) for i in range(1, 12, 2))
+        total = odd + even * 3
+        return (10 - (total % 10)) % 10
+
+    def _next_unique_barcode(self, base: str, index: int) -> str:
+        """
+        Genera un código único por variante a partir de un 'base' proveniente del Excel.
+        - Si base es numérico: construye un EAN-13 válido (12 dígitos + checksum).
+        - Si base tiene letras: usa base-<n>. (Odoo no obliga EAN-13, solo unicidad.)
+        Además garantiza que no exista ya en product.product.
+        """
+        Product = self.env['product.product']
+        s = (base or '').strip()
+        digits = ''.join(ch for ch in s if ch.isdigit())
+
+        cand = None
+        attempt = 0
+        while True:
+            attempt += 1
+            if digits:
+                # Construimos 12 dígitos: base + índice (2-3 dígitos) y rellenamos/cortamos
+                tail = f"{index + attempt - 1:02d}"  # 01,02,03...
+                body12 = (digits + tail)[:12].ljust(12, '0')
+                cd = self._ean13_check_digit(body12)
+                cand = body12 + str(cd)
+            else:
+                cand = f"{s}-{index + attempt - 1}"
+
+            # ¿ya existe?
+            if not Product.search_count([('barcode', '=', cand)], limit=1):
+                return cand
+
 
     def resize_image_128(self, img_bytes):
         if not self.env.user.has_group('base.group_system'):
@@ -222,18 +259,19 @@ class ImportarProductosWizard(models.TransientModel):
             if imported % 20 == 0:
                 self.env.cr.commit()
 
-            # --- PROPAGAR BARCODE A VARIANTES ---
+            # --- PROPAGAR BARCODE A VARIANTES (maneja 1 o N variantes) ---
         if barcode:
             if getattr(tmpl, 'product_variant_count', 0) == 1:
-                # Caso tradicional: una sola variante
+                # Una sola variante: deja el barcode tal cual
                 if not tmpl.product_variant_id.barcode:
                     tmpl.product_variant_id.barcode = barcode
             else:
-                # NUEVO: múltiples variantes y el Excel trajo un único barcode.
-                # Copiamos el mismo código a todas las variantes sin código
+                # Múltiples variantes: genera códigos únicos derivados del base para cada una
+                idx = 1
                 for var in tmpl.product_variant_ids:
                     if not var.barcode:
-                        var.barcode = barcode
+                        var.barcode = self._next_unique_barcode(barcode, idx)
+                        idx += 1
 
             # Reglas de precio
             rules = {
