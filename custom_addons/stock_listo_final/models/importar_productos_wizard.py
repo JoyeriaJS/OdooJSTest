@@ -132,7 +132,6 @@ class ImportarProductosWizard(models.TransientModel):
         book = xlrd.open_workbook(file_contents=data)
         sheet = book.sheet_by_name("Productos") if "Productos" in book.sheet_names() else book.sheet_by_index(0)
 
-        # Índices base (los tuyos)
         cols = {
             'code':       9,
             'name':       1,
@@ -142,14 +141,12 @@ class ImportarProductosWizard(models.TransientModel):
             'mayorista':  6,
             'preferente': 7,
             'interno':    8,
-            'barcode':   15,   # asumido, pero lo recalculamos abajo si está movido
+            'barcode':   15,
             'image_url': 16,
             'attr_name': 17,
             'attr_vals': 18,
             'pos':       19,
         }
-
-        # >>> Ajuste robusto: si cambiaron las columnas, detectar por encabezado <<<
         cols['barcode'] = self._find_col(
             sheet,
             candidates=['codbar', 'códbar', 'codigo de barras', 'código de barras', 'barcode', 'ean13'],
@@ -169,27 +166,24 @@ class ImportarProductosWizard(models.TransientModel):
         duplicates_barcode = set()
         imported           = 0
 
-        # Datos desde la fila 3 (0-based = 3) como ya tenías
         for row_idx in range(3, sheet.nrows):
             row = sheet.row(row_idx)
             code = str(row[cols['code']].value).strip().upper()
             if not code or code.lower().startswith('code'):
                 continue
 
-            # Saltar códigos duplicados
             if Product.search([('default_code', '=', code)], limit=1):
                 duplicates_code.add(code)
                 continue
 
-            # Leer y normalizar BARCODE
+            # BARCODE normalizado desde Excel
             raw_barcode = row[cols['barcode']].value if cols['barcode'] < sheet.ncols else ''
             barcode = self._normalize_barcode(raw_barcode)
 
-            # Saltar barcodes duplicados (si existe)
+            # Si ya existe ese barcode en alguna variante, lo marcamos como duplicado y seguimos sin asignarlo
             if barcode and ProdVar.search([('barcode', '=', barcode)], limit=1):
                 duplicates_barcode.add(barcode)
-                barcode = ''  # evita fallo y sigue creando el producto sin codbar
-                # (si prefieres saltar el producto, usa "continue")
+                barcode = ''   # sigue creando el producto, pero sin ese código base
 
             name       = str(row[cols['name']].value).strip()
             weight     = self.safe_float(row[cols['weight']].value)
@@ -203,7 +197,6 @@ class ImportarProductosWizard(models.TransientModel):
             attr_name  = str(row[cols['attr_name']].value).strip()
             attr_vals  = str(row[cols['attr_vals']].value).strip()
 
-            # Categoría compuesta
             metal   = str(row[10].value).strip()
             nacimp  = str(row[11].value).strip()
             externa = str(row[12].value).strip()
@@ -213,7 +206,6 @@ class ImportarProductosWizard(models.TransientModel):
             categ = Category.search([('name', '=', cat_name)], limit=1) or Category.create({'name': cat_name})
             pos_categ = PosCateg.search([('name', '=', cat_name)], limit=1) or PosCateg.create({'name': cat_name})
 
-            # Procesar imagen
             img_data = False
             if img_url.startswith('http'):
                 try:
@@ -223,25 +215,23 @@ class ImportarProductosWizard(models.TransientModel):
                 except Exception:
                     pass
 
-            # Procesar atributos (si tu Excel trae muchos valores en una fila, generará varias variantes)
             attr_lines = []
             if attr_name and attr_vals:
                 att = Attr.search([('name', '=', attr_name)], limit=1) or Attr.create({'name': attr_name})
                 val_ids = []
                 for v in (x.strip() for x in attr_vals.split(',') if x.strip()):
                     av = AttrVal.search([('name', '=', v), ('attribute_id', '=', att.id)], limit=1) \
-                         or AttrVal.create({'name': v, 'attribute_id': att.id})
+                        or AttrVal.create({'name': v, 'attribute_id': att.id})
                     val_ids.append(av.id)
                 if val_ids:
                     attr_lines = [(0, 0, {'attribute_id': att.id, 'value_ids': [(6, 0, val_ids)]})]
 
-            # Crear plantilla
             tmpl_vals = {
                 'default_code':       code,
                 'name':               name,
                 'categ_id':           categ.id,
                 'type':               'product',
-                'barcode':            barcode,   # lo dejamos también en template (no molesta)
+                'barcode':            barcode,   # también en template
                 'list_price':         pub_pr,
                 'standard_price':     cost_pr,
                 'weight':             weight,
@@ -251,7 +241,6 @@ class ImportarProductosWizard(models.TransientModel):
             }
             tmpl = Product.create(tmpl_vals)
 
-            # POS categoría
             if 'pos_categ_ids' in Product._fields:
                 tmpl.write({'pos_categ_ids': [(4, pos_categ.id)]})
 
@@ -259,20 +248,21 @@ class ImportarProductosWizard(models.TransientModel):
             if imported % 20 == 0:
                 self.env.cr.commit()
 
-            # --- PROPAGAR BARCODE A VARIANTES (maneja 1 o N variantes) ---
-        if barcode:
-            if getattr(tmpl, 'product_variant_count', 0) == 1:
-                # Una sola variante: deja el barcode tal cual
-                if not tmpl.product_variant_id.barcode:
-                    tmpl.product_variant_id.barcode = barcode
-            else:
-                # Múltiples variantes: genera códigos únicos derivados del base para cada una
-                idx = 1
-                for var in tmpl.product_variant_ids:
-                    if not var.barcode:
-                        var.barcode = self._next_unique_barcode(barcode, idx)
-                        idx += 1
-        
+            # ---------- OJO: ESTA PARTE DEBE IR DENTRO DEL FOR ----------
+            # Propagar/Generar códigos de barras en variantes (1 o N)
+            if barcode:
+                if getattr(tmpl, 'product_variant_count', 0) == 1:
+                    # una sola variante
+                    if not tmpl.product_variant_id.barcode:
+                        tmpl.product_variant_id.barcode = barcode
+                else:
+                    # múltiples variantes: generar únicos en base al "barcode" del Excel
+                    idx = 1
+                    for var in tmpl.product_variant_ids:
+                        if not var.barcode:
+                            var.barcode = self._next_unique_barcode(barcode, idx)
+                            idx += 1
+            # ------------------------------------------------------------
 
             # Reglas de precio
             rules = {
@@ -292,7 +282,6 @@ class ImportarProductosWizard(models.TransientModel):
                         'fixed_price':     price,
                     })
 
-        # Notificación
         msg = _("%d productos importados.") % imported
         if duplicates_code:
             msg += _(" Se omitieron códigos duplicados: %s") % ', '.join(sorted(duplicates_code))
@@ -307,3 +296,4 @@ class ImportarProductosWizard(models.TransientModel):
                 'sticky':  False,
             }
         }
+
