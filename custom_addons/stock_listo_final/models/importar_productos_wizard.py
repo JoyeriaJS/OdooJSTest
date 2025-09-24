@@ -259,18 +259,20 @@ class ImportarProductosWizard(models.TransientModel):
             if imported % 20 == 0:
                 self.env.cr.commit()
 
-            # --- PROPAGAR BARCODE A VARIANTES ---
+            # --- PROPAGAR BARCODE A VARIANTES (maneja 1 o N variantes) ---
         if barcode:
             if getattr(tmpl, 'product_variant_count', 0) == 1:
-                # Caso tradicional: una sola variante
+                # Una sola variante: deja el barcode tal cual
                 if not tmpl.product_variant_id.barcode:
                     tmpl.product_variant_id.barcode = barcode
             else:
-                # NUEVO: múltiples variantes y el Excel trajo un único barcode.
-                # Copiamos el mismo código a todas las variantes sin código
+                # Múltiples variantes: genera códigos únicos derivados del base para cada una
+                idx = 1
                 for var in tmpl.product_variant_ids:
                     if not var.barcode:
-                        var.barcode = barcode
+                        var.barcode = self._next_unique_barcode(barcode, idx)
+                        idx += 1
+        
 
             # Reglas de precio
             rules = {
