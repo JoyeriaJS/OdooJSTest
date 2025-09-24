@@ -222,10 +222,18 @@ class ImportarProductosWizard(models.TransientModel):
             if imported % 20 == 0:
                 self.env.cr.commit()
 
-            # Propagar barcode a la variante única (para que lo veas en la UI y en etiquetas)
-            if barcode and getattr(tmpl, 'product_variant_count', 0) == 1:
+            # --- PROPAGAR BARCODE A VARIANTES ---
+        if barcode:
+            if getattr(tmpl, 'product_variant_count', 0) == 1:
+                # Caso tradicional: una sola variante
                 if not tmpl.product_variant_id.barcode:
                     tmpl.product_variant_id.barcode = barcode
+            else:
+                # NUEVO: múltiples variantes y el Excel trajo un único barcode.
+                # Copiamos el mismo código a todas las variantes sin código
+                for var in tmpl.product_variant_ids:
+                    if not var.barcode:
+                        var.barcode = barcode
 
             # Reglas de precio
             rules = {
