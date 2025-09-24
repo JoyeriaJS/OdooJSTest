@@ -294,7 +294,17 @@ class Reparacion(models.Model):
             if (not prev_tenia_firma) and rec.clave_firma_manual and rec.firma_id and rec.estado != 'reparado y entregado':
                 rec.estado = 'reparado y entregado'
 
-
+    @api.onchange('estado')
+    def _onchange_estado(self):
+        """Si se marca como cancelado, limpiar los montos a 0"""
+        if self.estado == 'cancelado':
+            self.gramos_utilizados = 0.0
+            self.metales_extra = 0.0
+            self.peso_total = 0.0
+            self.cobro_interno = 0.0
+            self.hechura = 0.0
+            self.cobros_extras = 0.0
+            self.total_salida = 0.0
     
     @api.model
     def create(self, vals):
