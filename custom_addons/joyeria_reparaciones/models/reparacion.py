@@ -391,6 +391,11 @@ class Reparacion(models.Model):
         self._procesar_firma()
 
 
+    from datetime import datetime
+    import pytz
+
+    CHILE_TZ = pytz.timezone('America/Santiago')
+
     def _procesar_firma(self):
         if self.clave_firma_manual:
             clave = self.clave_firma_manual.strip().upper()
@@ -402,10 +407,12 @@ class Reparacion(models.Model):
             ], limit=1)
             if vendedora:
                 self.firma_id = vendedora.id
-                # Obtiene hora local y la vuelve naive (sin tzinfo)
-                ahora_chile = datetime.now(CHILE_TZ).replace(tzinfo=None)
-                self.fecha_firma = ahora_chile
 
+                # ✅ Obtener hora exacta de Chile, convertir a UTC y eliminar tzinfo (Odoo requiere naive)
+                ahora_chile = datetime.now(pytz.timezone('America/Santiago'))
+                ahora_utc_naive = ahora_chile.astimezone(pytz.UTC).replace(tzinfo=None)
+
+                self.fecha_firma = ahora_utc_naive
 
 
     @api.onchange('clave_autenticacion_manual')
