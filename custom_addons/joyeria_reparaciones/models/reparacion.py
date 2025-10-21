@@ -402,9 +402,10 @@ class Reparacion(models.Model):
             ], limit=1)
             if vendedora:
                 self.firma_id = vendedora.id
-                # Hora local convertida a UTC para guardar correctamente
-                ahora_chile = datetime.now(CHILE_TZ)
-                self.fecha_firma = ahora_chile.astimezone(pytz.UTC)
+                # Obtiene hora local y la vuelve naive (sin tzinfo)
+                ahora_chile = datetime.now(CHILE_TZ).replace(tzinfo=None)
+                self.fecha_firma = ahora_chile
+
 
 
     @api.onchange('clave_autenticacion_manual')
