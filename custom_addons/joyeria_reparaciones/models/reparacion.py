@@ -402,7 +402,7 @@ class Reparacion(models.Model):
             ], limit=1)
             if vendedora:
                 self.firma_id = vendedora.id
-                ahora_chile = datetime.now()  # Hora local del servidor
+                ahora_chile = datetime.now(CHILE_TZ).strftime('%d/%m/%Y %H:%M:%S')  # Hora local del servidor
                 self.fecha_firma = ahora_chile
 
 
