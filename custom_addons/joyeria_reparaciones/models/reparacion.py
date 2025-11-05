@@ -397,6 +397,7 @@ class Reparacion(models.Model):
     CHILE_TZ = pytz.timezone('America/Santiago')
 
     def _procesar_firma(self):
+        """Asigna la firma (vendedora que retira) y la fecha al escanear el QR"""
         if self.clave_firma_manual:
             clave = self.clave_firma_manual.strip().upper()
             vendedora = self.env['joyeria.vendedora'].search([
@@ -408,10 +409,9 @@ class Reparacion(models.Model):
             if vendedora:
                 self.firma_id = vendedora.id
 
-                # ✅ Obtener hora exacta de Chile, convertir a UTC y eliminar tzinfo (Odoo requiere naive)
+                # Registrar fecha y hora exacta de Chile
                 ahora_chile = datetime.now(pytz.timezone('America/Santiago'))
                 ahora_utc_naive = ahora_chile.astimezone(pytz.UTC).replace(tzinfo=None)
-
                 self.fecha_firma = ahora_utc_naive
 
 
@@ -574,11 +574,11 @@ class Reparacion(models.Model):
 
         for rec in self:
             # ✍️ Procesar firma si se ingresó clave
-            if vals.get('clave_firma_manual'):
+            if vals.get('clave_autenticacion_manual'):
                 rec._procesar_firma()
 
             # 📦 Procesar vendedora si se ingresó clave
-            if vals.get('clave_autenticacion_manual'):
+            if vals.get('clave_firma_manual'):
                 rec._procesar_vendedora()
 
         return res
