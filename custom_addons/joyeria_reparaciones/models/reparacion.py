@@ -305,11 +305,11 @@ class Reparacion(models.Model):
             self.cobros_extras = 0.0
 
     
-    @api.model
-    def create(self, vals):
-        if not vals.get('vendedora_id'):
-            raise ValidationError("Debe escanear una vendedora válida antes de crear la orden.")
-        return super(Reparacion, self).create(vals)
+    #@api.model
+    #def create(self, vals):
+     #   if not vals.get('vendedora_id'):
+      #      raise ValidationError("Debe escanear una vendedora válida antes de crear la orden.")
+       # return super(Reparacion, self).create(vals)
 
 
 
