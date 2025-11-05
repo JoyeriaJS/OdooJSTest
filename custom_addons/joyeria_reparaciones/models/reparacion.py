@@ -397,7 +397,6 @@ class Reparacion(models.Model):
     CHILE_TZ = pytz.timezone('America/Santiago')
 
     def _procesar_firma(self):
-        """Asigna la firma (vendedora que retira) y la fecha al escanear el QR"""
         if self.clave_firma_manual:
             clave = self.clave_firma_manual.strip().upper()
             vendedora = self.env['joyeria.vendedora'].search([
@@ -409,9 +408,10 @@ class Reparacion(models.Model):
             if vendedora:
                 self.firma_id = vendedora.id
 
-                # Registrar fecha y hora exacta de Chile
+                # ✅ Obtener hora exacta de Chile, convertir a UTC y eliminar tzinfo (Odoo requiere naive)
                 ahora_chile = datetime.now(pytz.timezone('America/Santiago'))
                 ahora_utc_naive = ahora_chile.astimezone(pytz.UTC).replace(tzinfo=None)
+
                 self.fecha_firma = ahora_utc_naive
 
 
@@ -565,23 +565,52 @@ class Reparacion(models.Model):
         # Validaciones SOLO para usuarios NO admin
         if not is_admin:
             for rec in self:
-                # No permitir cambiar el tipo de peso una vez creado
                 if 'peso' in vals and vals['peso'] != rec.peso:
                     raise ValidationError("No se permite cambiar el tipo de peso una vez creado el registro.")
-                # Si en el futuro reactivas la validación de peso_valor, quedaría aquí análoga
 
+        # ⚙️ Preprocesar claves ANTES de guardar (para que no se pierdan en el super().write)
+        for rec in self:
+            # 📦 Si se escanea QR de recepción (quien recibe)
+            if vals.get('clave_autenticacion_manual'):
+                clave = vals['clave_autenticacion_manual'].strip().upper()
+                vendedora = rec.env['joyeria.vendedora'].search([
+                    '|', '|',
+                    ('clave_autenticacion', '=', clave),
+                    ('clave_qr', '=', clave),
+                    ('codigo_qr', '=', clave),
+                ], limit=1)
+                if vendedora:
+                    vals['vendedora_id'] = vendedora.id
+
+            # ✍️ Si se escanea QR de retiro (quien retira)
+            if vals.get('clave_firma_manual'):
+                clave = vals['clave_firma_manual'].strip().upper()
+                vendedora_firma = rec.env['joyeria.vendedora'].search([
+                    '|', '|',
+                    ('clave_autenticacion', '=', clave),
+                    ('clave_qr', '=', clave),
+                    ('codigo_qr', '=', clave),
+                ], limit=1)
+                if vendedora_firma:
+                    vals['firma_id'] = vendedora_firma.id
+                    ahora_chile = datetime.now(pytz.timezone('America/Santiago'))
+                    ahora_utc_naive = ahora_chile.astimezone(pytz.UTC).replace(tzinfo=None)
+                    vals['fecha_firma'] = ahora_utc_naive
+
+        # 🔒 Guardar finalmente
         res = super().write(vals)
 
+        # Post-procesos adicionales si se necesita actualizar en tiempo real
         for rec in self:
-            # ✍️ Procesar firma si se ingresó clave
+            # si deseas mantener lógica visual inmediata:
             if vals.get('clave_autenticacion_manual'):
+                rec._procesar_vendedora()
+            if vals.get('clave_firma_manual'):
                 rec._procesar_firma()
 
-            # 📦 Procesar vendedora si se ingresó clave
-            if vals.get('clave_firma_manual'):
-                rec._procesar_vendedora()
-
         return res
+
+        
 
     def imprimir_reporte_responsables(self):
         # Rango de fechas fijo, puedes cambiarlo más adelante a dinámico
