@@ -433,7 +433,7 @@ class Reparacion(models.Model):
             if vendedora:
                 self.vendedora_id = vendedora.id
 
-# ###create funcional######
+# ###create funcional(se modifica)######
     @api.model
     def create(self, vals):
         ahora = datetime.now(CHILE_TZ).strftime('%d/%m/%Y %H:%M:%S')
@@ -485,6 +485,13 @@ class Reparacion(models.Model):
                 ahora_utc_naive = ahora_chile.astimezone(pytz.UTC).replace(tzinfo=None)
                 vals['fecha_firma'] = ahora_utc_naive
                 mensajes.append(f"✍️ Retirado por: <b>{vendedora_firma.name}</b> el <b>{ahora}</b>")
+
+            # 🚫 Si hay clave de QR pero no se encontró vendedora válida
+            if vals.get('clave_autenticacion_manual') and not vals.get('vendedora_id'):
+                raise ValidationError("❌ Clave inválida: No se encontró ninguna vendedora con esa clave de autenticación o QR (quien recibe).")
+
+            if vals.get('clave_firma_manual') and not vals.get('firma_id'):
+                raise ValidationError("❌ Clave inválida: No se encontró ninguna vendedora con esa clave de autenticación o QR (quien retira).")
 
         # ----------------------------------------------------------
         # CREAR REGISTRO
@@ -614,6 +621,29 @@ class Reparacion(models.Model):
                     ahora_chile = datetime.now(pytz.timezone('America/Santiago'))
                     ahora_utc_naive = ahora_chile.astimezone(pytz.UTC).replace(tzinfo=None)
                     vals['fecha_firma'] = ahora_utc_naive
+            
+            # 🚫 Validar que las claves QR correspondan a vendedoras registradas
+            if vals.get('clave_autenticacion_manual'):
+                clave = str(vals['clave_autenticacion_manual']).strip().upper()
+                existe = self.env['joyeria.vendedora'].search([
+                    '|', '|',
+                    ('clave_autenticacion', '=', clave),
+                    ('clave_qr', '=', clave),
+                    ('codigo_qr', '=', clave),
+                ], limit=1)
+                if not existe:
+                    raise ValidationError("❌ Clave inválida: No se encontró ninguna vendedora con esa clave de autenticación o QR (quien recibe).")
+
+            if vals.get('clave_firma_manual'):
+                clave = str(vals['clave_firma_manual']).strip().upper()
+                existe = self.env['joyeria.vendedora'].search([
+                    '|', '|',
+                    ('clave_autenticacion', '=', clave),
+                    ('clave_qr', '=', clave),
+                    ('codigo_qr', '=', clave),
+                ], limit=1)
+                if not existe:
+                    raise ValidationError("❌ Clave inválida: No se encontró ninguna vendedora con esa clave de autenticación o QR (quien retira).")
 
         # 🔒 Guardar finalmente
         res = super().write(vals)
