@@ -440,45 +440,62 @@ class Reparacion(models.Model):
         mensajes = []
 
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
-        # ✅ Detectar importación (wizard de importar Odoo)
         is_import = bool(self.env.context.get('import_file') or self.env.context.get('from_import'))
 
-        # ✅ Validar peso especial (solo si NO es admin y NO es importación)
+        # ✅ Validar peso especial
         if (not is_admin) and (not is_import) and vals.get('peso') == 'especial' and not vals.get('peso_valor'):
             raise ValidationError("Debe ingresar un valor para el campo 'Peso' si selecciona tipo de peso 'Especial'.")
 
-        # Generar secuencia
+        # ✅ Generar secuencia si corresponde
         if vals.get('name', 'Nuevo') == 'Nuevo':
             secuencia = self.env['ir.sequence'].next_by_code('joyeria.reparacion')
             if not secuencia:
                 raise ValidationError("No se pudo generar la secuencia.")
             vals['name'] = secuencia.replace("'", "-")
 
-        # Procesar vendedora ANTES de crear
+        # ----------------------------------------------------------
+        # ⚙️ PROCESAR QR DE QUIEN RECIBE (vendedora)
+        # ----------------------------------------------------------
         if not vals.get('vendedora_id') and vals.get('clave_autenticacion_manual'):
-            clave = self._normalizar_clave(vals['clave_autenticacion_manual'])
+            clave = str(vals['clave_autenticacion_manual']).strip().upper()
             vendedora = self.env['joyeria.vendedora'].search([
-                '|', ('clave_autenticacion', '=', clave),
-                    ('codigo_qr', '=', clave)
+                '|', '|',
+                ('clave_autenticacion', '=', clave),
+                ('clave_qr', '=', clave),
+                ('codigo_qr', '=', clave),
             ], limit=1)
             if vendedora:
                 vals['vendedora_id'] = vendedora.id
                 mensajes.append(f"📦 Recibido por: <b>{vendedora.name}</b> el <b>{ahora}</b>")
 
-        # Crear el registro
+        # ----------------------------------------------------------
+        # ⚙️ PROCESAR QR DE QUIEN RETIRA (firma)
+        # ----------------------------------------------------------
+        if not vals.get('firma_id') and vals.get('clave_firma_manual'):
+            clave = str(vals['clave_firma_manual']).strip().upper()
+            vendedora_firma = self.env['joyeria.vendedora'].search([
+                '|', '|',
+                ('clave_autenticacion', '=', clave),
+                ('clave_qr', '=', clave),
+                ('codigo_qr', '=', clave),
+            ], limit=1)
+            if vendedora_firma:
+                vals['firma_id'] = vendedora_firma.id
+                ahora_chile = datetime.now(pytz.timezone('America/Santiago'))
+                ahora_utc_naive = ahora_chile.astimezone(pytz.UTC).replace(tzinfo=None)
+                vals['fecha_firma'] = ahora_utc_naive
+                mensajes.append(f"✍️ Retirado por: <b>{vendedora_firma.name}</b> el <b>{ahora}</b>")
+
+        # ----------------------------------------------------------
+        # CREAR REGISTRO
+        # ----------------------------------------------------------
         record = super().create(vals)
 
-        # Procesar firma
-        if record.clave_firma_manual:
-            record._procesar_firma()
-            if record.firma_id:
-                mensajes.append(f"✍️ Firmado por: <b>{record.firma_id.name}</b> el <b>{ahora}</b>")
-
-        # Generar código QR
+        # ✅ Generar QR de la reparación
         if hasattr(record, '_generar_codigo_qr'):
             record._generar_codigo_qr()
 
-        # Resumen general
+        # ✅ Mensaje resumen general
         peso_str = str(record.peso_valor) if record.peso_valor not in (False, 0, 0.0) else "No especificado"
         resumen = (
             "📌 Resumen generado automáticamente\n"
@@ -491,11 +508,12 @@ class Reparacion(models.Model):
         )
         mensajes.append(resumen)
 
-        # Publicar mensajes en bitácora
+        # ✅ Publicar mensajes en el chatter
         for msg in mensajes:
             record.message_post(body=msg)
 
         return record
+
 
 
     class ResPartnerRestrictWriteForRMAClients(models.Model):
