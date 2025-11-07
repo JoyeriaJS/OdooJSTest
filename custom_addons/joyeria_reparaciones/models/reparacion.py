@@ -486,12 +486,14 @@ class Reparacion(models.Model):
                 vals['fecha_firma'] = ahora_utc_naive
                 mensajes.append(f"✍️ Retirado por: <b>{vendedora_firma.name}</b> el <b>{ahora}</b>")
 
-            # 🚫 Si hay clave de QR pero no se encontró vendedora válida
-            if vals.get('clave_autenticacion_manual') and not vals.get('vendedora_id'):
-                raise ValidationError("❌ Clave inválida: No se encontró ninguna vendedora con esa clave de autenticación o QR (quien recibe).")
+        # ----------------------------------------------------------
+        # 🚫 VALIDAR CLAVES INVÁLIDAS
+        # ----------------------------------------------------------
+        if vals.get('clave_autenticacion_manual') and not vals.get('vendedora_id'):
+            raise ValidationError("❌ Clave inválida: No se encontró ninguna vendedora con esa clave (quien recibe).")
 
-            if vals.get('clave_firma_manual') and not vals.get('firma_id'):
-                raise ValidationError("❌ Clave inválida: No se encontró ninguna vendedora con esa clave de autenticación o QR (quien retira).")
+        if vals.get('clave_firma_manual') and not vals.get('firma_id'):
+            raise ValidationError("❌ Clave inválida: No se encontró ninguna vendedora con esa clave (quien retira).")
 
         # ----------------------------------------------------------
         # CREAR REGISTRO
