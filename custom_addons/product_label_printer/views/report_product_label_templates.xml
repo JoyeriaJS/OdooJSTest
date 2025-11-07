@@ -3,7 +3,7 @@
   <data>
     <!-- Acción ligada a product.template -->
     <record id="action_report_product_label_2x2" model="ir.actions.report">
-      <field name="name">Etiquetas 2×2 cm</field>
+      <field name="name">Etiquetas 2×2 cm</field>
       <field name="model">product.template</field>
       <field name="report_type">qweb-pdf</field>
       <field name="report_name">product_label_printer.report_product_label_2x2</field>
@@ -12,12 +12,13 @@
       <field name="binding_type">report</field>
     </record>
 
-    <!-- Plantilla QWeb 2×2 cm con nombre, Code128 y numeración -->
+    <!-- Plantilla QWeb 2×2 cm con nombre, código de barras y precio sin decimales -->
     <template id="report_product_label_2x2">
       <t t-call="web.html_container">
         <t t-foreach="docs" t-as="template">
-          <!-- Primera variante para campo real -->
           <t t-set="var" t-value="template.product_variant_ids and template.product_variant_ids[0] or False"/>
+          <!-- Código de barras preferido: template.barcode o variante -->
+          <t t-set="barcode_value" t-value="template.barcode or (var and var.barcode)"/>
           <div style="
               width:2cm;
               height:2cm;
@@ -30,18 +31,20 @@
               position:relative;
               page-break-inside:avoid;
             ">
-            <t t-if="var and var.barcode">
-              <!-- Nombre del producto arriba -->
+            <t t-if="barcode_value">
+              <!-- Código interno o modelo -->
               <div style="font-size:6px; line-height:1em; margin-bottom:2px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">
                 <t t-esc="template.default_code"/>
               </div>
-              <!-- Código de barras Code128 -->
-              <span t-field="var.barcode"
+
+              <!-- Código de barras -->
+              <span t-field="barcode_value"
                     t-options="{
                       'widget': 'barcode',
                       'symbology': 'Code128',
                       'img_style': 'width:100%; height:50%'
                     }"/>
+
               <!-- Número debajo -->
               <div style="
                   font-size:6px;
@@ -51,9 +54,10 @@
                   width:100%;
                   text-align:center;
                 ">
-                <t t-esc="var.barcode"/>
+                <t t-esc="barcode_value"/>
               </div>
-              <!-- Precio debajo -->
+
+              <!-- Precio sin decimales -->
               <div style="
                   font-size:6px;
                   line-height:1em;
@@ -62,13 +66,12 @@
                   width:100%;
                   text-align:center;
                 ">
-                $<t t-esc="template.list_price"/>
+                $<t t-esc="'{:,.0f}'.format(template.list_price).replace(',', '.')"/>
               </div>
             </t>
           </div>
         </t>
       </t>
     </template>
-
   </data>
 </odoo>
