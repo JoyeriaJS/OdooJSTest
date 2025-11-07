@@ -12,12 +12,14 @@
       <field name="binding_type">report</field>
     </record>
 
-    <!-- Plantilla QWeb 2×2 cm con nombre, Code128 y numeración -->
+    <!-- Plantilla QWeb 2×2 cm -->
     <template id="report_product_label_2x2">
       <t t-call="web.html_container">
         <t t-foreach="docs" t-as="template">
-          <!-- Primera variante (para el gráfico) -->
+          <!-- Primera variante -->
           <t t-set="var" t-value="template.product_variant_ids and template.product_variant_ids[0] or False"/>
+          <!-- Obtener código de barras (solo primeros 7 dígitos) -->
+          <t t-set="barcode_value" t-value="(var and var.barcode)[:7] if (var and var.barcode) else (template.barcode or '')"/>
 
           <div style="
               width:2cm;
@@ -31,13 +33,13 @@
               position:relative;
               page-break-inside:avoid;
             ">
-            <t t-if="var and var.barcode">
-              <!-- Código interno o SKU -->
+            <t t-if="barcode_value">
+              <!-- Nombre del producto -->
               <div style="font-size:6px; line-height:1em; margin-bottom:2px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">
                 <t t-esc="template.default_code"/>
               </div>
 
-              <!-- Código de barras Code128 (sigue usando el de la variante para generar el gráfico correctamente) -->
+              <!-- Código de barras gráfico (sin tocar) -->
               <span t-field="var.barcode"
                     t-options="{
                       'widget': 'barcode',
@@ -45,7 +47,7 @@
                       'img_style': 'width:100%; height:50%'
                     }"/>
 
-              <!-- Número impreso: usa SIEMPRE el barcode del producto padre -->
+              <!-- Código numérico original (7 dígitos base) -->
               <div style="
                   font-size:6px;
                   line-height:1em;
@@ -54,10 +56,10 @@
                   width:100%;
                   text-align:center;
                 ">
-                <t t-esc="template.barcode or var.barcode"/>
+                <t t-esc="barcode_value"/>
               </div>
 
-              <!-- Precio sin decimales -->
+              <!-- Precio formateado -->
               <div style="
                   font-size:6px;
                   line-height:1em;
@@ -73,6 +75,5 @@
         </t>
       </t>
     </template>
-
   </data>
 </odoo>
