@@ -18,9 +18,8 @@
         <t t-foreach="docs" t-as="template">
           <!-- Primera variante para campo real -->
           <t t-set="var" t-value="template.product_variant_ids and template.product_variant_ids[0] or False"/>
-
-          <!-- Forzar código de barras base original -->
-          <t t-set="barcode_value" t-value="template.barcode or (var and var.barcode and var.barcode.split('0')[0])"/>
+          <!-- Usar código de barras directamente, sin cortar -->
+          <t t-set="barcode_value" t-value="var and var.barcode or template.barcode"/>
 
           <div style="
               width:2cm;
@@ -40,7 +39,7 @@
                 <t t-esc="template.default_code"/>
               </div>
 
-              <!-- Código de barras Code128 (sin tocar, mantiene gráfico funcional) -->
+              <!-- Código de barras Code128 -->
               <span t-field="var.barcode"
                     t-options="{
                       'widget': 'barcode',
@@ -48,7 +47,7 @@
                       'img_style': 'width:100%; height:50%'
                     }"/>
 
-              <!-- Número debajo (usa código base sin extensión) -->
+              <!-- Número completo debajo -->
               <div style="
                   font-size:6px;
                   line-height:1em;
@@ -60,7 +59,7 @@
                 <t t-esc="barcode_value"/>
               </div>
 
-              <!-- Precio debajo (sin decimales, formato CLP) -->
+              <!-- Precio sin decimales -->
               <div style="
                   font-size:6px;
                   line-height:1em;
