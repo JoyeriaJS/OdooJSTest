@@ -1,6 +1,13 @@
 #!/bin/sh
 set -e
 
+# Si las variables ODOO_ no existen, usa las PG* que Railway inyecta automáticamente
+: "${ODOO_DATABASE_HOST:=$PGHOST}"
+: "${ODOO_DATABASE_PORT:=$PGPORT}"
+: "${ODOO_DATABASE_USER:=$PGUSER}"
+: "${ODOO_DATABASE_PASSWORD:=$PGPASSWORD}"
+: "${ODOO_DATABASE_NAME:=$PGDATABASE}"
+
 echo "Esperando conexión a PostgreSQL en ${ODOO_DATABASE_HOST}:${ODOO_DATABASE_PORT}..."
 
 # Espera a que la base de datos esté lista
