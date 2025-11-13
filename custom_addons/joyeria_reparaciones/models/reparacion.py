@@ -63,7 +63,6 @@ class Reparacion(models.Model):
         ('aros', 'Aros'),
         ('cadena', 'Cadena'),
         ('colgante', 'Colgante'),
-        ('dije', 'Dije'),
         ('pulsera', 'Pulsera'),
         ('otro', 'Otro')
     ], string='Tipo de joya', required=True)
