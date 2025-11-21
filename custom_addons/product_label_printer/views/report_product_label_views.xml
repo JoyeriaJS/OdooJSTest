@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
   <data>
-
+    <!-- Acción para imprimir etiqueta de anillo 75,95 x 10,01 mm -->
     <record id="action_report_product_label_ring" model="ir.actions.report">
       <field name="name">Etiqueta Anillo 75,95x10,01mm</field>
       <field name="model">product.template</field>
@@ -12,58 +12,54 @@
       <field name="binding_type">report</field>
     </record>
 
+    <!-- Plantilla 75,95 x 10,01 mm -->
     <template id="report_product_label_ring">
       <t t-call="web.html_container">
         <div class="page">
           <t t-foreach="docs" t-as="template">
-
             <t t-set="var" t-value="template.product_variant_ids and template.product_variant_ids[0] or False"/>
-
-            <!-- Código corto -->
-            <t t-if="var and var.barcode">
-              <t t-set="barcode_final" t-value="var.barcode[:7]"/>
-            </t>
-
             <div style="
                 width:75.95mm;
                 height:12mm;
-                border:1px solid #000;
-                padding:1mm;
-                text-align:center;
-                font-family:Arial, sans-serif;
                 box-sizing:border-box;
+                display:block;
+                margin:0 0 4mm 0;
+                border:1px solid #000;
+                text-align:center;
+                padding:1mm;
+                font-family:Arial, sans-serif;
                 page-break-inside:avoid;
               ">
-
-              <t t-if="barcode_final">
-
-                <!-- Referencia -->
+              <t t-if="var and var.barcode">
+                <!-- Referencia interna centrada -->
                 <div style="font-size:8px; font-weight:bold; margin-bottom:1mm;">
                   <t t-esc="var.default_code or ''"/>
                 </div>
 
-                <!-- Código de barras -->
-                <img t-att-src="'/report/barcode/Code128/%s?width=65mm&amp;height=6mm&amp;humanreadable=0' % barcode_final"
-                     style="width:65mm; height:6mm; display:block; margin:0 auto;"/>
-
-                <!-- Número corto -->
-                <div style="font-size:6px; margin-top:-0.5mm;">
-                  <t t-esc="barcode_final"/>
+                <!-- Código de barras centrado -->
+                <div>
+                  <span t-field="var.barcode"
+                        t-options="{
+                          'widget': 'barcode',
+                          'symbology': 'Code128',
+                          'img_style': 'width:65mm; height:6mm; display:block; margin:0 auto;'
+                        }"/>
                 </div>
 
-                <!-- Precio -->
+                <!-- Número de código debajo, centrado y más arriba -->
+                <div style="font-size:6px; margin-top:-0,5mm;">
+                  <t t-esc="var.barcode"/>
+                </div>
+
+                <!-- Precio debajo, centrado -->
                 <div t-if="var.lst_price" style="font-size:8px; font-weight:bold; margin-top:1mm;">
                   <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
                 </div>
-
               </t>
-
             </div>
-
           </t>
         </div>
       </t>
     </template>
-
   </data>
 </odoo>
