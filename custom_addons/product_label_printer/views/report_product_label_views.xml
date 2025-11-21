@@ -42,11 +42,11 @@
                   <t t-esc="var.default_code or ''"/>
                 </div>
 
-                <!-- CÓDIGO DE BARRAS FUNCIONAL -->
-                <img t-att-src="'/report/barcode/Code128/%s?width=72mm&height=5mm&humanreadable=0' % barcode_final"
+                <!-- Código de barras -->
+                <img t-att-src="'/report/barcode/Code128/%s?width=72mm&amp;height=5mm&amp;humanreadable=0' % barcode_final"
                      style="width:72mm; height:5mm; display:block; margin:0 auto;"/>
 
-                <!-- Número abajo -->
+                <!-- Número debajo -->
                 <div style="font-size:6px; margin-top:0mm;">
                   <t t-esc="barcode_final"/>
                 </div>
