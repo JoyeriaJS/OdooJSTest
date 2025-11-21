@@ -60,6 +60,7 @@
                   <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
                 </div>
 
+
               </t>
             </div>
           </t>
