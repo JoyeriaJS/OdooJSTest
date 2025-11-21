@@ -18,7 +18,6 @@
         <div class="page">
           <t t-foreach="docs" t-as="template">
             <t t-set="var" t-value="template.product_variant_ids and template.product_variant_ids[0] or False"/>
-
             <div style="
                 width:75.95mm;
                 height:12mm;
@@ -31,15 +30,13 @@
                 font-family:Arial, sans-serif;
                 page-break-inside:avoid;
               ">
-
               <t t-if="var and var.barcode">
-
-                <!-- Referencia interna -->
+                <!-- Referencia interna centrada -->
                 <div style="font-size:8px; font-weight:bold; margin-bottom:1mm;">
                   <t t-esc="var.default_code or ''"/>
                 </div>
 
-                <!-- Código de barras gráfico (SIN CAMBIOS) -->
+                <!-- Código de barras centrado -->
                 <div>
                   <span t-field="var.barcode"
                         t-options="{
@@ -49,18 +46,16 @@
                         }"/>
                 </div>
 
-                <!-- Número debajo -> SOLO RECORTADO A 7 -->
-                <div style="font-size:6px; margin-top:-0.5mm;">
-                  <t t-esc="var.barcode[:7]"/>
+                <!-- Número de código debajo, centrado y más arriba -->
+                <div style="font-size:6px; margin-top:-0,5mm;">
+                  <t t-esc="var.barcode"/>
                 </div>
 
-                <!-- Precio -->
+                <!-- Precio debajo, centrado -->
                 <div t-if="var.lst_price" style="font-size:8px; font-weight:bold; margin-top:1mm;">
                   <t t-esc="'$ {:,.0f}'.format(var.lst_price).replace(',', '.')"/>
                 </div>
-
               </t>
-
             </div>
           </t>
         </div>
