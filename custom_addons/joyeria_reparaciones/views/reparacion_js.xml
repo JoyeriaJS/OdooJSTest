@@ -37,26 +37,18 @@
                         <!-- Datos de salida del taller -->
                         <group string="🔧 Datos de salida del taller" col="2" groups="base.group_system">
                             <field name="metal_utilizado" groups="base.group_system" options="{'no_empty': True}"/>
-                            <field name="gramos_utilizado" groups="base.group_system"
-                                style="background-color:#e6f0ff; color:#003366;"/> <!-- Azul -->
+                            <field name="gramos_utilizado" groups="base.group_system" style="background-color:#e6f0ff; color:#003366;"/>
 
-                            <field name="metales_extra" groups="base.group_system"
-                                style="background-color:#e6f0ff; color:#003366;"/> <!-- Azul -->
-
+                            <field name="metales_extra" groups="base.group_system" style="background-color:#e6f0ff; color:#003366;"/>
                             <field name="peso_total" groups="base.group_system" readonly="1"
-                                style="background-color:#fff8b3; color:#665c00; font-weight:bold;"/> <!-- Amarillo + negrita -->
+                                style="background-color:#fff8b3; color:#665c00; font-weight:bold;"/>
 
-                            <field name="cobro_interno" groups="base.group_system"
-                                style="background-color:#d9fdd3; color:#1c6b1c;"/> <!-- Verde -->
-
-                            <field name="hechura" groups="base.group_system"
-                                style="background-color:#d9fdd3; color:#1c6b1c;"/> <!-- Verde -->
-
-                            <field name="cobros_extras" groups="base.group_system"
-                                style="background-color:#d9fdd3; color:#1c6b1c;"/> <!-- Verde -->
-
+                            <field name="cobro_interno" groups="base.group_system" style="background-color:#d9fdd3; color:#1c6b1c;"/>
+                            <field name="hechura" groups="base.group_system" style="background-color:#d9fdd3; color:#1c6b1c;"/>
+                            <field name="cobros_extras" groups="base.group_system" style="background-color:#d9fdd3; color:#1c6b1c;"/>
                             <field name="total_salida_taller" groups="base.group_system" readonly="1"
-                                style="background-color:#fff8b3; color:#665c00; font-weight:bold;"/> <!-- Amarillo + negrita -->
+                                style="background-color:#fff8b3; color:#665c00; font-weight:bold;"/>
+
                             <field name="clave_firma_manual" password="True" groups="base.group_system" placeholder="Escanear o ingresar clave"/>
                             <field name="firma_id" readonly="1" groups="base.group_system"/>
                             <field name="fecha_firma" readonly="1" groups="base.group_system"/>
@@ -88,11 +80,23 @@
                             <field name="saldo" readonly="1"/>
                         </group>
 
+                        <!-- 🔐 Autorización para Reparaciones Sin Costo -->
+                        <group string="Autorización (solo si es sin costo)" col="2">
+                            <field name="codigo_ingresado"/>
+                            <field name="codigo_autorizacion" groups="base.group_system"/>
+                            <button name="action_generate_code"
+                                    type="object"
+                                    class="btn-primary"
+                                    string="Generar código"
+                                    groups="base.group_system"/>
+                        </group>
+
                         <!-- Notas y Comentarios -->
                         <group string="Notas y Comentarios" col="2">
                             <field name="notas"/>
                             <field name="comentarios"/>
                         </group>
+
                     </group>
 
                     <!-- Pestaña Operaciones -->
@@ -114,15 +118,14 @@
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers"/>
                         <field name="message_ids" widget="mail_thread"/>
-
-                        
                     </div>
+
                 </sheet>
             </form>
         </field>
     </record>
-     <!-- Vista árbol -->
-    
+
+    <!-- Vista árbol -->
     <record id="view_custom_repair_order_tree" model="ir.ui.view">
         <field name="name">custom.repair.order.tree</field>
         <field name="model">joyeria.reparacion</field>
@@ -161,9 +164,4 @@
 
     <menuitem id="menu_joyeria_root" name="Reparaciones" action="action_joyeria_reparacion_listado"/>
 
-    
-    
-    
 </odoo>
-
-
