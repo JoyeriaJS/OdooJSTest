@@ -33,6 +33,15 @@ class Reparacion(models.Model):
     )
     producto_id = fields.Many2one('joyeria.producto', string='Producto a reparar', required=False)
     
+    auth_code_id = fields.Many2one(
+    "joyeria.reparacion.authcode",
+    string="Código usado"
+    )
+    codigo_ingresado = fields.Char(string="Código de autorización")
+    codigo_ingresado = fields.Char("Código ingresado")
+    codigo_autorizacion_id = fields.Many2one("joyeria.reparacion.authcode", string="Código autorizado", readonly=True)
+
+
     modelo = fields.Char(string='Modelo', required=False)
     cliente_id = fields.Many2one('res.partner', string='Nombre y apellido del Cliente', required=True)
     nombre_cliente = fields.Char(string='Nombre y apellido del cliente', required=False)
@@ -441,20 +450,54 @@ class Reparacion(models.Model):
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
         is_import = bool(self.env.context.get('import_file') or self.env.context.get('from_import'))
 
-        # ✅ Validar peso especial
+        # ============================================================
+        # 🔐 VALIDACIÓN DE AUTORIZACIÓN EXTERNA (RMA SIN COSTO)
+        # ============================================================
+        # Detectar si todos los valores financieros están en 0
+        precio0 = all(vals.get(f, 0) in (0, False, None)
+                    for f in ['precio_unitario', 'extra', 'extra2', 'extra3', 'abono', 'saldo'])
+
+        if precio0 and not is_admin:
+            codigo_ing = vals.get("codigo_ingresado", "").strip().upper()
+
+            if not codigo_ing:
+                raise ValidationError("❌ Debes ingresar un código de autorización para crear una reparación sin costo.")
+
+            # Buscar código en el modelo externo
+            code = self.env["joyeria.reparacion.authcode"].search([
+                ('codigo', '=', codigo_ing),
+                ('ya_usado', '=', False)
+            ], limit=1)
+
+            if not code:
+                raise ValidationError("❌ El código ingresado no existe o ya fue utilizado.")
+
+            # Marcar código como usado
+            code.write({
+                'ya_usado': True,
+                'usado_por_id': self.env.uid,
+                'fecha_uso': datetime.now()
+            })
+
+            # Asociar el código al RMA que se creará
+            vals["codigo_autorizacion_id"] = code.id
+
+        # ============================================================
+        # ⚙️ LÓGICA EXISTENTE – NO TOCAR
+        # ============================================================
+
+        # Validar peso especial
         if (not is_admin) and (not is_import) and vals.get('peso') == 'especial' and not vals.get('peso_valor'):
             raise ValidationError("Debe ingresar un valor para el campo 'Peso' si selecciona tipo de peso 'Especial'.")
 
-        # ✅ Generar secuencia si corresponde
+        # Generar secuencia
         if vals.get('name', 'Nuevo') == 'Nuevo':
             secuencia = self.env['ir.sequence'].next_by_code('joyeria.reparacion')
             if not secuencia:
                 raise ValidationError("No se pudo generar la secuencia.")
             vals['name'] = secuencia.replace("'", "-")
 
-        # ----------------------------------------------------------
-        # ⚙️ PROCESAR QR DE QUIEN RECIBE (vendedora)
-        # ----------------------------------------------------------
+        # Procesar QR quien recibe
         if not vals.get('vendedora_id') and vals.get('clave_autenticacion_manual'):
             clave = str(vals['clave_autenticacion_manual']).strip().upper()
             vendedora = self.env['joyeria.vendedora'].search([
@@ -467,9 +510,7 @@ class Reparacion(models.Model):
                 vals['vendedora_id'] = vendedora.id
                 mensajes.append(f"📦 Recibido por: <b>{vendedora.name}</b> el <b>{ahora}</b>")
 
-        # ----------------------------------------------------------
-        # ⚙️ PROCESAR QR DE QUIEN RETIRA (firma)
-        # ----------------------------------------------------------
+        # Procesar QR quien retira
         if not vals.get('firma_id') and vals.get('clave_firma_manual'):
             clave = str(vals['clave_firma_manual']).strip().upper()
             vendedora_firma = self.env['joyeria.vendedora'].search([
@@ -485,25 +526,21 @@ class Reparacion(models.Model):
                 vals['fecha_firma'] = ahora_utc_naive
                 mensajes.append(f"✍️ Retirado por: <b>{vendedora_firma.name}</b> el <b>{ahora}</b>")
 
-        # ----------------------------------------------------------
-        # 🚫 VALIDAR CLAVES INVÁLIDAS
-        # ----------------------------------------------------------
+        # Validaciones QR
         if vals.get('clave_autenticacion_manual') and not vals.get('vendedora_id'):
             raise ValidationError("❌ Clave inválida: No se encontró ninguna vendedora con esa clave (quien recibe).")
 
         if vals.get('clave_firma_manual') and not vals.get('firma_id'):
             raise ValidationError("❌ Clave inválida: No se encontró ninguna vendedora con esa clave (quien retira).")
 
-        # ----------------------------------------------------------
-        # CREAR REGISTRO
-        # ----------------------------------------------------------
+        # Crear registro
         record = super().create(vals)
 
-        # ✅ Generar QR de la reparación
+        # Generar QR reparación
         if hasattr(record, '_generar_codigo_qr'):
             record._generar_codigo_qr()
 
-        # ✅ Mensaje resumen general
+        # Resumen
         peso_str = str(record.peso_valor) if record.peso_valor not in (False, 0, 0.0) else "No especificado"
         resumen = (
             "📌 Resumen generado automáticamente\n"
@@ -516,7 +553,6 @@ class Reparacion(models.Model):
         )
         mensajes.append(resumen)
 
-        # ✅ Publicar mensajes en el chatter
         for msg in mensajes:
             record.message_post(body=msg)
 

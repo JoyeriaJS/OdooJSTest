@@ -1,0 +1,44 @@
+<odoo>
+    <record id="view_auth_code_tree" model="ir.ui.view">
+        <field name="name">auth.code.tree</field>
+        <field name="model">joyeria.reparacion.authcode</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="codigo"/>
+                <field name="used"/>
+                <field name="fecha_generado"/>
+                <field name="tienda_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_auth_code_form" model="ir.ui.view">
+        <field name="name">auth.code.form</field>
+        <field name="model">joyeria.reparacion.authcode</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="codigo" readonly="1"/>
+                        <field name="used"/>
+                        <field name="tienda_id"/>
+                        <field name="fecha_generado"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_auth_code" model="ir.actions.act_window">
+        <field name="name">Códigos de Autorización</field>
+        <field name="res_model">joyeria.reparacion.authcode</field>
+        <field name="view_mode">tree,form</field>
+        <field name="groups_id" eval="[(4, ref('base.group_system'))]"/>
+    </record>
+
+    <menuitem id="menu_auth_code"
+              parent="menu_joyeria_root"
+              name="Códigos de Autorización"
+              action="action_auth_code"
+              groups="base.group_system"/>
+</odoo>
