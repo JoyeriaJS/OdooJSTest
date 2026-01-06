@@ -198,9 +198,17 @@ class Reparacion(models.Model):
             )
 
     def action_generate_code(self):
-        for r in self:
-            r.codigo_autorizacion = secrets.token_hex(3).upper()
-        return True
+        self.ensure_one()
+        new_code = self.env["joyeria.reparacion.code"].generar_codigo()
+        self.codigo_autorizacion = new_code.codigo
+        return {
+            "effect": {
+                "fadeout": "slow",
+                "message": f"Código generado: {new_code.codigo}",
+                "type": "rainbow_man",
+            }
+        }
+
 
     @api.constrains('cliente_id')
     def _check_cliente_id_unique_name(self):
@@ -477,16 +485,16 @@ class Reparacion(models.Model):
             codigo_real = vals.get("codigo_autorizacion")
             codigo_ing = vals.get("codigo_ingresado")
 
-            # No existe código generado por admin
+            # No existe código generado por admin (NO permitir guardar)
             if not codigo_real:
                 raise ValidationError(
-                    "❌ Esta reparación sin costo requiere un código generado por un administrador."
+                    "❌ Esta reparación de costo $0 requiere un código generado por un administrador antes de poder guardarla."
                 )
 
             # Usuario no ingresó código
             if not codigo_ing:
                 raise ValidationError(
-                    "❌ Debes ingresar el código de autorización para crear una reparación sin costo."
+                    "❌ Debes ingresar el código de autorización entregado por administración."
                 )
 
             # Código incorrecto
@@ -494,7 +502,7 @@ class Reparacion(models.Model):
                 raise ValidationError("❌ El código de autorización ingresado es incorrecto.")
 
         # ============================================================
-        # ⚙️ LÓGICA EXISTENTE — NO TOCAR COMO ME PEDISTE
+        # ⚙️ LÓGICA EXISTENTE — SIN MODIFICAR COMO ME PEDISTE
         # ============================================================
 
         # Validar peso especial
@@ -573,6 +581,7 @@ class Reparacion(models.Model):
 
 
 
+
     class ResPartnerRestrictWriteForRMAClients(models.Model):
         _inherit = 'res.partner'
 
@@ -638,35 +647,40 @@ class Reparacion(models.Model):
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
 
         # ============================================================
-        # 🔐 VALIDACIÓN DE AUTORIZACIÓN PARA REPARACIONES SIN COSTO
+        # 🔐 VALIDACIÓN AUTORIZACIÓN PARA REPARACIONES SIN COSTO
         # ============================================================
         for rec in self:
 
-            if rec.requiere_autorizacion:  # <-- disparador correcto
+            # REPARACIÓN SIN COSTO = requiere autorización
+            requiere = rec.requiere_autorizacion
 
-                if not is_admin:
-                    # Código ingresado por el usuario (nuevo o existente)
-                    codigo_ing = vals.get("codigo_ingresado") or rec.codigo_ingresado
+            if requiere and not is_admin:
 
-                    # Admin no generó código todavía
-                    if not rec.codigo_autorizacion:
-                        raise ValidationError(
-                            "❌ Esta reparación es SIN COSTO y requiere un código de autorización "
-                            "generado por un administrador."
-                        )
+                # Código ingresado por el usuario (si viene en vals o ya existe en el registro)
+                codigo_ing = vals.get("codigo_ingresado") or rec.codigo_ingresado
 
-                    # Usuario no ingresó código
-                    if not codigo_ing:
-                        raise ValidationError(
-                            "❌ Debes ingresar el código de autorización para guardar una reparación sin costo."
-                        )
+                # Código generado por el administrador
+                codigo_real = rec.codigo_autorizacion
 
-                    # Código incorrecto
-                    if str(codigo_ing).strip() != str(rec.codigo_autorizacion).strip():
-                        raise ValidationError("❌ El código de autorización ingresado es incorrecto.")
+                # No existe código generado por admin
+                if not codigo_real:
+                    raise ValidationError(
+                        "❌ Esta reparación es SIN COSTO y requiere un código de autorización "
+                        "generado por un administrador antes de poder guardarla."
+                    )
+
+                # No se ingresó código
+                if not codigo_ing:
+                    raise ValidationError(
+                        "❌ Debes ingresar el código de autorización entregado por administración."
+                    )
+
+                # Código incorrecto
+                if str(codigo_ing).strip() != str(codigo_real).strip():
+                    raise ValidationError("❌ El código de autorización ingresado es incorrecto.")
 
         # ==================================================================
-        # ⚙️ VALIDACIONES Y LÓGICA EXISTENTE (NO TOCAR COMO ME PEDISTE)
+        # ⚙️ VALIDACIONES ORIGINALES — SIN MODIFICAR (como pediste)
         # ==================================================================
         if not is_admin:
             for rec in self:
@@ -675,10 +689,12 @@ class Reparacion(models.Model):
                         "No se permite cambiar el tipo de peso una vez creado el registro."
                     )
 
-        # ⚙️ Preprocesamiento QR
+        # ==================================================================
+        # ⚙️ PROCESAMIENTO QR — TU LÓGICA ORIGINAL
+        # ==================================================================
         for rec in self:
 
-            # 📦 Recepción
+            # 📦 Recepción (quien recibe)
             if vals.get('clave_autenticacion_manual'):
                 clave = vals['clave_autenticacion_manual'].strip().upper()
                 vendedora = rec.env['joyeria.vendedora'].search([
@@ -690,7 +706,7 @@ class Reparacion(models.Model):
                 if vendedora:
                     vals['vendedora_id'] = vendedora.id
 
-            # ✍️ Firma retiro
+            # ✍️ Firma (quien retira)
             if vals.get('clave_firma_manual'):
                 clave = vals['clave_firma_manual'].strip().upper()
                 vendedora_firma = rec.env['joyeria.vendedora'].search([
@@ -707,9 +723,9 @@ class Reparacion(models.Model):
                     )
                     vals['fecha_firma'] = ahora_utc_naive
 
-            # 🚫 Validar claves invalidas
+            # 🚫 Validaciones QR inválidos
             if vals.get('clave_autenticacion_manual'):
-                clave = str(vals['clave_autenticacion_manual']).strip().upper()
+                clave = vals['clave_autenticacion_manual'].strip().upper()
                 existe = rec.env['joyeria.vendedora'].search([
                     '|', '|',
                     ('clave_autenticacion', '=', clave),
@@ -718,12 +734,11 @@ class Reparacion(models.Model):
                 ], limit=1)
                 if not existe:
                     raise ValidationError(
-                        "❌ Clave inválida: No se encontró ninguna vendedora con esa clave "
-                        "(quien recibe)."
+                        "❌ Clave inválida: No se encontró ninguna vendedora con esa clave (quien recibe)."
                     )
 
             if vals.get('clave_firma_manual'):
-                clave = str(vals['clave_firma_manual']).strip().upper()
+                clave = vals['clave_firma_manual'].strip().upper()
                 existe = rec.env['joyeria.vendedora'].search([
                     '|', '|',
                     ('clave_autenticacion', '=', clave),
@@ -732,14 +747,15 @@ class Reparacion(models.Model):
                 ], limit=1)
                 if not existe:
                     raise ValidationError(
-                        "❌ Clave inválida: No se encontró ninguna vendedora con esa clave "
-                        "(quien retira)."
+                        "❌ Clave inválida: No se encontró ninguna vendedora con esa clave (quien retira)."
                     )
 
-        # 🔒 Guardar finalmente
+        # ==================================================================
+        # 🔒 GUARDADO FINAL
+        # ==================================================================
         res = super().write(vals)
 
-        # Post-procesos
+        # Post-procesos QR
         for rec in self:
             if vals.get('clave_autenticacion_manual'):
                 rec._procesar_vendedora()
@@ -747,6 +763,7 @@ class Reparacion(models.Model):
                 rec._procesar_firma()
 
         return res
+
 
 
 

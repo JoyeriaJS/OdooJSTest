@@ -81,15 +81,29 @@
                         </group>
 
                         <!-- 🔐 Autorización para Reparaciones Sin Costo -->
-                        <group string="Autorización (solo si es sin costo)" col="2">
-                            <field name="codigo_ingresado"/>
-                            <field name="codigo_autorizacion" groups="base.group_system"/>
+                       <!-- 🔐 Autorización para Reparaciones Sin Costo -->
+                        <group string="Autorización (solo si es sin costo)"
+                            col="2"
+                            attrs="{'invisible': [('requiere_autorizacion', '=', False)]}">
+
+                            <!-- Código que ingresa la vendedora -->
+                            <field name="codigo_ingresado"
+                                placeholder="Ingresa el código entregado por administración"/>
+
+                            <!-- Código generado, solo visible para administradores -->
+                            <field name="codigo_autorizacion"
+                                readonly="1"
+                                groups="base.group_system"/>
+
+                            <!-- Botón para generar código, solo administradores -->
                             <button name="action_generate_code"
-                                    type="object"
-                                    class="btn-primary"
                                     string="Generar código"
+                                    type="object"
+                                    class="oe_highlight"
                                     groups="base.group_system"/>
+
                         </group>
+
 
                         <!-- Notas y Comentarios -->
                         <group string="Notas y Comentarios" col="2">
