@@ -84,7 +84,7 @@
                        <!-- 🔐 Autorización para Reparaciones Sin Costo -->
                         <group string="Autorización (solo si es sin costo)"
                             col="2"
-                            attrs="{'invisible': [('requiere_autorizacion', '=', False)]}">
+                            visibility_condition="requiere_autorizacion == True">
 
                             <!-- Código que ingresa la vendedora -->
                             <field name="codigo_ingresado"
@@ -101,7 +101,6 @@
                                     type="object"
                                     class="oe_highlight"
                                     groups="base.group_system"/>
-
                         </group>
 
 
