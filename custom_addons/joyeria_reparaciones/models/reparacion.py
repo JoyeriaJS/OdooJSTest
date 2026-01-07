@@ -43,7 +43,7 @@ class Reparacion(models.Model):
     auth_code_id = fields.Many2one(
         "joyeria.reparacion.authcode",
         string="Código seleccionado por administración",
-        domain="[('ya_usado','=',False)]",
+        domain="[('used','=',False)]",
         groups="base.group_system",  # solo admins lo ven
     )
 
@@ -508,7 +508,7 @@ class Reparacion(models.Model):
 
             # Marcar como usado
             code.write({
-                'ya_usado': True,
+                'used': True,
                 'usado_por_id': self.env.uid,
                 'fecha_uso': datetime.now()
             })
@@ -706,7 +706,7 @@ class Reparacion(models.Model):
                 # 4) Evitar marcarlo dos veces
                 if not code.ya_usado:
                     code.write({
-                        'ya_usado': True,
+                        'used': True,
                         'usado_por_id': self.env.uid,
                         'fecha_uso': datetime.now(),
                     })

@@ -95,7 +95,7 @@
                             <!-- Código asignado por administración -->
                             <field name="auth_code_id"
                                 string="Código autorizado"
-                                domain="[('ya_usado','=',False)]"
+                                domain="[('used','=',False)]"
                                 groups="base.group_system"
                                 options="{'no_create': True}"/>
 
