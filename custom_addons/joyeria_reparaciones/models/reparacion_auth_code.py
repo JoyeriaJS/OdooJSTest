@@ -9,7 +9,7 @@ class ReparacionAuthCode(models.Model):
     _rec_name = "codigo"
 
     codigo = fields.Char(string="Código", readonly=True)
-    ya_usado = fields.Boolean(string="Usado", default=False)
+    used = fields.Boolean(string="Usado", default=False)
     fecha_generado = fields.Datetime(string="Fecha generado", default=fields.Datetime.now)
     #tienda_id = fields.Many2one("joyeria.tienda", string="Tienda", help="Opcional")
 
