@@ -89,28 +89,22 @@
                         </group>
 
                         <!-- AUTORIZACIÓN PARA RMA SIN COSTO -->
-                        <group string="Autorización para reparaciones sin costo"
-                            visibility_condition="requiere_autorizacion == True"
-                            col="2">
+                        <group string="Autorización (solo si es sin costo)"
+                            visibility_condition="requiere_autorizacion == True">
 
-                            <!-- Código ingresado por la vendedora -->
+                            <!-- Admin selecciona el código -->
+                            <field name="auth_code_id"
+                                string="Código autorizado"
+                                groups="base.group_system"
+                                options="{'no_create': True}"/>
+
+                            <!-- Vendedora ingresa el código -->
                             <field name="codigo_ingresado"
                                 placeholder="Ingresa el código entregado por administración"
-                                password="True" />
-
-                            <!-- Código asociado al RMA (solo lectura) -->
-                            <field name="codigo_autorizacion_id"
-                                string="Código validado"
-                                readonly="1"
-                                groups="base.group_system" />
-
-                            <!-- Selección del código disponible (solo admin) -->
-                            <field name="auth_code_id"
-                                string="Código disponible"
-                                groups="base.group_system"
-                                options="{'no_create': True}" />
+                                password="True"/>
 
                         </group>
+
 
 
 
