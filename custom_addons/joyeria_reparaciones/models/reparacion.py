@@ -478,11 +478,27 @@ class Reparacion(models.Model):
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
         is_import = bool(self.env.context.get('import_file') or self.env.context.get('from_import'))
 
-        # ============================================================
+         # ============================================================
         # 🔐 VALIDACIÓN DE AUTORIZACIÓN PARA RMA SIN COSTO
         # ============================================================
-        precio0 = all(vals.get(f, 0) in (0, False, None)
-                    for f in ['precio_unitario', 'extra', 'extra2', 'extra3', 'abono', 'saldo'])
+
+        # Tomar valores reales que tendrá el registro (vals o default 0)
+        precio_unitario = vals.get("precio_unitario", 0) or 0
+        extra = vals.get("extra", 0) or 0
+        extra2 = vals.get("extra2", 0) or 0
+        extra3 = vals.get("extra3", 0) or 0
+        abono = vals.get("abono", 0) or 0
+        saldo = vals.get("saldo", 0) or 0
+
+        # Detectar RMA sin costo REAL
+        precio0 = (
+            precio_unitario == 0 and
+            extra == 0 and
+            extra2 == 0 and
+            extra3 == 0 and
+            abono == 0 and
+            saldo == 0
+        )
 
         if precio0 and not is_admin:
 
@@ -496,25 +512,20 @@ class Reparacion(models.Model):
             if not auth_code_id:
                 raise ValidationError("❌ Un administrador debe seleccionar un código de autorización antes de guardar.")
 
-            # Obtener el código correctamente
             code = self.env["joyeria.reparacion.authcode"].browse(auth_code_id)
 
-            # Validar campo correcto: "used" (NO "ya_usado")
             if code.used:
                 raise ValidationError("❌ El código seleccionado ya fue utilizado.")
 
-            # Validar que coincida con el ingresado
             if code.codigo.strip().upper() != codigo_ing:
                 raise ValidationError("❌ El código ingresado es incorrecto.")
 
-            # Marcar como usado
             code.write({
                 'used': True,
                 'usado_por_id': self.env.uid,
                 'fecha_uso': datetime.now()
             })
 
-            # Asociar código validado al RMA
             vals["codigo_autorizacion_id"] = code.id
 
         # ============================================================
