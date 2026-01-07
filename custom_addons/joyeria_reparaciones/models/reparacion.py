@@ -758,6 +758,7 @@ class Reparacion(models.Model):
 
 
 
+
         
 
     def imprimir_reporte_responsables(self):
