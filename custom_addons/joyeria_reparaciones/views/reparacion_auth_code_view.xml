@@ -8,7 +8,6 @@
                 <field name="codigo"/>
                 <field name="used"/>
                 <field name="fecha_generado"/>
-                <field name="tienda_id"/>
             </tree>
         </field>
     </record>
