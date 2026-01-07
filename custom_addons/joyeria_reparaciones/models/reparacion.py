@@ -52,6 +52,11 @@ class Reparacion(models.Model):
     compute="_compute_requiere_autorizacion",
     store=True
 )
+    codigo_autorizacion_id = fields.Many2one(
+    "joyeria.reparacion.authcode",
+    string="Código autorizado",
+    readonly=True
+)
 
     modelo = fields.Char(string='Modelo', required=False)
     cliente_id = fields.Many2one('res.partner', string='Nombre y apellido del Cliente', required=True)
