@@ -88,6 +88,32 @@
                             <field name="saldo" readonly="1"/>
                         </group>
 
+                        <!-- AUTORIZACIÓN PARA RMA SIN COSTO -->
+                        <group string="Autorización para reparaciones sin costo"
+                            attrs="{'invisible': [('requiere_autorizacion', '=', False)]}"
+                            col="2">
+
+                            <!-- Código ingresado por la vendedora -->
+                            <field name="codigo_ingresado"
+                                placeholder="Ingresa el código entregado por administración"
+                                password="True" />
+
+                            <!-- Código asociado al RMA (solo lectura) -->
+                            <field name="codigo_autorizacion_id"
+                                string="Código validado"
+                                readonly="1"
+                                groups="base.group_system" />
+
+                            <!-- Selección del código (solo administradores) -->
+                            <field name="auth_code_id"
+                                string="Código disponible"
+                                groups="base.group_system"
+                                options="{'no_create': True}" />
+
+                        </group>
+
+
+
                         <!-- Notas y Comentarios -->
                         <group string="Notas y Comentarios" col="2">
                             <field name="notas"/>
