@@ -29,6 +29,7 @@
         "views/reparacion_auth_code_view.xml",
         "views/reparacion_confirm_view.xml",
         
+        
 
         'report/report_salida_taller_xlsx.xml',
         'report/report_sales_by_store_xlsx.xml',

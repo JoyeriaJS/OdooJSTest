@@ -9,7 +9,7 @@ class ReparacionAuthorizationCode(models.Model):
 
     codigo = fields.Char(string="Código de autorización", required=True, readonly=True)
     fecha_generado = fields.Datetime(default=lambda self: fields.Datetime.now(), readonly=True)
-    usado = fields.Boolean(string="Usado", default=False, readonly=True)
+    used = fields.Boolean(string="Usado", default=False, readonly=True)
     reparacion_id = fields.Many2one("joyeria.reparacion", string="Reparación vinculada", readonly=True)
 
     @api.model
