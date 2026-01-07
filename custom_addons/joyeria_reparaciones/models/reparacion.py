@@ -485,9 +485,9 @@ class Reparacion(models.Model):
                     for f in ['precio_unitario', 'extra', 'extra2', 'extra3', 'abono', 'saldo'])
 
         if precio0 and not is_admin:
+
             # Código ingresado por la vendedora
             codigo_ing = vals.get("codigo_ingresado", "").strip().upper()
-
             if not codigo_ing:
                 raise ValidationError("❌ Debes ingresar un código de autorización para reparaciones sin costo.")
 
@@ -496,10 +496,11 @@ class Reparacion(models.Model):
             if not auth_code_id:
                 raise ValidationError("❌ Un administrador debe seleccionar un código de autorización antes de guardar.")
 
+            # Obtener el código correctamente
             code = self.env["joyeria.reparacion.authcode"].browse(auth_code_id)
 
-            # Validar que no esté usado
-            if code.ya_usado:
+            # Validar campo correcto: "used" (NO "ya_usado")
+            if code.used:
                 raise ValidationError("❌ El código seleccionado ya fue utilizado.")
 
             # Validar que coincida con el ingresado
@@ -512,6 +513,9 @@ class Reparacion(models.Model):
                 'usado_por_id': self.env.uid,
                 'fecha_uso': datetime.now()
             })
+
+            # Asociar código validado al RMA
+            vals["codigo_autorizacion_id"] = code.id
 
         # ============================================================
         # ⚙️ LÓGICA EXISTENTE — NO TOCAR
