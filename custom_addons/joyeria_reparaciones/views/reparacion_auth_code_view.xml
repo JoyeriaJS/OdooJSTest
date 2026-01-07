@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <record id="view_auth_code_tree" model="ir.ui.view">
         <field name="name">auth.code.tree</field>
@@ -37,8 +38,8 @@
     </record>
 
     <menuitem id="menu_auth_code"
-              parent="menu_joyeria_root"
               name="Códigos de Autorización"
+              parent="menu_joyeria_root"
               action="action_auth_code"
               groups="base.group_system"/>
 </odoo>
