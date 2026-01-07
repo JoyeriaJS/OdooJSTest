@@ -11,7 +11,7 @@ class ReparacionAuthCode(models.Model):
     codigo = fields.Char(string="Código", readonly=True)
     used = fields.Boolean(string="Usado", default=False)
     fecha_generado = fields.Datetime(string="Fecha generado", default=fields.Datetime.now)
-    tienda_id = fields.Many2one("joyeria.tienda", string="Tienda", help="Opcional")
+    #tienda_id = fields.Many2one("joyeria.tienda", string="Tienda", help="Opcional")
 
     def generar_codigo(self):
         """Generar código aleatorio de 6 caracteres"""

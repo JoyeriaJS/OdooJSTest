@@ -22,7 +22,6 @@
                     <group>
                         <field name="codigo" readonly="1"/>
                         <field name="used"/>
-                        <field name="tienda_id"/>
                         <field name="fecha_generado"/>
                     </group>
                 </sheet>
