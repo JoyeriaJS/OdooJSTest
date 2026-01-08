@@ -99,7 +99,6 @@
                            visibility_condition="requiere_autorizacion == True">
 
                         <field name="codigo_ingresado"
-                               password="True"
                                placeholder="Ingresa el código entregado por administración"/>
                     </group>
 
