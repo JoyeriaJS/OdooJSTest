@@ -199,15 +199,24 @@ class Reparacion(models.Model):
     @api.depends('precio_unitario', 'extra', 'extra2', 'extra3', 'abono', 'saldo')
     def _compute_requiere_autorizacion(self):
         for rec in self:
-            precios = [
-                rec.precio_unitario,
-                rec.extra,
-                rec.extra2,
-                rec.extra3,
-                rec.abono,
-                rec.saldo,
-            ]
-            rec.requiere_autorizacion = all(v in (0, False, None) for v in precios)
+
+            # Convertir None/False/vacío en 0
+            precio_unitario = rec.precio_unitario or 0
+            extra = rec.extra or 0
+            extra2 = rec.extra2 or 0
+            extra3 = rec.extra3 or 0
+            abono = rec.abono or 0
+            saldo = rec.saldo or 0
+
+            # Solo requiere autorización si REALMENTE todo es 0
+            rec.requiere_autorizacion = (
+                precio_unitario == 0 and
+                extra == 0 and
+                extra2 == 0 and
+                extra3 == 0 and
+                abono == 0 and
+                saldo == 0
+            )
 
 
 
