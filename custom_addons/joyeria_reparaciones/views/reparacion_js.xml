@@ -99,7 +99,9 @@
                            visibility_condition="requiere_autorizacion == True">
 
                         <field name="codigo_ingresado"
-                               placeholder="Ingresa el código entregado por administración"/>
+                            force_save="1"
+                            placeholder="Ingresa el código entregado por administración"/>
+
                     </group>
 
                     <!-- Notas y Comentarios -->

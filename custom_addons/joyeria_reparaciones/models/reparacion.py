@@ -517,7 +517,11 @@ class Reparacion(models.Model):
         if precio0 and not is_admin:
 
             # Código ingresado por la vendedora
-            codigo_ing = str(vals.get("codigo_ingresado") or "").strip().upper()
+            codigo_ing = vals.get("codigo_ingresado")
+            if not codigo_ing:
+                codigo_ing = self._context.get("codigo_ingresado") or ""
+            codigo_ing = str(codigo_ing).strip().upper()
+
             if not codigo_ing:
                 raise ValidationError("❌ Debes ingresar un código de autorización para reparaciones sin costo.")
 
