@@ -522,10 +522,18 @@ class Reparacion(models.Model):
                 raise ValidationError("❌ Debes ingresar un código de autorización para reparaciones sin costo.")
 
             # Buscar código válido sin usar
-            code = self.env["joyeria.reparacion.authcode"].search([
-                ('codigo', '=', codigo_ing),
+            codigo_ing_norm = codigo_ing.strip().upper()
+
+            # Buscar todos los códigos no usados
+            codes = self.env["joyeria.reparacion.authcode"].search([
                 ('used', '=', False)
-            ], limit=1)
+            ])
+
+            # Comparar uno por uno normalizando
+            code = next(
+                (c for c in codes if (c.codigo or "").strip().upper() == codigo_ing_norm),
+                False
+            )
 
             if not code:
                 raise ValidationError("❌ El código ingresado no existe o ya fue utilizado.")
@@ -717,10 +725,18 @@ class Reparacion(models.Model):
                     raise ValidationError("❌ Debes ingresar un código de autorización para reparaciones sin costo.")
 
                 # Buscar un código activo/no usado con ese texto
-                code = self.env["joyeria.reparacion.authcode"].search([
-                    ('codigo', '=', codigo_ing),
+                codigo_ing_norm = codigo_ing.strip().upper()
+
+                # Buscar todos los códigos no usados
+                codes = self.env["joyeria.reparacion.authcode"].search([
                     ('used', '=', False)
-                ], limit=1)
+                ])
+
+                # Comparar uno por uno normalizando
+                code = next(
+                    (c for c in codes if (c.codigo or "").strip().upper() == codigo_ing_norm),
+                    False
+                )
 
                 if not code:
                     raise ValidationError("❌ El código ingresado no existe o ya fue utilizado.")
