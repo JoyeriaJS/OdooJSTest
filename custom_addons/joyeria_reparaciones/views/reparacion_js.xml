@@ -95,8 +95,7 @@
                     </group> <!-- CIERRE group col="2" -->
 
                     <!-- 🔐 AUTORIZACIÓN FUERA del BLOQUE PRINCIPAL (para que Odoo envíe el valor) -->
-                    <group string="Autorización (solo si es sin costo)"
-                           visibility_condition="requiere_autorizacion == True">
+                    <group string="Autorización (solo si es sin costo)">
 
                         <field name="codigo_ingresado"
                             force_save="1"
