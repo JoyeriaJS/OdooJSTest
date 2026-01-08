@@ -92,12 +92,6 @@
                         <group string="Autorización (solo si es sin costo)"
                             visibility_condition="requiere_autorizacion == True">
 
-                            <!-- Código asignado por administración -->
-                            <field name="auth_code_id"
-                                string="Código autorizado"
-                                domain="[('used','=',False)]"
-                                groups="base.group_system"
-                                options="{'no_create': True}"/>
 
                             <!-- Código ingresado por la vendedora -->
                             <field name="codigo_ingresado"
