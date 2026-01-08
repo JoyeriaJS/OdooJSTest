@@ -24,5 +24,8 @@ class ReparacionAuthCode(models.Model):
     @api.model
     def create(self, vals):
         rec = super().create(vals)
-        rec.generar_codigo()
+        # Generar código
+        code = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        # Guardarlo en DB de verdad
+        rec.write({"codigo": code})
         return rec
