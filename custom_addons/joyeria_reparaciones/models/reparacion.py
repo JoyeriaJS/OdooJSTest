@@ -687,60 +687,56 @@ class Reparacion(models.Model):
         for rec in self:
 
             # ============================================================
-            # 🔍 DETECTAR SI LA REPARACIÓN QUEDA SIN COSTO (con los datos nuevos)
+            # 🔍 DETECTAR SI LA REPARACIÓN QUEDARÁ SIN COSTO
+            #    (comparando valores nuevos vs actuales)
             # ============================================================
-            precio_unitario = vals.get("precio_unitario", rec.precio_unitario)
-            extra = vals.get("extra", rec.extra)
-            extra2 = vals.get("extra2", rec.extra2)
-            extra3 = vals.get("extra3", rec.extra3)
-            abono = vals.get("abono", rec.abono)
-            saldo = vals.get("saldo", rec.saldo)
+            precio_unitario = vals.get("precio_unitario", rec.precio_unitario) or 0
+            extra = vals.get("extra", rec.extra) or 0
+            extra2 = vals.get("extra2", rec.extra2) or 0
+            extra3 = vals.get("extra3", rec.extra3) or 0
+            abono = vals.get("abono", rec.abono) or 0
+            saldo = vals.get("saldo", rec.saldo) or 0
 
-            requiere_aut = (
-                precio_unitario in (0, False, None) and
-                extra in (0, False, None) and
-                extra2 in (0, False, None) and
-                extra3 in (0, False, None) and
-                abono in (0, False, None) and
-                saldo in (0, False, None)
+            precio0 = (
+                precio_unitario == 0 and
+                extra == 0 and
+                extra2 == 0 and
+                extra3 == 0 and
+                abono == 0 and
+                saldo == 0
             )
 
             # ============================================================
-            # 🔐 VALIDACIÓN SOLO PARA NO-ADMINS
+            # 🔐 VALIDACIÓN — SOLO PARA USUARIOS NO-ADMIN
             # ============================================================
-            if requiere_aut and not is_admin:
+            if precio0 and not is_admin:
 
-                # 1) Debe haber código asignado por admin
-                auth_code_id = vals.get("auth_code_id", rec.auth_code_id.id)
-
-                if not auth_code_id:
-                    raise ValidationError(
-                        "❌ Esta reparación es SIN COSTO.\n"
-                        "Un administrador debe seleccionar un código de autorización antes de guardar."
-                    )
-
-                # 2) Código ingresado por vendedora
-                codigo_ing = str(vals.get("codigo_ingresado") or "").strip().upper()
+                codigo_ing = str(vals.get("codigo_ingresado") or rec.codigo_ingresado or "").strip().upper()
 
                 if not codigo_ing:
-                    raise ValidationError("❌ Debes ingresar el código de autorización entregado por administración.")
+                    raise ValidationError("❌ Debes ingresar un código de autorización para reparaciones sin costo.")
 
-                # 3) Validar coincidencia
-                code = self.env["joyeria.reparacion.authcode"].browse(auth_code_id)
+                # Buscar un código activo/no usado con ese texto
+                code = self.env["joyeria.reparacion.authcode"].search([
+                    ('codigo', '=', codigo_ing),
+                    ('used', '=', False)
+                ], limit=1)
 
-                if code.codigo.strip().upper() != str(codigo_ing).strip().upper():
-                    raise ValidationError("❌ El código ingresado es incorrecto.")
+                if not code:
+                    raise ValidationError("❌ El código ingresado no existe o ya fue utilizado.")
 
-                # 4) Evitar marcarlo dos veces
-                if not code.ya_usado:
-                    code.write({
-                        'used': True,
-                        'usado_por_id': self.env.uid,
-                        'fecha_uso': datetime.now(),
-                    })
+                # Marcarlo como usado
+                code.write({
+                    'used': True,
+                    'usado_por_id': self.env.uid,
+                    'fecha_uso': datetime.now()
+                })
+
+                # Guardarlo en la reparación
+                vals["codigo_autorizacion_id"] = code.id
 
         # ============================================================
-        # 🔧 VALIDACIONES EXISTENTES (TU CÓDIGO)
+        # 🔧 VALIDACIONES EXISTENTES
         # ============================================================
         if not is_admin:
             for rec in self:
@@ -748,10 +744,11 @@ class Reparacion(models.Model):
                     raise ValidationError("No se permite cambiar el tipo de peso una vez creado el registro.")
 
         # ============================================================
-        # 📲 PROCESAR QR (se deja tu lógica sin cambios)
+        # 📲 PROCESAR QR — NO SE TOCA
         # ============================================================
         for rec in self:
-            # 📦 Si se escanea QR de recepción
+
+            # Recepción por QR
             if vals.get('clave_autenticacion_manual'):
                 clave = vals['clave_autenticacion_manual'].strip().upper()
                 vendedora = rec.env['joyeria.vendedora'].search([
@@ -763,7 +760,7 @@ class Reparacion(models.Model):
                 if vendedora:
                     vals['vendedora_id'] = vendedora.id
 
-            # ✍️ QR de retiro
+            # Firma por QR
             if vals.get('clave_firma_manual'):
                 clave = vals['clave_firma_manual'].strip().upper()
                 vendedora_firma = rec.env['joyeria.vendedora'].search([
@@ -781,8 +778,7 @@ class Reparacion(models.Model):
         # ============================================================
         # ✔ GUARDAR CAMBIOS
         # ============================================================
-        res = super().write(vals)
-        return res
+        return super().write(vals)
 
 
 
