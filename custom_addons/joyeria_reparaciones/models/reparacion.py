@@ -706,76 +706,8 @@ class Reparacion(models.Model):
     def write(self, vals):
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
 
-        for rec in self:
-
-            # ============================================================
-            # 🔍 DETECTAR SI LA REPARACIÓN QUEDARÁ SIN COSTO
-            #    (comparando valores nuevos vs actuales)
-            # ============================================================
-            precio_unitario = vals.get("precio_unitario", rec.precio_unitario) or 0
-            extra = vals.get("extra", rec.extra) or 0
-            extra2 = vals.get("extra2", rec.extra2) or 0
-            extra3 = vals.get("extra3", rec.extra3) or 0
-            abono = vals.get("abono", rec.abono) or 0
-            saldo = vals.get("saldo", rec.saldo) or 0
-
-            precio0 = (
-                precio_unitario == 0 and
-                extra == 0 and
-                extra2 == 0 and
-                extra3 == 0 and
-                abono == 0 and
-                saldo == 0
-            )
-
-            # ============================================================
-            # 🔐 VALIDACIÓN — SOLO PARA USUARIOS NO-ADMIN
-            # ============================================================
-            if precio0 and not is_admin:
-                _logger = logging.getLogger(__name__)
-                _logger.warning("===== DEBUG AUTORIZACIÓN CREA =====")
-                _logger.warning("VALS codigo_ingresado = %s", vals.get("codigo_ingresado"))
-                _logger.warning("CÓDIGOS EN BD:")
-                for c in self.env["joyeria.reparacion.authcode"].search([]):
-                    _logger.warning("ID %s | '%s' | used=%s", c.id, repr(c.codigo), c.used)
-                _logger.warning("====================================")
-
-
-                codigo_ing = vals.get("codigo_ingresado") or rec.codigo_ingresado or ""
-                codigo_ing = str(codigo_ing).strip().upper()
-
-                if not codigo_ing:
-                    raise ValidationError("❌ Debes ingresar un código de autorización para reparaciones sin costo.")
-
-                # Buscar un código activo/no usado con ese texto
-                codigo_ing_norm = codigo_ing.strip().upper()
-
-                # Buscar todos los códigos no usados
-                codes = self.env["joyeria.reparacion.authcode"].search([
-                    ('used', '=', False)
-                ])
-
-                # Comparar uno por uno normalizando
-                code = next(
-                    (c for c in codes if (c.codigo or "").strip().upper() == codigo_ing_norm),
-                    False
-                )
-
-                if not code:
-                    raise ValidationError("❌ El código ingresado no existe o ya fue utilizado.")
-
-                # Marcarlo como usado
-                code.write({
-                    'used': True,
-                    'usado_por_id': self.env.uid,
-                    'fecha_uso': datetime.now()
-                })
-
-                # Guardarlo en la reparación
-                vals["codigo_autorizacion_id"] = code.id
-
         # ============================================================
-        # 🔧 VALIDACIONES EXISTENTES
+        # 🔧 VALIDACIONES EXISTENTES (NO TOCAR)
         # ============================================================
         if not is_admin:
             for rec in self:
