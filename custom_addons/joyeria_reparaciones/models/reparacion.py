@@ -517,6 +517,13 @@ class Reparacion(models.Model):
         )
 
         if precio0 and not is_admin:
+            _logger = logging.getLogger(__name__)
+            _logger.warning("===== DEBUG AUTORIZACIÓN CREA =====")
+            _logger.warning("VALS codigo_ingresado = %s", vals.get("codigo_ingresado"))
+            _logger.warning("CÓDIGOS EN BD:")
+            for c in self.env["joyeria.reparacion.authcode"].search([]):
+                _logger.warning("ID %s | '%s' | used=%s", c.id, repr(c.codigo), c.used)
+            _logger.warning("====================================")
 
             # Código ingresado por la vendedora
             codigo_ing = vals.get("codigo_ingresado")
@@ -725,6 +732,14 @@ class Reparacion(models.Model):
             # 🔐 VALIDACIÓN — SOLO PARA USUARIOS NO-ADMIN
             # ============================================================
             if precio0 and not is_admin:
+                _logger = logging.getLogger(__name__)
+                _logger.warning("===== DEBUG AUTORIZACIÓN CREA =====")
+                _logger.warning("VALS codigo_ingresado = %s", vals.get("codigo_ingresado"))
+                _logger.warning("CÓDIGOS EN BD:")
+                for c in self.env["joyeria.reparacion.authcode"].search([]):
+                    _logger.warning("ID %s | '%s' | used=%s", c.id, repr(c.codigo), c.used)
+                _logger.warning("====================================")
+
 
                 codigo_ing = vals.get("codigo_ingresado") or rec.codigo_ingresado or ""
                 codigo_ing = str(codigo_ing).strip().upper()
