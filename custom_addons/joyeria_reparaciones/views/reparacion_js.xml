@@ -94,14 +94,14 @@
 
                     </group> <!-- CIERRE group col="2" -->
 
-                    <!-- 🔐 AUTORIZACIÓN FUERA del BLOQUE PRINCIPAL (para que Odoo envíe el valor) -->
-                    <group string="Autorización (solo si es sin costo)">
+                    <!-- AUTORIZACIÓN PARA RMA SIN COSTO -->
+                        <group string="Autorización (solo si es sin costo)"
+                            visibility_condition="requiere_autorizacion == True">
 
-                        <field name="codigo_ingresado"
-                            force_save="1"
-                            placeholder="Ingresa el código entregado por administración"/>
-
-                    </group>
+                            <field name="codigo_ingresado"
+                                force_save="1"
+                                placeholder="Ingresa el código entregado por administración"/>
+                        </group>
 
                     <!-- Notas y Comentarios -->
                     <group string="Notas y Comentarios" col="2">
