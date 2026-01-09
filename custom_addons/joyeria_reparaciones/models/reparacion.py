@@ -36,8 +36,10 @@ class Reparacion(models.Model):
     # Código que ingresa la vendedora
     codigo_ingresado = fields.Char(
         string="Código ingresado",
-        help="Código entregado por administración."
-    )
+        help="Código entregado por administración.",
+        store=True
+)
+
 
     # Código generado por administración
     auth_code_id = fields.Many2one(
