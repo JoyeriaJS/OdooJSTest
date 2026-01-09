@@ -661,28 +661,29 @@ class Reparacion(models.Model):
 
 
 
-    def write(self, vals):
-        for record in self:
-            ya_tiene_vendedora = bool(record.vendedora_id)
+    #ef write(self, vals):
+     #
+    #  for record in self:
+     #      ya_tiene_vendedora = bool(record.vendedora_id)
 
-            # Si ya hay vendedora asignada, no permitir modificarla ni borrar claves
-            if ya_tiene_vendedora:
-                if 'vendedora_id' in vals and not vals['vendedora_id']:
-                    raise ValidationError("No puede eliminar la vendedora una vez asignada.")
-
-                for campo in ['clave_autenticacion', 'codigo_qr', 'clave_autenticacion_manual']:
-                    if campo in vals and not vals[campo]:
-                        raise ValidationError(f"No puede eliminar el valor de {campo} una vez asignada la vendedora.")
-
-                claves_cambiadas = any(campo in vals for campo in ['clave_autenticacion', 'codigo_qr', 'clave_autenticacion_manual'])
-                if 'vendedora_id' in vals or claves_cambiadas:
-                    raise ValidationError("No se puede modificar la clave o la vendedora una vez asignada.")
-
-            # Procesar firma si se ingresa por primera vez
-            if vals.get('clave_firma_manual'):
-                record._procesar_firma()
-
-        return super(Reparacion, self).write(vals)
+      #      # Si ya hay vendedora asignada, no permitir modificarla ni borrar claves
+       #     if ya_tiene_vendedora:
+        #        if 'vendedora_id' in vals and not vals['vendedora_id']:
+         #           raise ValidationError("No puede eliminar la vendedora una vez asignada.")
+#
+ #               for campo in ['clave_autenticacion', 'codigo_qr', 'clave_autenticacion_manual']:
+  #                  if campo in vals and not vals[campo]:
+   #                     raise ValidationError(f"No puede eliminar el valor de {campo} una vez asignada la vendedora.")
+#
+ #               claves_cambiadas = any(campo in vals for campo in ['clave_autenticacion', 'codigo_qr', 'clave_autenticacion_manual'])
+  #              if 'vendedora_id' in vals or claves_cambiadas:
+   #                 raise ValidationError("No se puede modificar la clave o la vendedora una vez asignada.")
+#
+ #           # Procesar firma si se ingresa por primera vez
+  #          if vals.get('clave_firma_manual'):
+   #             record._procesar_firma()
+#
+ #       return super(Reparacion, self).write(vals)
     
     def _normalizar_clave(self, clave):
         """
