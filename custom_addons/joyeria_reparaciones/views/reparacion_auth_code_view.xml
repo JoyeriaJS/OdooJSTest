@@ -11,8 +11,8 @@
                 <field name="used" readonly="1"/>
                 <field name="fecha_generado" readonly="1"/>
                 <field name="fecha_uso" readonly="1"/>
-                <field name="usado_por_id" readonly="1"/>
                 <field name="tiempo_restante" readonly="1"/>
+                <field name="usado_por_id" readonly="1"/>
             </tree>
         </field>
     </record>
@@ -29,8 +29,8 @@
                         <field name="used" readonly="1"/>
                         <field name="fecha_generado" readonly="1"/>
                         <field name="fecha_uso" readonly="1"/>
-                        <field name="usado_por_id" readonly="1"/>
                         <field name="tiempo_restante" readonly="1"/>
+                        <field name="usado_por_id" readonly="1"/>
                     </group>
                 </sheet>
             </form>
