@@ -73,15 +73,18 @@ class ReparacionAuthCode(models.Model):
 
     @api.depends("fecha_creacion", "used")
     def _compute_expired(self):
-        """Marca automáticamente un código como expirado si ya pasó 1 hora."""
         for code in self:
 
-            # Si ya fue usado → automáticamente expira
-            if code.used or not code.fecha_creacion:
-                code.expired = True if code.used else False
+            # Si ya fue usado → expirado
+            if code.used:
+                code.expired = True
                 continue
 
-            # Aseguramos aware datetime
+            if not code.fecha_creacion:
+                code.expired = False
+                continue
+
+            # Asegurar aware datetime
             fecha_ini = code.fecha_creacion
             if fecha_ini.tzinfo is None:
                 fecha_ini = pytz.UTC.localize(fecha_ini)
@@ -89,15 +92,12 @@ class ReparacionAuthCode(models.Model):
             ahora = datetime.now(pytz.UTC)
             expira = fecha_ini + timedelta(hours=1)
 
-            # Si ya expiró → marcar como usado y expirado
             if ahora >= expira:
-                code.write({
-                    'used': True,
-                    'expired': True,
-                    'usado_por_id': False,
-                    'fecha_uso': datetime.now(),
-                })
+                # Expirar definitivamente
+                code.used = True
                 code.expired = True
+                code.fecha_uso = datetime.now()
+                code.usado_por_id = False
             else:
                 code.expired = False
 
