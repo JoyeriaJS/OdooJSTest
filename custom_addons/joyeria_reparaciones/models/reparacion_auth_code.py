@@ -22,18 +22,18 @@ class ReparacionAuthCode(models.Model):
     fecha_uso = fields.Datetime("Fecha de uso", readonly=True)
     fecha_creacion = fields.Datetime(string="Fecha creación", default=lambda self: fields.Datetime.now())
     tiempo_restante = fields.Char(string="Tiempo restante", compute="_compute_tiempo_restante")
-    expirado = fields.Boolean(string="Expirado", compute="_compute_expirado", store=True)
+    expired = fields.Boolean(string="Expirado", compute="_compute_expired", store=True)
     fecha_creacion = fields.Datetime(
     string="Fecha de creación",
     default=lambda self: fields.Datetime.now(),
     readonly=True
     )
 
-    expired = fields.Boolean(
-        string="Expirado",
-        default=False,
-        readonly=True
-    )
+    #expired = fields.Boolean(
+     #   string="Expirado",
+      #  default=False,
+       # readonly=True
+    #)
 
 
 
@@ -71,34 +71,36 @@ class ReparacionAuthCode(models.Model):
                 rec.tiempo_restante = f"⏳ {minutos} min {segundos} seg"
 
 
-    @api.depends("fecha_generado", "used")
-    def _compute_expirado(self):
+    @api.depends("fecha_creacion", "used")
+    def _compute_expired(self):
         """Marca automáticamente un código como expirado si ya pasó 1 hora."""
         for code in self:
-            # Si ya está usado, automáticamente es expirado
-            if code.used or not code.fecha_generado:
-                code.expirado = True if code.used else False
+
+            # Si ya fue usado → automáticamente expira
+            if code.used or not code.fecha_creacion:
+                code.expired = True if code.used else False
                 continue
 
-            # Convertir fecha_generado a aware
-            if code.fecha_generado.tzinfo is None:
-                fecha_ini = pytz.UTC.localize(code.fecha_generado)
-            else:
-                fecha_ini = code.fecha_generado
+            # Aseguramos aware datetime
+            fecha_ini = code.fecha_creacion
+            if fecha_ini.tzinfo is None:
+                fecha_ini = pytz.UTC.localize(fecha_ini)
 
             ahora = datetime.now(pytz.UTC)
             expira = fecha_ini + timedelta(hours=1)
 
+            # Si ya expiró → marcar como usado y expirado
             if ahora >= expira:
-                # Expiró → marcar como usado automáticamente
                 code.write({
                     'used': True,
+                    'expired': True,
                     'usado_por_id': False,
                     'fecha_uso': datetime.now(),
                 })
-                code.expirado = True
+                code.expired = True
             else:
-                code.expirado = False
+                code.expired = False
+
 
 
     @api.model
