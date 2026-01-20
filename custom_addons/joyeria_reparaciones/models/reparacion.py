@@ -539,7 +539,8 @@ class Reparacion(models.Model):
 
             # Buscar todos los códigos no usados
             codes = self.env["joyeria.reparacion.authcode"].search([
-                ('used', '=', False)
+                ('used', '=', False),
+                ('expired', '=', False)
             ])
 
             # Comparar uno por uno normalizando

@@ -2,6 +2,8 @@ from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 import random
 import string
+import logging
+from datetime import datetime, timedelta
 
 class ReparacionAuthCode(models.Model):
     _name = "joyeria.reparacion.authcode"
@@ -16,10 +18,47 @@ class ReparacionAuthCode(models.Model):
     usado_por_id = fields.Many2one("res.users", string="Usado por", readonly=True)
     fecha_uso = fields.Datetime("Fecha de uso", readonly=True)
 
+    fecha_creacion = fields.Datetime(
+    string="Fecha de creación",
+    default=lambda self: fields.Datetime.now(),
+    readonly=True
+    )
+
+    expired = fields.Boolean(
+        string="Expirado",
+        default=False,
+        readonly=True
+    )
+
+
+
     def generar_codigo(self):
         """Generar código aleatorio de 6 caracteres"""
         code = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
         self.codigo = code
+
+    @api.model
+    def _expirar_codigos(self):
+        """Expira automáticamente códigos con más de 1 hora sin usar."""
+        ahora = fields.Datetime.now()
+
+        codigos = self.search([
+            ('used', '=', False),
+            ('expired', '=', False)
+        ])
+
+        for code in codigos:
+            if code.fecha_creacion:
+                limite = code.fecha_creacion + timedelta(hours=1)
+                if ahora >= limite:
+                    code.write({
+                        'expired': True,
+                        'used': True,
+                        'fecha_uso': ahora,
+                        'usado_por_id': None,  # No lo usó un usuario
+                    })
+                    _logger = logging.getLogger(__name__)
+                    _logger.warning(f"⚠ Código expirado automáticamente: {code.codigo}")
 
     @api.model
     def create(self, vals):
