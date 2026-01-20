@@ -4,6 +4,9 @@ import random
 import string
 import logging
 from datetime import datetime, timedelta
+import pytz
+from  pytz import utc
+from pytz import timezone
 
 class ReparacionAuthCode(models.Model):
     _name = "joyeria.reparacion.authcode"
