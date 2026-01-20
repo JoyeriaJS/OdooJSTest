@@ -17,6 +17,8 @@ class ReparacionAuthCode(models.Model):
     # 🔥 CAMPOS NECESARIOS PARA REGISTRAR QUIÉN Y CUÁNDO SE USA EL CÓDIGO
     usado_por_id = fields.Many2one("res.users", string="Usado por", readonly=True)
     fecha_uso = fields.Datetime("Fecha de uso", readonly=True)
+    fecha_creacion = fields.Datetime(string="Fecha creación", default=lambda self: fields.Datetime.now())
+    tiempo_restante = fields.Char(string="Tiempo restante", compute="_compute_tiempo_restante")
 
     fecha_creacion = fields.Datetime(
     string="Fecha de creación",
@@ -36,6 +38,25 @@ class ReparacionAuthCode(models.Model):
         """Generar código aleatorio de 6 caracteres"""
         code = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
         self.codigo = code
+    
+    @api.depends("fecha_creacion")
+    def _compute_tiempo_restante(self):
+        for rec in self:
+            if not rec.fecha_creacion:
+                rec.tiempo_restante = "No disponible"
+                continue
+
+            ahora = datetime.now(pytz.UTC)
+            expira = rec.fecha_creacion + timedelta(hours=1)
+
+            diff = expira - ahora
+
+            if diff.total_seconds() <= 0:
+                rec.tiempo_restante = "⛔ Código expirado"
+            else:
+                minutos = int(diff.total_seconds() // 60)
+                segundos = int(diff.total_seconds() % 60)
+                rec.tiempo_restante = f"⏳ {minutos} min {segundos} seg"
 
     @api.model
     def _expirar_codigos(self):
