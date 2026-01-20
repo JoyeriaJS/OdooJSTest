@@ -22,7 +22,7 @@ class ReparacionAuthCode(models.Model):
     fecha_uso = fields.Datetime("Fecha de uso", readonly=True)
     fecha_creacion = fields.Datetime(string="Fecha creación", default=lambda self: fields.Datetime.now())
     tiempo_restante = fields.Char(string="Tiempo restante", compute="_compute_tiempo_restante")
-
+    expirado = fields.Boolean(string="Expirado", compute="_compute_expirado", store=True)
     fecha_creacion = fields.Datetime(
     string="Fecha de creación",
     default=lambda self: fields.Datetime.now(),
@@ -71,28 +71,35 @@ class ReparacionAuthCode(models.Model):
                 rec.tiempo_restante = f"⏳ {minutos} min {segundos} seg"
 
 
-    @api.model
-    def _expirar_codigos(self):
-        """Expira automáticamente códigos con más de 1 hora sin usar."""
-        ahora = fields.Datetime.now()
+    @api.depends("fecha_generado", "used")
+    def _compute_expirado(self):
+        """Marca automáticamente un código como expirado si ya pasó 1 hora."""
+        for code in self:
+            # Si ya está usado, automáticamente es expirado
+            if code.used or not code.fecha_generado:
+                code.expirado = True if code.used else False
+                continue
 
-        codigos = self.search([
-            ('used', '=', False),
-            ('expired', '=', False)
-        ])
+            # Convertir fecha_generado a aware
+            if code.fecha_generado.tzinfo is None:
+                fecha_ini = pytz.UTC.localize(code.fecha_generado)
+            else:
+                fecha_ini = code.fecha_generado
 
-        for code in codigos:
-            if code.fecha_creacion:
-                limite = code.fecha_creacion + timedelta(hours=1)
-                if ahora >= limite:
-                    code.write({
-                        'expired': True,
-                        'used': True,
-                        'fecha_uso': ahora,
-                        'usado_por_id': None,  # No lo usó un usuario
-                    })
-                    _logger = logging.getLogger(__name__)
-                    _logger.warning(f"⚠ Código expirado automáticamente: {code.codigo}")
+            ahora = datetime.now(pytz.UTC)
+            expira = fecha_ini + timedelta(hours=1)
+
+            if ahora >= expira:
+                # Expiró → marcar como usado automáticamente
+                code.write({
+                    'used': True,
+                    'usado_por_id': False,
+                    'fecha_uso': datetime.now(),
+                })
+                code.expirado = True
+            else:
+                code.expirado = False
+
 
     @api.model
     def create(self, vals):
