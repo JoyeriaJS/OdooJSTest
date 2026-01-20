@@ -60,6 +60,11 @@ class Reparacion(models.Model):
     string="Código autorizado",
     readonly=True
 )
+    costo_cero_definitivo = fields.Boolean(
+    string="Es RMA sin costo",
+    default=False,
+    readonly=True
+)
 
 
     modelo = fields.Char(string='Modelo', required=False)
@@ -516,7 +521,8 @@ class Reparacion(models.Model):
             saldo == 0
         )
 
-        if precio0 and not is_admin:
+        if precio0  and not is_admin:
+            vals["costo_cero_definitivo"] = True
             _logger = logging.getLogger(__name__)
             _logger.warning("===== DEBUG AUTORIZACIÓN CREA =====")
             _logger.warning("VALS codigo_ingresado = %s", vals.get("codigo_ingresado"))
@@ -706,6 +712,20 @@ class Reparacion(models.Model):
 ###write funcional"""""""""
     def write(self, vals):
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
+
+        # ============================================================
+        # 🛑 BLOQUEO FINANCIERO SI ES RMA SIN COSTO (NO ADMIN)
+        # ============================================================
+        campos_financieros = {"precio_unitario", "extra", "extra2", "extra3", "abono", "saldo"}
+
+        for rec in self:
+            if rec.costo_cero_definitivo and not is_admin:
+                # Si intenta modificar algún campo financiero → bloquear
+                if any(campo in vals for campo in campos_financieros):
+                    raise ValidationError(
+                        "❌ No puedes modificar los datos financieros.\n"
+                        "Este RMA fue creado como *sin costo* y está completamente bloqueado."
+                    )
 
         # ============================================================
         # 🔧 VALIDACIONES EXISTENTES (NO TOCAR)
