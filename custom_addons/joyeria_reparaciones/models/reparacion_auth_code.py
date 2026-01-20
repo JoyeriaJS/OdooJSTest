@@ -49,8 +49,17 @@ class ReparacionAuthCode(models.Model):
                 rec.tiempo_restante = "No disponible"
                 continue
 
+            # Convertir fecha_creacion siempre a aware (UTC)
+            if rec.fecha_creacion.tzinfo is None:
+                fecha_creacion_aware = pytz.UTC.localize(rec.fecha_creacion)
+            else:
+                fecha_creacion_aware = rec.fecha_creacion
+
+            # Ahora actual en aware (UTC)
             ahora = datetime.now(pytz.UTC)
-            expira = rec.fecha_creacion + timedelta(hours=1)
+
+            # Expira 1 hora después
+            expira = fecha_creacion_aware + timedelta(hours=1)
 
             diff = expira - ahora
 
@@ -60,6 +69,7 @@ class ReparacionAuthCode(models.Model):
                 minutos = int(diff.total_seconds() // 60)
                 segundos = int(diff.total_seconds() % 60)
                 rec.tiempo_restante = f"⏳ {minutos} min {segundos} seg"
+
 
     @api.model
     def _expirar_codigos(self):
