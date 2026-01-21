@@ -59,7 +59,7 @@ class ReparacionAuthCode(models.Model):
                 fecha_ini = pytz.UTC.localize(fecha_ini)
 
             ahora = datetime.now(pytz.UTC)
-            expira = fecha_ini + timedelta(minutes=1)  # 🔥 EXPIRA EN 1 MINUTO PARA PRUEBAS
+            expira = fecha_ini + timedelta(hours=1)  # 🔥 EXPIRA EN 1 MINUTO PARA PRUEBAS
 
             diff = expira - ahora
 
