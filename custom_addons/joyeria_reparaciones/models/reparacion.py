@@ -499,11 +499,10 @@ class Reparacion(models.Model):
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
         is_import = bool(self.env.context.get('import_file') or self.env.context.get('from_import'))
 
-         # ============================================================
+        # ============================================================
         # 🔐 VALIDACIÓN DE AUTORIZACIÓN PARA RMA SIN COSTO
         # ============================================================
 
-        # Tomar valores reales que tendrá el registro (vals o default 0)
         precio_unitario = vals.get("precio_unitario", 0) or 0
         extra = vals.get("extra", 0) or 0
         extra2 = vals.get("extra2", 0) or 0
@@ -511,7 +510,6 @@ class Reparacion(models.Model):
         abono = vals.get("abono", 0) or 0
         saldo = vals.get("saldo", 0) or 0
 
-        # Detectar RMA sin costo REAL
         precio0 = (
             precio_unitario == 0 and
             extra == 0 and
@@ -521,8 +519,13 @@ class Reparacion(models.Model):
             saldo == 0
         )
 
-        if precio0  and not is_admin:
+        if precio0 and not is_admin:
+
             vals["costo_cero_definitivo"] = True
+
+            # 🔥🔥🔥 NUEVO: Forzar expiración antes de validar
+            self.env["joyeria.reparacion.authcode"].search([]).check_expired()
+
             _logger = logging.getLogger(__name__)
             _logger.warning("===== DEBUG AUTORIZACIÓN CREA =====")
             _logger.warning("VALS codigo_ingresado = %s", vals.get("codigo_ingresado"))
@@ -531,7 +534,6 @@ class Reparacion(models.Model):
                 _logger.warning("ID %s | '%s' | used=%s", c.id, repr(c.codigo), c.used)
             _logger.warning("====================================")
 
-            # Código ingresado por la vendedora
             codigo_ing = vals.get("codigo_ingresado")
             if not codigo_ing:
                 codigo_ing = self._context.get("codigo_ingresado") or ""
@@ -540,16 +542,13 @@ class Reparacion(models.Model):
             if not codigo_ing:
                 raise ValidationError("❌ Debes ingresar un código de autorización para reparaciones sin costo.")
 
-            # Buscar código válido sin usar
             codigo_ing_norm = codigo_ing.strip().upper()
 
-            # Buscar todos los códigos no usados
             codes = self.env["joyeria.reparacion.authcode"].search([
                 ('used', '=', False),
                 ('expired', '=', False),
             ])
 
-            # Comparar uno por uno normalizando
             code = next(
                 (c for c in codes if (c.codigo or "").strip().upper() == codigo_ing_norm),
                 False
@@ -558,33 +557,27 @@ class Reparacion(models.Model):
             if not code:
                 raise ValidationError("❌ El código ingresado no existe o ya fue utilizado.")
 
-            # Marcar como usado
             code.write({
                 'used': True,
                 'usado_por_id': self.env.uid,
                 'fecha_uso': datetime.now()
             })
 
-            # Asociar código validado al RMA
             vals["codigo_autorizacion_id"] = code.id
-
 
         # ============================================================
         # ⚙️ LÓGICA EXISTENTE — NO TOCAR
         # ============================================================
 
-        # Validación de peso especial
         if (not is_admin) and (not is_import) and vals.get('peso') == 'especial' and not vals.get('peso_valor'):
             raise ValidationError("Debe ingresar un valor para el campo 'Peso' si selecciona tipo de peso 'Especial'.")
 
-        # Generar secuencia
         if vals.get('name', 'Nuevo') == 'Nuevo':
             secuencia = self.env['ir.sequence'].next_by_code('joyeria.reparacion')
             if not secuencia:
                 raise ValidationError("No se pudo generar la secuencia.")
             vals['name'] = secuencia.replace("'", "-")
 
-        # Procesar QR quien recibe
         if not vals.get('vendedora_id') and vals.get('clave_autenticacion_manual'):
             clave = str(vals['clave_autenticacion_manual']).strip().upper()
             vendedora = self.env['joyeria.vendedora'].search([
@@ -597,7 +590,6 @@ class Reparacion(models.Model):
                 vals['vendedora_id'] = vendedora.id
                 mensajes.append(f"📦 Recibido por: <b>{vendedora.name}</b> el <b>{ahora}</b>")
 
-        # Procesar QR quien retira
         if not vals.get('firma_id') and vals.get('clave_firma_manual'):
             clave = str(vals['clave_firma_manual']).strip().upper()
             vendedora_firma = self.env['joyeria.vendedora'].search([
@@ -613,21 +605,17 @@ class Reparacion(models.Model):
                 vals['fecha_firma'] = ahora_utc_naive
                 mensajes.append(f"✍️ Retirado por: <b>{vendedora_firma.name}</b> el <b>{ahora}</b>")
 
-        # Validaciones QR
         if vals.get('clave_autenticacion_manual') and not vals.get('vendedora_id'):
             raise ValidationError("❌ Clave inválida: No se encontró ninguna vendedora con esa clave (quien recibe).")
 
         if vals.get('clave_firma_manual') and not vals.get('firma_id'):
             raise ValidationError("❌ Clave inválida: No se encontró ninguna vendedora con esa clave (quien retira).")
 
-        # Crear registro
         record = super().create(vals)
 
-        # Generar QR reparación
         if hasattr(record, '_generar_codigo_qr'):
             record._generar_codigo_qr()
 
-        # Resumen
         peso_str = str(record.peso_valor) if record.peso_valor not in (False, 0, 0.0) else "No especificado"
         resumen = (
             "📌 Resumen generado automáticamente\n"
@@ -644,6 +632,7 @@ class Reparacion(models.Model):
             record.message_post(body=msg)
 
         return record
+
 
 
 
@@ -712,20 +701,6 @@ class Reparacion(models.Model):
 ###write funcional"""""""""
     def write(self, vals):
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
-
-        # ============================================================
-        # 🛑 BLOQUEO FINANCIERO SI ES RMA SIN COSTO (NO ADMIN)
-        # ============================================================
-        campos_financieros = {"precio_unitario", "extra", "extra2", "extra3", "abono", "saldo"}
-
-        for rec in self:
-            if rec.costo_cero_definitivo and not is_admin:
-                # Si intenta modificar algún campo financiero → bloquear
-                if any(campo in vals for campo in campos_financieros):
-                    raise ValidationError(
-                        "❌ No puedes modificar los datos financieros.\n"
-                        "Este RMA fue creado como *sin costo* y está completamente bloqueado."
-                    )
 
         # ============================================================
         # 🔧 VALIDACIONES EXISTENTES (NO TOCAR)

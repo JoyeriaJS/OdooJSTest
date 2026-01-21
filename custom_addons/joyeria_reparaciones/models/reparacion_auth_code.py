@@ -12,9 +12,7 @@ class ReparacionAuthCode(models.Model):
 
     codigo = fields.Char(string="Código", readonly=True)
     used = fields.Boolean(string="Usado", default=False)
-    fecha_generado = fields.Datetime(string="Fecha generado", default=fields.Datetime.now)
 
-    # ⚠️ EL CAMPO fecha_creacion SE DEFINE UNA SOLA VEZ
     fecha_creacion = fields.Datetime(
         string="Fecha creación",
         default=lambda self: fields.Datetime.now(),
@@ -35,16 +33,15 @@ class ReparacionAuthCode(models.Model):
         store=True
     )
 
-    # --------------------------------------------
-    # Generar código
-    # --------------------------------------------
+    # ============================
+    # GENERAR CÓDIGO
+    # ============================
     def generar_codigo(self):
-        """Generar código aleatorio de 6 caracteres"""
         self.codigo = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
-    # --------------------------------------------
-    # Tiempo restante
-    # --------------------------------------------
+    # ============================
+    # TIEMPO RESTANTE
+    # ============================
     @api.depends("fecha_creacion", "expired")
     def _compute_tiempo_restante(self):
         for rec in self:
@@ -58,13 +55,11 @@ class ReparacionAuthCode(models.Model):
                 continue
 
             fecha_ini = rec.fecha_creacion
-
-            # Normalizar a aware (UTC)
             if fecha_ini.tzinfo is None:
                 fecha_ini = pytz.UTC.localize(fecha_ini)
 
             ahora = datetime.now(pytz.UTC)
-            expira = fecha_ini + timedelta(hours=1)
+            expira = fecha_ini + timedelta(minutes=1)  # 🔥 EXPIRA EN 1 MINUTO PARA PRUEBAS
 
             diff = expira - ahora
 
@@ -75,9 +70,9 @@ class ReparacionAuthCode(models.Model):
                 segundos = int(diff.total_seconds() % 60)
                 rec.tiempo_restante = f"⏳ {minutos} min {segundos} seg"
 
-    # --------------------------------------------
-    # Expiración automática
-    # --------------------------------------------
+    # ============================
+    # EXPIRACIÓN AUTOMÁTICA
+    # ============================
     @api.depends("fecha_creacion", "used")
     def _compute_expired(self):
         for code in self:
@@ -92,15 +87,14 @@ class ReparacionAuthCode(models.Model):
                 continue
 
             fecha_ini = code.fecha_creacion
-
             if fecha_ini.tzinfo is None:
                 fecha_ini = pytz.UTC.localize(fecha_ini)
 
             ahora = datetime.now(pytz.UTC)
-            expira = fecha_ini + timedelta(hours=1)
+            expira = fecha_ini + timedelta(minutes=1)   # 🔥 EXPIRA EN 1 MINUTO
 
             if ahora >= expira:
-                # 🔥 Expirar DEFINITIVAMENTE → lo marca como USADO también
+                # 🔥 Expirar DEFINITIVAMENTE
                 code.write({
                     "used": True,
                     "expired": True,
@@ -111,9 +105,33 @@ class ReparacionAuthCode(models.Model):
             else:
                 code.expired = False
 
-    # --------------------------------------------
-    # Crear código
-    # --------------------------------------------
+    # ============================
+    # VERIFICAR EXPIRACIÓN MANUALMENTE
+    # (ESTO ES LO QUE ARREGLA TODO)
+    # ============================
+    def check_expired(self):
+        """Forzar revisión de expiración antes de validar un RMA."""
+        for code in self:
+            fecha_ini = code.fecha_creacion
+            if fecha_ini.tzinfo is None:
+                fecha_ini = pytz.UTC.localize(fecha_ini)
+
+            expira = fecha_ini + timedelta(minutes=1)
+            ahora = datetime.now(pytz.UTC)
+
+            if not code.used and ahora >= expira:
+                code.write({
+                    "used": True,           # 🔥 AHORA SÍ SE MARCA SIEMPRE
+                    "expired": True,
+                    "fecha_uso": datetime.now(),
+                    "usado_por_id": False
+                })
+
+        return True
+
+    # ============================
+    # CREACIÓN
+    # ============================
     @api.model
     def create(self, vals):
         rec = super().create(vals)
