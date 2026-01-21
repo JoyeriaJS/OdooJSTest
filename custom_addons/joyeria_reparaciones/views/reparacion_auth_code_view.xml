@@ -27,7 +27,7 @@
                     <group>
                         <field name="codigo" readonly="1"/>
                         <field name="used" readonly="1"/>
-                        <field name="fecha_generado" readonly="1"/>
+                        <field name="fecha_creacion" readonly="1"/>
                         <field name="fecha_uso" readonly="1"/>
                         <field name="tiempo_restante" readonly="1"/>
                         <field name="usado_por_id" readonly="1"/>
