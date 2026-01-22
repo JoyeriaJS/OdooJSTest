@@ -1,0 +1,52 @@
+
+<odoo>
+    <record id="view_pos_discount_code_tree" model="ir.ui.view">
+        <field name="name">pos.discount.code.tree</field>
+        <field name="model">pos.discount.code</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code"/>
+                <field name="discount_type"/>
+                <field name="discount_value"/>
+                <field name="used"/>
+                <field name="expired"/>
+                <field name="fecha_creacion"/>
+                <field name="fecha_uso"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_pos_discount_code_form" model="ir.ui.view">
+        <field name="name">pos.discount.code.form</field>
+        <field name="model">pos.discount.code</field>
+        <field name="arch" type="xml">
+            <form string="Código de Descuento POS">
+                <header>
+                    <button name="action_generate" string="Regenerar Código" type="object" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="code" readonly="1"/>
+                        <field name="discount_type"/>
+                        <field name="discount_value"/>
+                        <field name="used" readonly="1"/>
+                        <field name="expired" readonly="1"/>
+                        <field name="fecha_creacion" readonly="1"/>
+                        <field name="fecha_uso" readonly="1"/>
+                        <field name="usado_por" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <menuitem id="menu_pos_discount_root" name="Códigos Descuento POS" parent="point_of_sale.menu_point_root" sequence="99"/>
+
+    <record id="action_pos_discount_code" model="ir.actions.act_window">
+        <field name="name">Códigos de Descuento</field>
+        <field name="res_model">pos.discount.code</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_pos_discount_code" parent="menu_pos_discount_root" action="action_pos_discount_code"/>
+</odoo>
