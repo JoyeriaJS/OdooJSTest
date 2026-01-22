@@ -3,11 +3,11 @@
 odoo.define('pos_discount_authorized.discount_button', function (require) {
     "use strict";
 
-    const chrome = require('point_of_sale.Chrome');
+    const Chrome = require('point_of_sale.Chrome');
     const gui = require('point_of_sale.Gui');
     const rpc = require('web.rpc');
 
-    chrome.Chrome.include({
+    Chrome.Chrome.include({
 
         async start() {
             await this._super(...arguments);
@@ -27,7 +27,7 @@ odoo.define('pos_discount_authorized.discount_button', function (require) {
 
             if (!confirmed) return;
 
-            const code = payload.trim();
+            const code = (payload || "").trim();
 
             const result = await rpc.query({
                 model: "pos.discount.code",
@@ -38,10 +38,10 @@ odoo.define('pos_discount_authorized.discount_button', function (require) {
                 ],
             });
 
-            if (result.length === 0) {
+            if (!result || result.length === 0) {
                 return gui.showPopup("ErrorPopup", {
                     title: "Código inválido",
-                    body: "No existe este código.",
+                    body: "Este código no existe.",
                 });
             }
 
@@ -49,7 +49,7 @@ odoo.define('pos_discount_authorized.discount_button', function (require) {
 
             if (data.used || data.expired) {
                 return gui.showPopup("ErrorPopup", {
-                    title: "Código inválido",
+                    title: "No válido",
                     body: "El código está usado o expirado.",
                 });
             }
@@ -59,12 +59,12 @@ odoo.define('pos_discount_authorized.discount_button', function (require) {
             if (data.discount_type === "percent") {
                 order.add_global_discount(data.discount_value);
             } else {
-                order.add_paymentline("Cash", -data.discount_value);
+                order.add_paymentline(this.env.pos.cashregisters[0], -data.discount_value);
             }
 
             gui.showPopup("ConfirmPopup", {
                 title: "Aplicado",
-                body: "El descuento se aplicó correctamente.",
+                body: "El descuento fue aplicado correctamente.",
             });
 
             await rpc.query({
