@@ -1,8 +1,8 @@
-
 <odoo>
-    <template id="assets" inherit_id="point_of_sale._assets_pos">
+    <template id="assets_authorized_discount" inherit_id="point_of_sale.assets_prod">
         <xpath expr="." position="inside">
-            <script type="text/javascript" src="/pos_discount_authorized/static/src/js/discount_code.js"></script>
+            <script type="text/javascript"
+                src="/pos_discount_authorized/static/src/js/discount_code.js"/>
         </xpath>
     </template>
 </odoo>
