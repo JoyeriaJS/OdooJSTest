@@ -4,17 +4,15 @@ import { PosComponent } from "@point_of_sale/app/components/pos_component/pos_co
 import { registry } from "@web/core/registry";
 import { usePos } from "@point_of_sale/app/store/pos_hook";
 import { Gui } from "@web/gui/gui";
-import { onMounted } from "@odoo/owl";
 import { _rpc } from "@web/core/network/rpc_service";
 
-export class DiscountCodeButton extends PosComponent {
+class DiscountCodeButton extends PosComponent {
     setup() {
         super.setup();
         this.pos = usePos();
     }
 
     async onClick() {
-
         const popup = await Gui.showPopup("TextInputPopup", {
             title: "Ingresar código de descuento",
             startingValue: "",
@@ -22,9 +20,8 @@ export class DiscountCodeButton extends PosComponent {
 
         if (!popup.confirmed) return;
 
-        let codigo = popup.payload.trim();
+        const codigo = popup.payload.trim();
 
-        // Buscar código en Odoo
         const result = await _rpc({
             model: "pos.discount.code",
             method: "search_read",
@@ -37,17 +34,17 @@ export class DiscountCodeButton extends PosComponent {
         if (result.length === 0) {
             Gui.showPopup("ErrorPopup", {
                 title: "Código inválido",
-                body: "No existe el código.",
+                body: "Este código NO existe.",
             });
             return;
         }
 
-        let data = result[0];
+        const data = result[0];
 
         if (data.used || data.expired) {
             Gui.showPopup("ErrorPopup", {
                 title: "Código inválido",
-                body: "Código usado o expirado.",
+                body: "El código está USADO o EXPIRADO.",
             });
             return;
         }
@@ -62,10 +59,9 @@ export class DiscountCodeButton extends PosComponent {
 
         Gui.showPopup("ConfirmPopup", {
             title: "Descuento aplicado",
-            body: "Código aplicado correctamente.",
+            body: "El código se aplicó correctamente.",
         });
 
-        // Marcar como usado
         await _rpc({
             model: "pos.discount.code",
             method: "write",
