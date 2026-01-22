@@ -7,11 +7,12 @@
     "data": [
         "security/ir.model.access.csv",
         "views/pos_discount_views.xml",
-        "static/src/xml/discount_assets.xml"
+        #"static/src/xml/discount_assets.xml"
+        
     ],
     "assets": {
-        "point_of_sale.assets": [
-            "pos_discount_authorized/static/src/js/discount_code.js"
+        "point_of_sale.assets_prod": [
+            "/pos_discount_authorized/static/src/js/discount_code.js",
         ]
     },
     'installable': True,
