@@ -14,5 +14,5 @@
             "pos_discount_authorized/static/src/js/discount_code.js"
         ]
     },
-    "installable": true
+    'installable': True,
 }
