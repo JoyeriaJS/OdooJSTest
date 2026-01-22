@@ -1,77 +1,74 @@
 /** @odoo-module **/
 
-odoo.define('pos_discount_authorized.discount_button', function (require) {
-    "use strict";
+import { registry } from "@web/core/registry";
+import { PosComponent } from "@point_of_sale/app/components/pos_component/pos_component";
+import { usePos } from "@point_of_sale/app/store/pos_hook";
+import { TextInputPopup } from "@point_of_sale/app/utils/input_popups/input_popups";
+import { ConfirmPopup } from "@point_of_sale/app/utils/confirm_popup/confirm_popup";
+import { ErrorPopup } from "@point_of_sale/app/utils/error_popup/error_popup";
+import rpc from "web.rpc";
 
-    const Chrome = require('point_of_sale.Chrome');
-    const gui = require('point_of_sale.Gui');
-    const rpc = require('web.rpc');
+export class DiscountButton extends PosComponent {
+    setup() {
+        super.setup();
+        this.pos = usePos();
+    }
 
-    Chrome.Chrome.include({
+    async onClick() {
+        const { confirmed, payload } = await this.pos.popup.add(TextInputPopup, {
+            title: "Ingrese código de descuento",
+        });
 
-        async start() {
-            await this._super(...arguments);
+        if (!confirmed) return;
 
-            this.addActionButton({
-                name: 'discount_code',
-                label: 'Código Descuento',
-                icon: 'fa fa-tag',
-                action: () => this.applyDiscountCode(),
+        const code = payload.trim();
+
+        const result = await rpc.query({
+            model: "pos.discount.code",
+            method: "search_read",
+            args: [
+                [["code", "=", code]],
+                ["code", "discount_type", "discount_value", "used", "expired"],
+            ],
+        });
+
+        if (!result.length) {
+            return this.pos.popup.add(ErrorPopup, {
+                title: "Código inválido",
+                body: "El código no existe.",
             });
-        },
+        }
 
-        async applyDiscountCode() {
-            const { confirmed, payload } = await gui.showPopup('TextInputPopup', {
-                title: "Ingresar código de descuento",
+        const data = result[0];
+
+        if (data.used || data.expired) {
+            return this.pos.popup.add(ErrorPopup, {
+                title: "No válido",
+                body: "El código ya fue usado o expiró.",
             });
+        }
 
-            if (!confirmed) return;
+        const order = this.pos.get_order();
 
-            const code = (payload || "").trim();
+        if (data.discount_type === "percent") {
+            order.add_global_discount(data.discount_value);
+        } else {
+            order.add_paymentline(this.pos.cashRegister, -data.discount_value);
+        }
 
-            const result = await rpc.query({
-                model: "pos.discount.code",
-                method: "search_read",
-                args: [
-                    [["code", "=", code]],
-                    ["code", "discount_type", "discount_value", "used", "expired"]
-                ],
-            });
+        await rpc.query({
+            model: "pos.discount.code",
+            method: "write",
+            args: [[data.id], { used: true, fecha_uso: new Date() }],
+        });
 
-            if (!result || result.length === 0) {
-                return gui.showPopup("ErrorPopup", {
-                    title: "Código inválido",
-                    body: "Este código no existe.",
-                });
-            }
+        this.pos.popup.add(ConfirmPopup, {
+            title: "Descuento aplicado",
+            body: "El código fue aplicado correctamente.",
+        });
+    }
+}
 
-            const data = result[0];
+DiscountButton.template = "DiscountButtonTemplate";
 
-            if (data.used || data.expired) {
-                return gui.showPopup("ErrorPopup", {
-                    title: "No válido",
-                    body: "El código está usado o expirado.",
-                });
-            }
-
-            const order = this.env.pos.get_order();
-
-            if (data.discount_type === "percent") {
-                order.add_global_discount(data.discount_value);
-            } else {
-                order.add_paymentline(this.env.pos.cashregisters[0], -data.discount_value);
-            }
-
-            gui.showPopup("ConfirmPopup", {
-                title: "Aplicado",
-                body: "El descuento fue aplicado correctamente.",
-            });
-
-            await rpc.query({
-                model: "pos.discount.code",
-                method: "write",
-                args: [[data.id], { used: true, fecha_uso: new Date() }],
-            });
-        },
-    });
-});
+registry.category("pos_components").add("DiscountButton", DiscountButton);
