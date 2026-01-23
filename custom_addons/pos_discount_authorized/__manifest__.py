@@ -5,6 +5,7 @@
     "depends": ["point_of_sale"],
     "data": [
         "security/ir.model.access.csv",
+        'models/pos_discount_code_model.xml',
         "views/discount_code_views.xml",
         "views/discount_button_template.xml"
     ],
