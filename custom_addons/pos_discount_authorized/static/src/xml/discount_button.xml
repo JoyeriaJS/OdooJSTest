@@ -1,7 +1,0 @@
-<templates id="templates" xml:space="preserve">
-    <t t-name="DiscountCodeButton">
-        <button class="control-button">
-            <i class="fa fa-tag"/> Código Descuento
-        </button>
-    </t>
-</templates>

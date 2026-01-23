@@ -1,0 +1,10 @@
+
+<odoo>
+<templates id="template" xml:space="preserve">
+    <t t-name="DiscountButtonTemplate">
+        <button class="button" t-on-click="click">
+            <span>Descuento Código</span>
+        </button>
+    </t>
+</templates>
+</odoo>

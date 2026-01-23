@@ -2,19 +2,16 @@
 {
     "name": "POS Discount Authorized",
     "version": "1.0",
-    "author": "ChatGPT",
     "depends": ["point_of_sale"],
     "data": [
         "security/ir.model.access.csv",
-        "views/pos_discount_views.xml",
-        #"static/src/xml/discount_assets.xml"
-        
+        "views/discount_code_views.xml",
+        "views/discount_button_template.xml"
     ],
     "assets": {
-        "point_of_sale.assets_prod": [
-            "/pos_discount_authorized/static/src/js/discount_code.js",
-            "/pos_discount_authorized/static/src/xml/discount_button.xml",
+        "point_of_sale._assets_pos": [
+            "/pos_discount_authorized/static/src/js/discount_code.js"
         ]
     },
-    'installable': True,
+    "installable": True
 }
