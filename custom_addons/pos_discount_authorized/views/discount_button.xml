@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<templates xml:space="preserve">
+<templates id="template" xml:space="preserve">
 
-    <!-- Nuestro template -->
+    <!-- Botón -->
     <t t-name="DiscountButtonTemplate">
-        <button class="button oe_highlight" t-on-click="click">
-            <i class="fa fa-tag"></i> Código Descuento
+        <button class="button" t-on-click="click">
+            <i class="fa fa-tag"></i> Código descuento
         </button>
     </t>
-
-    <!-- PATCH OFICIAL DEL ACTIONPAD DE ODOO -->
-    <xpath expr="//div[contains(@class, 'action-pad')]" position="inside">
-        <t t-component="DiscountButton"/>
-    </xpath>
 
 </templates>
