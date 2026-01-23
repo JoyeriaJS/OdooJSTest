@@ -48,7 +48,6 @@ class DiscountButton extends Component {
             discountAmount = -data.discount_value;
         }
 
-        // Aplicar descuento usando el producto configurado por Odoo
         const product = this.pos.db.get_product_by_id(this.pos.config.discount_product_id);
 
         if (!product) {
@@ -58,11 +57,13 @@ class DiscountButton extends Component {
 
         order.add_product(product, { price: discountAmount });
 
-        // Marcar código como usado
-        await this.pos.orm.call("pos.discount.code", "write", [[data.id], {
-            used: true,
-            fecha_uso: new Date(),
-        }]);
+        await this.pos.orm.call("pos.discount.code", "write", [
+            [data.id],
+            {
+                used: true,
+                fecha_uso: new Date(),
+            },
+        ]);
 
         Gui.showNotification("Descuento aplicado correctamente");
     }
@@ -70,5 +71,4 @@ class DiscountButton extends Component {
 
 DiscountButton.template = "DiscountButtonTemplate";
 
-// Registrar botón en el POS
-registry.category("pos_ui").add("discount_button", DiscountButton);
+registry.category("pos_ui").add("DiscountButton", DiscountButton);
