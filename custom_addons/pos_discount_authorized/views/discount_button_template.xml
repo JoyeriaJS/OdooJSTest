@@ -1,10 +1,8 @@
-
-<odoo>
-<templates id="template" xml:space="preserve">
-    <t t-name="DiscountButtonTemplate">
-        <button class="button" t-on-click="click">
-            <span>Descuento Código</span>
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="DiscountCodeButton" owl="1">
+        <button class="discount-code-btn btn btn-primary">
+            Aplicar Código
         </button>
     </t>
 </templates>
-</odoo>

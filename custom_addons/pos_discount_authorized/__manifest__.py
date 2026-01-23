@@ -8,11 +8,11 @@
         "security/ir.model.access.csv",
         'models/pos_discount_code_model.xml',
         "views/discount_code_views.xml",
-        "views/discount_button_template.xml"
     ],
     "assets": {
         "point_of_sale._assets_pos": [
-            "/pos_discount_authorized/static/src/js/discount_code.js"
+            "/pos_discount_authorized/static/src/js/discount_code.js",
+            "/pos_discount_authorized/static/src/xml/discount_button.xml",
         ]
     },
     "installable": True
