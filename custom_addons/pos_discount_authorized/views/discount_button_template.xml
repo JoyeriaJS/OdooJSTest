@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    <t t-name="DiscountCodeButton" owl="1">
-        <button class="discount-code-btn btn btn-primary">
-            Aplicar Código
+    <t t-name="DiscountButtonTemplate" owl="1">
+        <button class="button" t-on-click="click">
+            <i class="fa fa-tag"></i> Código Descuento
         </button>
     </t>
 </templates>
