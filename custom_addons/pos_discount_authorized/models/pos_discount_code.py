@@ -12,6 +12,7 @@ class POSDiscountCode(models.Model):
     discount_value = fields.Float("Valor")
     used = fields.Boolean(default=False)
     expired = fields.Boolean(compute="_compute_expired", store=True)
+    fecha_creacion = fields.Datetime(default=lambda self: fields.Datetime.now(), readonly=True)
     fecha_uso = fields.Datetime()
 
     @api.model
