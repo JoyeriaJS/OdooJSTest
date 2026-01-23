@@ -3,9 +3,7 @@
 import { registry } from "@web/core/registry";
 import { Gui } from "@web/gui/gui";
 import { usePos } from "@point_of_sale/app/store/pos_hook";
-import { Component, xml } from "@odoo/owl";
-import { patch } from "@web/core/utils/patch";
-import { ActionPadWidget } from "@point_of_sale/app/screens/product_screen/action_pad/action_pad";
+import { Component } from "@odoo/owl";
 
 class DiscountButton extends Component {
     static template = "DiscountButtonTemplate";
@@ -24,7 +22,6 @@ class DiscountButton extends Component {
 
         const code = payload.trim().toUpperCase();
 
-        // Buscar código en backend
         const result = await this.pos.orm.call(
             "pos.discount.code",
             "search_read",
@@ -32,15 +29,13 @@ class DiscountButton extends Component {
         );
 
         if (!result.length) {
-            Gui.showError("Código no existe");
-            return;
+            return Gui.showError("Código no existe");
         }
 
         const data = result[0];
 
         if (data.used || data.expired) {
-            Gui.showError("Código usado o expirado");
-            return;
+            return Gui.showError("Código usado o expirado");
         }
 
         const order = this.pos.get_order();
@@ -52,38 +47,21 @@ class DiscountButton extends Component {
             amount = -data.discount_value;
         }
 
-        const product = this.pos.db.get_product_by_id(this.pos.config.discount_product_id);
+        const discountProduct = this.pos.db.get_product_by_id(this.pos.config.discount_product_id);
 
-        if (!product) {
-            Gui.showError("⚠️ No hay producto de descuento configurado en el POS.");
-            return;
+        if (!discountProduct) {
+            return Gui.showError("No hay producto configurado para descuentos");
         }
 
-        order.add_product(product, { price: amount });
+        order.add_product(discountProduct, { price: amount });
 
         await this.pos.orm.call("pos.discount.code", "write", [
             [data.id],
             { used: true, fecha_uso: new Date() },
         ]);
 
-        Gui.showNotification("Descuento aplicado correctamente");
+        Gui.showNotification("Descuento aplicado");
     }
 }
-
-// 🔥 INSERTAR EL BOTÓN EN EL ACTION PAD (debajo de los botones de pago)
-patch(ActionPadWidget.prototype, {
-    setup() {
-        super.setup();
-    },
-
-    get extraButtons() {
-        return [
-            {
-                component: DiscountButton,
-                position: "after",
-            },
-        ];
-    },
-});
 
 registry.category("pos_ui").add("DiscountButton", DiscountButton);
