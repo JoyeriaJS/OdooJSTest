@@ -3,9 +3,13 @@
 import { registry } from "@web/core/registry";
 import { Gui } from "@web/gui/gui";
 import { usePos } from "@point_of_sale/app/store/pos_hook";
-import { Component } from "@odoo/owl";
+import { Component, xml } from "@odoo/owl";
+import { patch } from "@web/core/utils/patch";
+import { ActionPadWidget } from "@point_of_sale/app/screens/product_screen/action_pad/action_pad";
 
 class DiscountButton extends Component {
+    static template = "DiscountButtonTemplate";
+
     setup() {
         this.pos = usePos();
     }
@@ -40,12 +44,12 @@ class DiscountButton extends Component {
         }
 
         const order = this.pos.get_order();
-        let discountAmount = 0;
+        let amount = 0;
 
         if (data.discount_type === "percent") {
-            discountAmount = -(order.get_total_with_tax() * (data.discount_value / 100));
+            amount = -(order.get_total_with_tax() * (data.discount_value / 100));
         } else {
-            discountAmount = -data.discount_value;
+            amount = -data.discount_value;
         }
 
         const product = this.pos.db.get_product_by_id(this.pos.config.discount_product_id);
@@ -55,20 +59,31 @@ class DiscountButton extends Component {
             return;
         }
 
-        order.add_product(product, { price: discountAmount });
+        order.add_product(product, { price: amount });
 
         await this.pos.orm.call("pos.discount.code", "write", [
             [data.id],
-            {
-                used: true,
-                fecha_uso: new Date(),
-            },
+            { used: true, fecha_uso: new Date() },
         ]);
 
         Gui.showNotification("Descuento aplicado correctamente");
     }
 }
 
-DiscountButton.template = "DiscountButtonTemplate";
+// 🔥 INSERTAR EL BOTÓN EN EL ACTION PAD (debajo de los botones de pago)
+patch(ActionPadWidget.prototype, {
+    setup() {
+        super.setup();
+    },
+
+    get extraButtons() {
+        return [
+            {
+                component: DiscountButton,
+                position: "after",
+            },
+        ];
+    },
+});
 
 registry.category("pos_ui").add("DiscountButton", DiscountButton);
