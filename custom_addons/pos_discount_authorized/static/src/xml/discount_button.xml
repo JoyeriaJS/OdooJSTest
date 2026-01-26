@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
 
-    <!-- Template del botón -->
     <t t-name="DiscountButtonTemplate">
-        <button class="button" t-on-click="click">
-            <i class="fa fa-tag"></i> Cod descuento
+        <button class="button pos-button" t-on-click="onClick">
+            <i class="fa fa-tag"></i> Código descuento
         </button>
-    </t>
-
-    <!-- Insertar el botón dentro de la ActionPad -->
-    <t t-inherit="point_of_sale.ActionPadWidget" t-inherit-mode="extension">
-        <xpath expr="//div[contains(@class, 'button-container')]" position="inside">
-            <DiscountButton />
-        </xpath>
     </t>
 
 </templates>
