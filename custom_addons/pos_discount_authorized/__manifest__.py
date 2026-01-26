@@ -1,8 +1,6 @@
-
 {
     "name": "POS Discount Authorized",
     "version": "1.0",
-    "license": "LGPL-3",
     "depends": ["point_of_sale"],
     "data": [
         "security/pos_discount_model.xml",
@@ -17,4 +15,5 @@
         ]
     },
     "installable": True,
+    "application": False
 }
