@@ -12,6 +12,7 @@
         "point_of_sale.assets": [
             "pos_discount_authorized/static/src/js/discount_code.js",
             "pos_discount_authorized/static/src/xml/discount_button.xml",
+            "pos_discount_authorized/static/src/js/test_error.js",
         ]
     },
     "installable": True,
