@@ -4,7 +4,7 @@
     <!-- Template del botón -->
     <t t-name="DiscountButtonTemplate">
         <button class="button" t-on-click="click">
-            <i class="fa fa-tag"></i> Código descuento
+            <i class="fa fa-tag"></i> Cod descuento
         </button>
     </t>
 
