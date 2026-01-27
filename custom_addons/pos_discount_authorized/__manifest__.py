@@ -13,9 +13,6 @@
         "point_of_sale._assets_pos": [
             "pos_discount_authorized/static/src/js/discount_override.js",
         ],
-        "point_of_sale._assets_pos_views": [
-            "pos_discount_authorized/static/src/xml/discount_button.xml",
-        ]
     },
     "installable": True,
     "application": False,

@@ -1,69 +1,65 @@
 /** @odoo-module **/
 
-import { registry } from "@web/core/registry";
-import { NumberPopup } from "@point_of_sale/app/utils/popups/number_popup";
-import { useService } from "@web/core/utils/hooks";
+import { NumberPopup } from "@point_of_sale/app/popup/number_popup/number_popup";
 import { patch } from "@web/core/utils/patch";
-import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
+import { DiscountButton } from "@point_of_sale/app/screens/product_screen/control_buttons/discount_button";
+import { useService } from "@web/core/utils/hooks";
 
-console.log("🔥 POS DISCOUNT MODULE LOADED CORRECTLY 🔥");
+patch(DiscountButton.prototype, "pos_discount_authorized", {
 
-patch(ProductScreen.prototype, "pos_discount_authorized", {
-    async onClickDiscount(event) {
+    setup() {
+        super.setup();
+        this.rpc = useService("rpc");
+        this.dialog = useService("dialog");
+    },
 
-        const dialog = this.env.services.dialog;
-        const rpc = this.env.services.rpc;
+    async onClick() {
 
-        // 1️⃣ Pedir código de autorización
-        const { confirmed, value: code } = await dialog.prompt({
+        // 1️⃣ Pedir código primero
+        const { confirmed, value } = await this.dialog.prompt({
             title: "Código Autorizado",
-            body: "Ingrese el código de autorización:",
+            body: "Ingrese el código de descuento:"
         });
 
         if (!confirmed) return;
 
-        const cleanCode = code.trim().toUpperCase();
+        const code = value.trim().toUpperCase();
 
-        // 2️⃣ Revisar si el código existe y está disponible
-        const result = await rpc("/web/dataset/call_kw", {
+        // 2️⃣ Validar código en el backend
+        const result = await this.rpc("/web/dataset/call_kw", {
             model: "pos.discount.code",
             method: "search_read",
-            args: [
-                [["code", "=", cleanCode]],
-                ["code", "discount_type", "discount_value", "used", "expired"]
-            ],
+            args: [[["code", "=", code]], ["discount_value", "discount_type", "used", "expired"]],
         });
 
         if (!result.length) {
-            await dialog.alert("Código inválido.");
+            this.dialog.alert("Código no válido.");
             return;
         }
 
-        const info = result[0];
+        const data = result[0];
 
-        if (info.used || info.expired) {
-            await dialog.alert("Código ya utilizado o expirado.");
+        if (data.used || data.expired) {
+            this.dialog.alert("Código ya usado o expirado.");
             return;
         }
 
-        // 3️⃣ Ahora sí pedir el porcentaje
-        const { confirmed: ok2, payload: discount } = await this.showPopup(NumberPopup, {
-            title: "Ingrese descuento (%) autorizado",
-            startingValue: info.discount_value,
+        // 3️⃣ Mostrar popup original pero limitado al valor del código
+        const discount = await this.showPopup(NumberPopup, {
+            title: "Aplicar descuento autorizado",
+            startingValue: data.discount_value,
         });
 
-        if (!ok2) return;
+        if (!discount.confirmed) return;
 
-        // 4️⃣ Aplicar descuento con control nativo de Odoo
-        super.onClickDiscount(event);
+        const qty = discount.payload;
 
-        // 5️⃣ Marcar el código como usado
-        await rpc("/web/dataset/call_kw", {
-            model: "pos.discount.code",
-            method: "write",
-            args: [[info.id], { used: true, fecha_uso: new Date() }],
-        });
+        if (qty !== data.discount_value) {
+            this.dialog.alert("El porcentaje/monto debe coincidir EXACTAMENTE con el autorizado.");
+            return;
+        }
 
-        await dialog.alert("Descuento aplicado correctamente.");
-    }
+        // 4️⃣ Continuar con la lógica original
+        return super.onClick();
+    },
 });
