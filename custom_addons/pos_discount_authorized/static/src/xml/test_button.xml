@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="TestButtonTemplate">
+        <button class="button btn-danger" t-on-click="onClick">
+            TEST 🔥
+        </button>
+    </t>
+
+    <xpath expr="//div[contains(@class, 'action-pad')]" position="inside">
+        <t t-component="TestButton"/>
+    </xpath>
+
+</templates>
