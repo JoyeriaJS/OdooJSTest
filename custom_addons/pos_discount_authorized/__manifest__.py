@@ -13,6 +13,8 @@
             "pos_discount_authorized/static/src/js/discount_override.js",
         ]
     },
+
+
     "installable": True,
     "application": False,
 }
