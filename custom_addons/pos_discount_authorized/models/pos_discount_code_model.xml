@@ -1,7 +1,0 @@
-<odoo>
-    <record id="model_pos_discount_code" model="ir.model">
-        <field name="name">POS Discount Code</field>
-        <field name="model">pos.discount.code</field>
-        <field name="state">base</field>
-    </record>
-</odoo>
