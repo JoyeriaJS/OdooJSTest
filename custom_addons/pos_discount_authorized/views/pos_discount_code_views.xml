@@ -20,9 +20,6 @@
         <field name="model">pos.discount.code</field>
         <field name="arch" type="xml">
             <form>
-                <header>
-                    <button name="mark_used" string="Marcar usado" type="object" states="draft"/>
-                </header>
                 <sheet>
                     <group>
                         <field name="code"/>

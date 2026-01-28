@@ -67,3 +67,5 @@ class POSDiscountCode(models.Model):
                 continue
 
             record.expired = record.expiration_date < now
+
+
