@@ -1,45 +1,51 @@
-/** @odoo-module **/
+/** @odoo-module */
 
-import { Component } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
+import { PosComponent } from "@point_of_sale/app/components/pos_component/pos_component";
 import { usePos } from "@point_of_sale/app/store/pos_hook";
+import { useService } from "@web/core/utils/hooks";
 
-export class DiscountButton extends Component {
-    static template = "DiscountButtonTemplate";
-
+export class DiscountButton extends PosComponent {
     setup() {
-        this.dialog = useService("dialog");
+        super.setup();
         this.pos = usePos();
+        this.dialog = useService("dialog");
+        console.log("🔥 POS DISCOUNT MODULE LOADED CORRECTLY 🔥");
     }
 
     async onClick() {
         const { confirmed, value } = await this.dialog.prompt({
             title: "Código de descuento",
-            body: "Ingrese el código autorizado:"
+            body: "Ingrese el código:",
         });
 
-        if (!confirmed) return;
+        if (!confirmed) {
+            return;
+        }
 
-        const code = value.trim();
+        const code = value.trim().toUpperCase();
 
-        const result = await this.pos.rpc({
+        const result = await this.pos.env.services.rpc("/web/dataset/call_kw", {
             model: "pos.discount.code",
             method: "search_read",
             args: [[["code", "=", code]], ["code","discount_type","discount_value","used","expired"]],
         });
 
         if (!result.length) {
-            return this.dialog.alert("Código no válido.");
+            this.dialog.alert("Código no existe");
+            return;
         }
 
         const data = result[0];
 
         if (data.used || data.expired) {
-            return this.dialog.alert("El código ya fue usado o está expirado.");
+            this.dialog.alert("Código usado o expirado");
+            return;
         }
 
         const order = this.pos.get_order();
+        const discount_product = this.pos.db.get_product_by_id(this.pos.config.discount_product_id);
+
         let amount = 0;
 
         if (data.discount_type === "percent") {
@@ -48,21 +54,21 @@ export class DiscountButton extends Component {
             amount = -data.discount_value;
         }
 
-        const discountProduct = this.pos.db.get_product_by_id(this.pos.config.discount_product_id);
+        order.add_product(discount_product, { price: amount });
 
-        order.add_product(discountProduct, { price: amount });
-
-        await this.pos.rpc({
+        await this.pos.env.services.rpc("/web/dataset/call_kw", {
             model: "pos.discount.code",
             method: "write",
-            args: [[data.id], { used: true }],
+            args: [[data.id], { used: true, fecha_uso: new Date() }],
         });
 
-        this.dialog.alert("Descuento aplicado correctamente.");
+        this.dialog.alert("Descuento aplicado");
     }
 }
 
-registry.category("pos_actionpad_buttons").add(
-    "discount_authorized_button",
-    { component: DiscountButton, position: 99 }
-);
+DiscountButton.template = "DiscountButtonTemplate";
+
+registry.category("pos_screens").add("DiscountButton", {
+    component: DiscountButton,
+    position: "payment-buttons",
+});

@@ -1,11 +1,10 @@
 {
     "name": "POS Discount Authorized",
     "version": "1.0",
-    "summary": "Descuentos autorizados por código en el POS",
-    "author": "Sebastián Joyería",
+    "license": "LGPL-3",
     "depends": ["point_of_sale"],
     "data": [
-        "security/pos_discount_rule.xml",
+        "security/pos_discount_model.xml",
         "security/ir.model.access.csv",
         "views/pos_discount_code_views.xml"
     ],
@@ -15,6 +14,5 @@
             "pos_discount_authorized/static/src/xml/discount_button.xml"
         ]
     },
-    "installable": True,
-    "application": False
+    "installable": True
 }
