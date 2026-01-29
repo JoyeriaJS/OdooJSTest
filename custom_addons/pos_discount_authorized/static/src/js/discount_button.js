@@ -3,13 +3,12 @@
 import { patch } from "@web/core/utils/patch";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 
-patch(ProductScreen.prototype, "discount_button_patch", {
+patch(ProductScreen.prototype, {
     setup() {
         super.setup();
-        console.log("BOTÓN DE DESCUENTO INYECTADO (COMMUNITY MODE)");
+        console.log("🔥 BOTÓN DE DESCUENTO INYECTADO EN COMMUNITY 🔥");
     },
 
-    // Este método se llamará al presionar el botón
     onClickDiscount() {
         alert("Descuento funcionando desde Community!");
     },
