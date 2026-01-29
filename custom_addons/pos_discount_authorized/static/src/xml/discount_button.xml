@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
-    <t t-name="PosDiscountButton" owl="1">
-        <button class="button button-light" t-on-click="onClick">
-            Descuento
+
+    <!-- Insertar el botón en la parte inferior del ProductScreen -->
+    <xpath expr="//div[contains(@class, 'pos-rightpane')]//div[contains(@class, 'actions')]" position="inside">
+        <button class="button highlight" t-on-click="onClickDiscount">
+            DESCUENTO
         </button>
-    </t>
+    </xpath>
+
 </templates>
