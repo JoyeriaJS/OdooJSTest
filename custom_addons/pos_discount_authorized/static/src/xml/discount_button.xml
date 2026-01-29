@@ -1,11 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <templates id="template" xml:space="preserve">
-
-    <t t-name="PosDiscountButton">
-    <button class="control-button oe_highlight">
-        <span>Autorización</span>
-    </button>
+    <t t-name="PosDiscountButton" owl="1">
+        <button class="control-button oe_highlight">
+            <span>Descuento</span>
+        </button>
     </t>
-
-
 </templates>

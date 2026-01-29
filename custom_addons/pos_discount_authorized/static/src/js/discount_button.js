@@ -1,63 +1,27 @@
 /** @odoo-module **/
 
-import { PosComponent } from "@point_of_sale/app/components/pos_component/pos_component";
+import { ControlButtons } from "@point_of_sale/app/screens/product_screen/control_buttons/control_buttons";
 import { registry } from "@web/core/registry";
+import { PosComponent } from "@point_of_sale/app/components/pos_component/pos_component";
 import { usePos } from "@point_of_sale/app/store/pos_hook";
 
 export class PosDiscountButton extends PosComponent {
     setup() {
         this.pos = usePos();
-        console.log("🔥 POS BUTTON LOADED CORRECTLY");
+        console.log("🔥 Botón de Descuento CARGADO en ControlButtons");
     }
 
-    async onClick() {
-        const { confirmed, payload } = await this.env.services.popup.show("NumberPopup", {
-            title: "Ingrese código autorizado",
-            startingValue: "",
-            confirmText: "Validar",
-        });
-
-        if (!confirmed) return;
-
-        const code = payload;
-
-        const result = await this.rpc({
-            model: "pos.discount.code",
-            method: "validate_code",
-            args: [code],
-        });
-
-        if (!result.valid) {
-            this.env.services.popup.add("ErrorPopup", {
-                title: "Código inválido",
-                body: result.message,
-            });
-            return;
-        }
-
-        // Aplicar descuento
-        const order = this.pos.get_order();
-
-        if (result.type === "percent") {
-            order.add_product(this.pos.db.get_product_by_id(result.product_id), {
-                price: -order.get_total_with_tax() * (result.value / 100),
-            });
-        } else {
-            order.add_product(this.pos.db.get_product_by_id(result.product_id), {
-                price: -result.value,
-            });
-        }
-
-        this.env.services.popup.show("ConfirmPopup", {
-            title: "Descuento aplicado",
-            body: `Código válido. Descuento aplicado exitosamente.`,
+    onClick() {
+        this.showPopup("ConfirmPopup", {
+            title: "Descuento Autorizado",
+            body: "El botón fue presionado correctamente."
         });
     }
 }
 
 PosDiscountButton.template = "PosDiscountButton";
 
-registry.category("pos_product_buttons").add("PosDiscountButton", {
+registry.category("pos_control_buttons").add("PosDiscountButton", {
     component: PosDiscountButton,
-    position: "after",
+    position: 6,  // lo inserta después de los otros botones
 });
