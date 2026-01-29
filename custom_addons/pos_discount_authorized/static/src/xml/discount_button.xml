@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
-    <t t-name="PosDiscountButton" owl="1">
-        <button class="button payment-button" t-on-click="onClick">
-            🔑 Código de Descuento
-        </button>
+
+    <t t-name="PosDiscountButton">
+    <button class="control-button oe_highlight">
+        <span>Autorización</span>
+    </button>
     </t>
+
+
 </templates>

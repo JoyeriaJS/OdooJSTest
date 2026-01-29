@@ -7,57 +7,57 @@ import { usePos } from "@point_of_sale/app/store/pos_hook";
 export class PosDiscountButton extends PosComponent {
     setup() {
         this.pos = usePos();
-        console.log("🔥 POS DISCOUNT MODULE LOADED OK");
+        console.log("🔥 POS BUTTON LOADED CORRECTLY");
     }
 
     async onClick() {
-        const code = prompt("Ingrese código:");
-
-        if (!code) return;
-
-        const result = await this.pos.env.services.rpc("/web/dataset/call_kw", {
-            model: "pos.discount.code",
-            method: "search_read",
-            args: [[["code", "=", code.toUpperCase()]]],
-            kwargs: { fields: ["discount_type", "discount_value", "used", "expired"] },
+        const { confirmed, payload } = await this.env.services.popup.show("NumberPopup", {
+            title: "Ingrese código autorizado",
+            startingValue: "",
+            confirmText: "Validar",
         });
 
-        if (!result.length) {
-            alert("Código no existe");
+        if (!confirmed) return;
+
+        const code = payload;
+
+        const result = await this.rpc({
+            model: "pos.discount.code",
+            method: "validate_code",
+            args: [code],
+        });
+
+        if (!result.valid) {
+            this.env.services.popup.add("ErrorPopup", {
+                title: "Código inválido",
+                body: result.message,
+            });
             return;
         }
 
-        const data = result[0];
-
-        if (data.used || data.expired) {
-            alert("Código usado o expirado");
-            return;
-        }
-
+        // Aplicar descuento
         const order = this.pos.get_order();
-        let amount = 0;
 
-        if (data.discount_type === "percent") {
-            amount = -(order.get_total_with_tax() * (data.discount_value / 100));
+        if (result.type === "percent") {
+            order.add_product(this.pos.db.get_product_by_id(result.product_id), {
+                price: -order.get_total_with_tax() * (result.value / 100),
+            });
         } else {
-            amount = -data.discount_value;
+            order.add_product(this.pos.db.get_product_by_id(result.product_id), {
+                price: -result.value,
+            });
         }
 
-        order.add_product(this.pos.config.discount_product_id, { price: amount });
-
-        await this.pos.env.services.rpc("/web/dataset/call_kw", {
-            model: "pos.discount.code",
-            method: "write",
-            args: [[data.id], { used: true }],
+        this.env.services.popup.show("ConfirmPopup", {
+            title: "Descuento aplicado",
+            body: `Código válido. Descuento aplicado exitosamente.`,
         });
-
-        alert("Descuento aplicado.");
     }
 }
 
 PosDiscountButton.template = "PosDiscountButton";
 
-registry.category("pos_screens").add("PosDiscountButton", {
+registry.category("pos_product_buttons").add("PosDiscountButton", {
     component: PosDiscountButton,
-    position: "payment-buttons",
+    position: "after",
 });

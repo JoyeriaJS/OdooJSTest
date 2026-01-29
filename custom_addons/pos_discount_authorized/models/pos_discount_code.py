@@ -35,3 +35,24 @@ class POSDiscountCode(models.Model):
     def action_mark_used(self):
         for rec in self:
             rec.used = True
+
+    @api.model
+    def validate_code(self, code):
+        rec = self.search([("code", "=", code)], limit=1)
+        if not rec:
+            return {"valid": False, "message": "No existe el código."}
+
+        if rec.used:
+            return {"valid": False, "message": "El código ya fue utilizado."}
+
+        if rec.expired:
+            return {"valid": False, "message": "El código ha expirado."}
+
+        rec.used = True
+
+        return {
+            "valid": True,
+            "type": rec.discount_type,
+            "value": rec.discount_value,
+            "product_id": 1,  # ID de producto descuento genérico
+        }
