@@ -6,8 +6,10 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_mark_used" type="object" string="Mark as Used" states="draft"/>
+                    <!-- CORREGIDO: QUITADO states="draft" -->
+                    <button name="action_mark_used" type="object" string="Marcar como usado"/>
                 </header>
+
                 <sheet>
                     <group>
                         <field name="code" readonly="1"/>
