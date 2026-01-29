@@ -1,4 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <record id="view_pos_discount_code_form" model="ir.ui.view">
+        <field name="name">pos.discount.code.form</field>
+        <field name="model">pos.discount.code</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_mark_used" type="object" string="Mark as Used" states="draft"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="code" readonly="1"/>
+                        <field name="discount_type"/>
+                        <field name="discount_value"/>
+                        <field name="used"/>
+                        <field name="fecha_creacion"/>
+                        <field name="expiration_date"/>
+                        <field name="expired"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
     <record id="view_pos_discount_code_tree" model="ir.ui.view">
         <field name="name">pos.discount.code.tree</field>
         <field name="model">pos.discount.code</field>
@@ -9,40 +33,17 @@
                 <field name="discount_value"/>
                 <field name="used"/>
                 <field name="expired"/>
-                <field name="fecha_creacion"/>
-                <field name="fecha_uso"/>
             </tree>
         </field>
     </record>
 
-    <record id="view_pos_discount_code_form" model="ir.ui.view">
-        <field name="name">pos.discount.code.form</field>
-        <field name="model">pos.discount.code</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <group>
-                        <field name="code"/>
-                        <field name="discount_type"/>
-                        <field name="discount_value"/>
-                        <field name="used"/>
-                        <field name="expired"/>
-                        <field name="fecha_creacion"/>
-                        <field name="fecha_uso"/>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
+    <menuitem id="menu_pos_discount_root" name="POS Discount Codes" parent="point_of_sale.menu_point_root"/>
+    <menuitem id="menu_pos_discount_code" name="Codes" parent="menu_pos_discount_root"
+              action="action_pos_discount_code"/>
 
     <record id="action_pos_discount_code" model="ir.actions.act_window">
-        <field name="name">Códigos de Descuento POS</field>
+        <field name="name">Discount Codes</field>
         <field name="res_model">pos.discount.code</field>
         <field name="view_mode">tree,form</field>
     </record>
-
-    <menuitem id="menu_pos_discount_root"
-              name="Códigos Descuento POS"
-              parent="point_of_sale.menu_point_root"
-              action="action_pos_discount_code"/>
 </odoo>
