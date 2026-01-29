@@ -19,5 +19,5 @@ PosDiscountButton.template = "PosDiscountButton";
 
 registry.category("pos_screens").add("PosDiscountButton", {
     component: PosDiscountButton,
-    position: "payment-buttons",
+    position: ["actionpad-buttons"],  // ← lo verás de inmediato
 });

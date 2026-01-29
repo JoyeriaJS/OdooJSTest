@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
 
-    <!-- Botón que aparecerá en el ActionPad -->
-    <t t-name="DiscountAuthorizedButton">
-        <button type="button" class="button btn btn-primary" t-on-click="apply_authorized_discount">
-            <i class="fa fa-key"></i> Código Autorizado
+    <t t-name="PosDiscountButton">
+        <button class="button pos-disc-btn" t-on-click="onClick">
+            <span>Validar Código</span>
         </button>
     </t>
-
-    <!-- Insertar el botón dentro del ActionPad -->
-    <xpath expr="//div[@class='control-buttons']" position="inside">
-        <t t-call="DiscountAuthorizedButton"/>
-    </xpath>
 
 </templates>
