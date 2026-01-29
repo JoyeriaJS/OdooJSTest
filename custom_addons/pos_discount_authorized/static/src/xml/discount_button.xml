@@ -1,5 +1,7 @@
-<xpath expr="//div[@class='product-screen']" position="inside">
-    <button class="button highlight" t-on-click="onClickDiscount" style="position:absolute; bottom:10px; right:10px;">
-        DESCUENTO
-    </button>
-</xpath>
+<t t-extend="PointOfSaleScreen">
+    <t t-jquery="div.pos-content" t-operation="append">
+        <button class="button highlight" t-on-click="onClickDiscount" style="position:absolute; bottom:20px; right:20px; z-index:9999;">
+            DESCUENTO
+        </button>
+    </t>
+</t>
