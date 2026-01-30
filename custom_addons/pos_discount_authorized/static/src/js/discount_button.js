@@ -1,8 +1,7 @@
 /** @odoo-module **/
 
 import { patch } from "@web/core/utils/patch";
-import { ActionPad } from "@point_of_sale/app/screens/product_screen/action_pad/action_pad";
-
+import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 patch(ActionPad.prototype, {
     setup() {
         super.setup();

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
 
-    <t t-inherit="point_of_sale.ActionPad" t-inherit-mode="extension">
-        <xpath expr="//div[contains(@class,'button-row')]" position="inside">
+    <!-- EXTENDER LA VISTA -->
+    <t t-extend="point_of_sale.ProductScreen">
+        <t t-jquery=".control-buttons" t-operation="append">
             <button class="button" t-on-click="onClickDiscount">
                 🔑 Autorizar Descuento
             </button>
-        </xpath>
+        </t>
     </t>
 
 </templates>
