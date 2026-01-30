@@ -6,10 +6,10 @@ import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product
 patch(ProductScreen.prototype, {
     setup() {
         super.setup();
-        console.log("🔥 Botón de descuento cargado en COMMUNITY 🔥");
+        console.log("🔥 DESCUENTO EN PRODUCT SCREEN CARGADO ✔");
     },
 
     onClickDiscount() {
         alert("Descuento funcionando en Community!");
-    }
+    },
 });

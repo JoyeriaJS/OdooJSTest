@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <template id="AAA_TEST_XML" inherit_id="point_of_sale.ProductScreen">
-        <xpath expr="//div" position="before">
-            <div style="background:red;color:white;padding:20px;">
-                XML CARGANDO 🔥
-            </div>
+    <template id="product_screen_discount_button" inherit_id="point_of_sale.ProductScreen">
+        <xpath expr="//div[contains(@class,'control-buttons')]" position="inside">
+            <button class="btn btn-primary" t-on-click="onClickDiscount">
+                🔑 Autorizar Descuento
+            </button>
         </xpath>
     </template>
 </odoo>
