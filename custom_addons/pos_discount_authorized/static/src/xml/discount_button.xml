@@ -1,7 +1,8 @@
-<t t-extend="PointOfSaleScreen">
-    <t t-jquery="div.pos-content" t-operation="append">
-        <button class="button highlight" t-on-click="onClickDiscount" style="position:absolute; bottom:20px; right:20px; z-index:9999;">
-            DESCUENTO
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="PosDiscountButton" owl="1">
+        <button class="control-button btn btn-primary">
+            <span>Descuento</span>
         </button>
     </t>
-</t>
+</templates>
