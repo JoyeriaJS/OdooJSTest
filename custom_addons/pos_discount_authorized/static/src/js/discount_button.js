@@ -1,12 +1,12 @@
 /** @odoo-module **/
 
 import { patch } from "@web/core/utils/patch";
-import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
+import { ActionPad } from "@point_of_sale/app/screens/product_screen/action_pad/action_pad";
 
-patch(ProductScreen.prototype, {
+patch(ActionPad.prototype, {
     setup() {
         super.setup();
-        console.log("🔥 DESCUENTO EN PRODUCT SCREEN CARGADO ✔");
+        console.log("🔥 Botón de descuento cargado en ActionPad (v17 Community) 🔥");
     },
 
     onClickDiscount() {

@@ -7,12 +7,11 @@
     "data": [
         "security/ir.model.access.csv",
         "views/pos_discount_code_views.xml",
-        "static/src/xml/product_screen.xml",
     ],
     "assets": {
         "point_of_sale.assets": [
             "pos_discount_authorized/static/src/js/discount_button.js",
-            "pos_discount_authorized/static/src/xml/product_screen.xml",
+            "pos_discount_authorized/static/src/xml/discount_button.xml",
         ],
     },
     "installable": True,
