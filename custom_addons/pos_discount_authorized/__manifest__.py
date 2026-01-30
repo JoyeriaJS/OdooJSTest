@@ -11,7 +11,7 @@
     "assets": {
         "point_of_sale._assets_pos": [
             "pos_discount_authorized/static/src/js/discount_button.js",
-            "pos_discount_authorized/static/src/xml/discount_button.xml",
+            "pos_discount_authorized/static/src/xml/product_screen.xml",
         ],
     },
     "installable": True,

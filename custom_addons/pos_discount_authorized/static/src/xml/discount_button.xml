@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<templates xml:space="preserve">
-    <t t-name="PosDiscountButton" owl="1">
-        <button class="control-button btn btn-primary">
-            <span>Descuento</span>
-        </button>
-    </t>
-</templates>
