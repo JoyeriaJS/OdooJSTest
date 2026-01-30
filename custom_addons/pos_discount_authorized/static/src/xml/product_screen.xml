@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <template id="product_screen_discount_button" inherit_id="point_of_sale.ProductScreen">
+    <template id="product_screen_discount_button" inherit_id="point_of_sale.product_screen">
         <xpath expr="//div[contains(@class,'control-buttons')]" position="inside">
             <button class="btn btn-primary" t-on-click="onClickDiscount">
                 🔑 Autorizar Descuento
