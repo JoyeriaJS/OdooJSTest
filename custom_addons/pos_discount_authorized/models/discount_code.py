@@ -3,39 +3,29 @@ from datetime import datetime
 
 class PosAuthorizedDiscount(models.Model):
     _name = "pos.authorized.discount"
-    _description = "Authorized POS Discount Codes"
+    _description = "POS Authorized Discounts"
     _rec_name = "code"
 
-    code = fields.Char("Código", required=True, copy=False)
-    discount_type = fields.Selection(
-        [("percent", "Porcentaje"), ("amount", "Monto fijo")],
-        required=True
-    )
-    value = fields.Float("Valor del descuento", required=True)
+    code = fields.Char(required=True)
+    discount_type = fields.Selection([
+        ("percent", "Porcentaje"),
+        ("amount", "Monto fijo"),
+    ], required=True)
 
+    value = fields.Float(required=True)
     expiration = fields.Datetime("Expira el")
-    used = fields.Boolean("Usado", default=False)
-
-    @api.model
-    def generate_code(self):
-        """Genera un código aleatorio tipo ABC12"""
-        import random, string
-        return ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+    used = fields.Boolean(default=False)
 
     @api.model
     def validate_code(self, code_str):
-        """Validación desde POS vía RPC."""
         code = self.search([("code", "=", code_str.upper())], limit=1)
         if not code:
-            return {"ok": False, "error": "Código inexistente"}
-
+            return {"ok": False, "error": "Código incorrecto"}
         if code.used:
-            return {"ok": False, "error": "Código ya fue utilizado"}
-
+            return {"ok": False, "error": "Código ya utilizado"}
         if code.expiration and datetime.now() > code.expiration:
-            return {"ok": False, "error": "El código expiró"}
+            return {"ok": False, "error": "Código expirado"}
 
-        # Marcar como usado
         code.used = True
 
         return {

@@ -1,64 +1,61 @@
-odoo.define('pos_discount_authorized', function (require) {
+odoo.define("pos_discount_authorized.discount_pos", function (require) {
     "use strict";
 
-    const ProductScreen = require('point_of_sale.ProductScreen');
-    const { Gui } = require('point_of_sale.Gui');
-    const rpc = require('web.rpc');
+    const NumberBuffer = require("point_of_sale.NumberBuffer");
+    const Registries = require("point_of_sale.Registries");
+    const DiscountButton = require("point_of_sale.DiscountButton");
+    const { useListener } = require("web.custom_hooks");
 
-    ProductScreen.include({
+    const rpc = require("web.rpc");
 
-        async authorizeDiscount() {
-
-            const { confirmed, payload } = await Gui.prompt({
-                title: "Descuento autorizado",
-                body: "Ingrese el código entregado por el administrador.",
-                inputType: "text",
-            });
-
-            if (!confirmed) return;
-
-            const code = payload.trim().toUpperCase();
-
-            const validation = await rpc.query({
-                model: "pos.authorized.discount",
-                method: "validate_code",
-                args: [code],
-            });
-
-            if (!validation.ok) {
-                return Gui.showPopup("ErrorPopup", {
-                    title: "Código inválido",
-                    body: validation.error,
-                });
+    const AuthorizedDiscountButton = (DiscountButton) =>
+        class extends DiscountButton {
+            setup() {
+                super.setup();
+                useListener("click", this.onClick);
             }
 
-            // Obtener línea actual o aplicar al pedido completo
-            const order = this.env.pos.get_order();
+            async onClick() {
+                const { confirmed, payload } = await this.showPopup("TextInputPopup", {
+                    title: "Código de autorización",
+                    placeholder: "Ingrese el código autorizado…",
+                });
 
-            if (validation.type === "percent") {
-                order.add_global_discount(validation.value);
-            } else if (validation.type === "amount") {
-                order.add_product(this.env.pos.db.product_by_id[1], {
-                    price: -validation.value,
+                if (!confirmed || !payload) return;
+
+                const code = payload.trim().toUpperCase();
+
+                const result = await rpc.query({
+                    model: "pos.authorized.discount",
+                    method: "validate_code",
+                    args: [code],
+                });
+
+                if (!result.ok) {
+                    return this.showPopup("ErrorPopup", {
+                        title: "Código inválido",
+                        body: result.error,
+                    });
+                }
+
+                const order = this.env.pos.get_order();
+                const discType = result.type;
+                const value = result.value;
+
+                if (discType === "percent") {
+                    order.set_discount(value);
+                } else {
+                    order.set_discount_fixed(value);
+                }
+
+                this.showPopup("ConfirmPopup", {
+                    title: "Descuento aplicado",
+                    body: "Código validado correctamente.",
                 });
             }
+        };
 
-            Gui.showPopup("ConfirmPopup", {
-                title: "Descuento aplicado",
-                body: `Se aplicó el descuento: ${validation.value} (${validation.type})`,
-            });
-        },
+    Registries.Component.extend(DiscountButton, AuthorizedDiscountButton);
 
-        // Agregar botón al POS
-        get buttons() {
-            const buttons = super.buttons;
-            buttons.push({
-                name: "authorized_discount_button",
-                label: "Descuento Autorizado",
-                class: "btn btn-primary",
-                command: "authorizeDiscount",
-            });
-            return buttons;
-        },
-    });
+    return AuthorizedDiscountButton;
 });

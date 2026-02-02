@@ -1,5 +1,4 @@
 <odoo>
-
     <record id="view_pos_authorized_discount_form" model="ir.ui.view">
         <field name="name">pos.authorized.discount.form</field>
         <field name="model">pos.authorized.discount</field>
@@ -38,11 +37,8 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem
-        id="menu_pos_discount_root"
-        name="Códigos Autorizados"
-        parent="point_of_sale.menu_point_root"
-        action="action_pos_authorized_discount"
-    />
-
+    <menuitem id="menu_pos_discount_root"
+              name="Códigos Autorizados"
+              parent="point_of_sale.menu_point_root"
+              action="action_pos_authorized_discount"/>
 </odoo>
