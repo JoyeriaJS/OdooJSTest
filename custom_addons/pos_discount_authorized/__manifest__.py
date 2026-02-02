@@ -1,7 +1,7 @@
 {
-    "name": "POS Discount Authorized",
+    "name": "POS Authorized Discount",
     "version": "1.0",
-    "summary": "Apply discounts in POS using authorization codes",
+    "summary": "Adds a discount authorization button to POS",
     "depends": ["point_of_sale"],
     "category": "Point of Sale",
     "data": [
@@ -11,7 +11,7 @@
     "assets": {
         "point_of_sale_.assets_pos": [
             "pos_discount_authorized/static/src/js/discount_button.js",
-            "pos_discount_authorized/static/src/xml/discount_button.xml",
+            "pos_discount_authorized/static/src/xml/product_screen.xml",
         ],
     },
     "installable": True,
