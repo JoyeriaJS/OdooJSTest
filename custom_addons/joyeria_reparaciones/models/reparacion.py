@@ -311,7 +311,7 @@ class Reparacion(models.Model):
             # 🔥 Nuevo caso especial: Local 584
             elif rec.local_tienda == 'local 584':
                 rec.direccion_entrega = (
-                    "Monjitas 873, Local 584 Santiago Centro, Metro Plaza de Armas"
+                    "Monjitas 873, Local 584, Santiago Centro, Metro Plaza de Armas"
                 )
 
             # Resto de locales (comportamiento normal)

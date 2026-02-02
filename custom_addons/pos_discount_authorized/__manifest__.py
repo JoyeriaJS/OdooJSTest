@@ -1,19 +1,19 @@
 {
     "name": "POS Authorized Discount",
     "version": "1.0",
-    "summary": "Adds a discount authorization button to POS",
-    "depends": ["point_of_sale"],
     "category": "Point of Sale",
+    "summary": "Permite aplicar descuentos mediante códigos autorizados generados por el administrador.",
+    "author": "JoyeríaJS",
+    "website": "",
+    "depends": ["point_of_sale"],
     "data": [
-        "security/ir.model.access.csv",
-        "views/pos_discount_code_views.xml",
+        "views/discount_code_views.xml",
     ],
     "assets": {
-        "point_of_sale_.assets_pos": [
-            "pos_discount_authorized/static/src/js/discount_button.js",
-            "pos_discount_authorized/static/src/xml/product_screen.xml",
+        "point_of_sale.assets": [
+            "pos_discount_authorized/static/src/js/pos_authorized_discount.js",
         ],
     },
     "installable": True,
-    "license": "LGPL-3",
+    "application": False,
 }

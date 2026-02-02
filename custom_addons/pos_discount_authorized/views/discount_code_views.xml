@@ -1,0 +1,46 @@
+<odoo>
+    <record id="view_pos_authorized_discount_form" model="ir.ui.view">
+        <field name="name">pos.authorized.discount.form</field>
+        <field name="model">pos.authorized.discount</field>
+        <field name="arch" type="xml">
+            <form string="Código Autorizado POS">
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="discount_type"/>
+                        <field name="value"/>
+                        <field name="expiration"/>
+                        <field name="used" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_pos_authorized_discount_tree" model="ir.ui.view">
+        <field name="name">pos.authorized.discount.tree</field>
+        <field name="model">pos.authorized.discount</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code"/>
+                <field name="discount_type"/>
+                <field name="value"/>
+                <field name="expiration"/>
+                <field name="used"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_pos_authorized_discount" model="ir.actions.act_window">
+        <field name="name">Descuentos Autorizados</field>
+        <field name="res_model">pos.authorized.discount</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem
+        id="menu_pos_discount_root"
+        name="Códigos Autorizados"
+        parent="point_of_sale.menu_point_root"
+        action="action_pos_authorized_discount"
+    />
+</odoo>
