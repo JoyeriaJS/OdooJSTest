@@ -5,7 +5,7 @@
     "summary": "Permite aplicar descuentos mediante códigos autorizados generados por el administrador.",
     "author": "JoyeríaJS",
     "website": "",
-    "depends": ["point_of_sale"],
+    "depends": ["base", "point_of_sale"],
     "data": [
         "views/discount_code_views.xml",
     ],
