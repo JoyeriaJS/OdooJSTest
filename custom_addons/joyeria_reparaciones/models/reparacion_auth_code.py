@@ -59,7 +59,7 @@ class ReparacionAuthCode(models.Model):
                 fecha_ini = pytz.UTC.localize(fecha_ini)
 
             ahora = datetime.now(pytz.UTC)
-            expira = fecha_ini + timedelta(hours=1)  # 🔥 EXPIRA EN 1 MINUTO PARA PRUEBAS
+            expira = fecha_ini + timedelta(hours=1)  # ✔ EXPIRA EN 1 HORA
 
             diff = expira - ahora
 
@@ -73,14 +73,9 @@ class ReparacionAuthCode(models.Model):
     # ============================
     # EXPIRACIÓN AUTOMÁTICA
     # ============================
-    @api.depends("fecha_creacion", "used")
+    @api.depends("fecha_creacion")
     def _compute_expired(self):
         for code in self:
-
-            # Si ya está usado → expirado
-            if code.used:
-                code.expired = True
-                continue
 
             if not code.fecha_creacion:
                 code.expired = False
@@ -91,15 +86,15 @@ class ReparacionAuthCode(models.Model):
                 fecha_ini = pytz.UTC.localize(fecha_ini)
 
             ahora = datetime.now(pytz.UTC)
-            expira = fecha_ini + timedelta(minutes=1)   # 🔥 EXPIRA EN 1 MINUTO
+            expira = fecha_ini + timedelta(hours=1)
 
             if ahora >= expira:
                 code.expired = True
-
+            else:
+                code.expired = False
 
     # ============================
-    # VERIFICAR EXPIRACIÓN MANUALMENTE
-    # (ESTO ES LO QUE ARREGLA TODO)
+    # VERIFICAR EXPIRACIÓN MANUAL
     # ============================
     def check_expired(self):
         """Forzar revisión de expiración antes de validar un RMA."""
@@ -108,17 +103,16 @@ class ReparacionAuthCode(models.Model):
             if fecha_ini.tzinfo is None:
                 fecha_ini = pytz.UTC.localize(fecha_ini)
 
-            expira = fecha_ini + timedelta(minutes=1)
+            expira = fecha_ini + timedelta(hours=1)
             ahora = datetime.now(pytz.UTC)
 
-            if not code.used and ahora >= expira:
+            if ahora >= expira:
                 code.expired = True
-
 
         return True
 
     # ============================
-    # CREACIÓN
+    # CREACIÓN DEL REGISTRO
     # ============================
     @api.model
     def create(self, vals):
