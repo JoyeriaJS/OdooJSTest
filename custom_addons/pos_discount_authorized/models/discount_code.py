@@ -3,33 +3,29 @@ from datetime import datetime
 
 class PosAuthorizedDiscount(models.Model):
     _name = "pos.authorized.discount"
-    _description = "POS Authorized Discounts"
-    _rec_name = "code"
+    _description = "Códigos autorizados para descuento en POS"
 
     code = fields.Char(required=True)
     discount_type = fields.Selection([
         ("percent", "Porcentaje"),
-        ("amount", "Monto fijo"),
+        ("fixed", "Monto fijo"),
     ], required=True)
 
-    value = fields.Float(required=True)
-    expiration = fields.Datetime("Expira el")
-    used = fields.Boolean(default=False)
+    value = fields.Float("Valor del descuento", required=True)
+    expires_at = fields.Datetime("Expira el", required=True)
+    used = fields.Boolean("Ya utilizado", default=False)
 
-    @api.model
-    def validate_code(self, code_str):
-        code = self.search([("code", "=", code_str.upper())], limit=1)
-        if not code:
-            return {"ok": False, "error": "Código incorrecto"}
-        if code.used:
-            return {"ok": False, "error": "Código ya utilizado"}
-        if code.expiration and datetime.now() > code.expiration:
-            return {"ok": False, "error": "Código expirado"}
+    def validate_code(self):
+        """Validación llamada desde JS"""
+        self.ensure_one()
+        if self.used:
+            return {"ok": False, "msg": "Código ya fue utilizado"}
 
-        code.used = True
+        if self.expires_at < datetime.now():
+            return {"ok": False, "msg": "Código expirado"}
 
         return {
             "ok": True,
-            "type": code.discount_type,
-            "value": code.value,
+            "type": self.discount_type,
+            "value": self.value,
         }

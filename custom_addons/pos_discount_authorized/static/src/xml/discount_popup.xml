@@ -1,0 +1,16 @@
+<templates id="template" xml:space="preserve">
+    <t t-name="PosDiscountAuthorizationPopup" owl="1">
+        <div class="popup popup-large">
+            <div class="popup-header">Código de Autorización</div>
+            <div class="popup-content">
+                <label>Ingrese el código:</label>
+                <input type="text" t-model="state.code" class="form-control"/>
+            </div>
+
+            <div class="popup-footer">
+                <button class="btn btn-secondary" t-on-click="cancel">Cancelar</button>
+                <button class="btn btn-primary" t-on-click="confirm">Validar</button>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -9,8 +9,8 @@
                         <field name="code"/>
                         <field name="discount_type"/>
                         <field name="value"/>
-                        <field name="expiration"/>
-                        <field name="used" readonly="1"/>
+                        <field name="expires_at"/>
+                        <field name="used"/>
                     </group>
                 </sheet>
             </form>
@@ -25,20 +25,20 @@
                 <field name="code"/>
                 <field name="discount_type"/>
                 <field name="value"/>
-                <field name="expiration"/>
+                <field name="expires_at"/>
                 <field name="used"/>
             </tree>
         </field>
     </record>
 
-    <record id="action_pos_authorized_discount" model="ir.actions.act_window">
-        <field name="name">Descuentos Autorizados</field>
+    <record id="action_pos_discount_codes" model="ir.actions.act_window">
+        <field name="name">Códigos de Descuento POS</field>
         <field name="res_model">pos.authorized.discount</field>
         <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem id="menu_pos_discount_root"
-              name="Códigos Autorizados"
+    <menuitem id="menu_pos_discount_codes"
+              name="Códigos Autorizados POS"
               parent="point_of_sale.menu_point_root"
-              action="action_pos_authorized_discount"/>
+              action="action_pos_discount_codes"/>
 </odoo>
