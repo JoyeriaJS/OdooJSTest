@@ -94,16 +94,8 @@ class ReparacionAuthCode(models.Model):
             expira = fecha_ini + timedelta(minutes=1)   # 🔥 EXPIRA EN 1 MINUTO
 
             if ahora >= expira:
-                # 🔥 Expirar DEFINITIVAMENTE
-                code.write({
-                    "used": True,
-                    "expired": True,
-                    "fecha_uso": datetime.now(),
-                    "usado_por_id": False
-                })
                 code.expired = True
-            else:
-                code.expired = False
+
 
     # ============================
     # VERIFICAR EXPIRACIÓN MANUALMENTE
@@ -120,12 +112,8 @@ class ReparacionAuthCode(models.Model):
             ahora = datetime.now(pytz.UTC)
 
             if not code.used and ahora >= expira:
-                code.write({
-                    "used": True,           # 🔥 AHORA SÍ SE MARCA SIEMPRE
-                    "expired": True,
-                    "fecha_uso": datetime.now(),
-                    "usado_por_id": False
-                })
+                code.expired = True
+
 
         return True
 
