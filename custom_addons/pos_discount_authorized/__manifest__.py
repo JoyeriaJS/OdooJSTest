@@ -1,15 +1,15 @@
 {
-    "name": "POS Authorized Discount",
-    "version": "1.0",
-    "author": "Joyería Sebastián",
+    "name": "POS Discount Authorized",
+    "version": "17.0.1.0.0",
     "depends": ["point_of_sale"],
-    "data": [
-        "views/discount_code_views.xml",
-    ],
+    "category": "Point of Sale",
+    "author": "Tu nombre",
+    "license": "LGPL-3",
+    "installable": True,
+
     "assets": {
-        "point_of_sale.assets": [
+        "point_of_sale._assets_pos_frontend": [
             "pos_discount_authorized/static/src/js/discount_pos.js",
         ],
     },
-    "installable": True,
 }
