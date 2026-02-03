@@ -10,7 +10,7 @@
         
     ],
     "assets": {
-        "point_of_sale.assets": [
+        "point_of_sale.assets_prod": [
             "pos_discount_authorized/static/src/js/discount_hook.js",
             "pos_discount_authorized/static/src/xml/discount_popup.xml",
         ]
