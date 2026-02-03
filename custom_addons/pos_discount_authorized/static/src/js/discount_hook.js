@@ -1,30 +1,33 @@
 /** @odoo-module **/
 
-// Esperar a que el POS cargue
-odoo.define("pos_discount_authorized.discount_hook", function (require) {
-    "use strict";
+import { patch } from "@web/core/utils/patch";
+import { Orderline } from "@point_of_sale/app/models/pos_model";
+import { useService } from "@web/core/utils/hooks";
+console.log("🔥 discount_hook.js CARGADO - ODOO 17");
+patch(Orderline.prototype, {
+    async set_discount(discount) {
 
-    const models = require("point_of_sale.models");
-
-    // Guardamos la función original
-    const _super_order = models.Order.prototype.set_discount;
-
-    models.Order.prototype.set_discount = async function (discount) {
-
-        // permitir sin autorización hasta 10%
+        // Dejar pasar descuentos ≤ 10%
         if (discount <= 10) {
-            return _super_order.apply(this, arguments);
+            return super.set_discount(discount);
         }
 
-        // pedir autorización
-        const codigo = window.prompt("Descuento mayor al 10%. Ingrese código:");
+        // Pedir autorización
+        const popup = useService("popup");
 
-        if (!codigo) {
-            alert("Operación cancelada.");
-            return;
-        }
+        const { confirmed, payload } = await popup.add({
+            type: "text",
+            title: "Autorización requerida",
+            body: "Ingrese el código de autorización:",
+            confirmText: "Validar",
+            cancelText: "Cancelar",
+        });
 
-        // llamada RPC
+        if (!confirmed) return;
+
+        const codigo = payload;
+
+        // Validación con backend
         const valido = await this.pos.rpc({
             model: "pos.discount.authcode",
             method: "validar_codigo",
@@ -32,10 +35,13 @@ odoo.define("pos_discount_authorized.discount_hook", function (require) {
         });
 
         if (!valido) {
-            alert("Código inválido o expirado.");
+            await popup.add({
+                title: "Código inválido",
+                body: "El código ingresado no es válido, está usado o expiró.",
+            });
             return;
         }
 
-        return _super_order.apply(this, arguments);
-    };
+        return super.set_discount(discount);
+    },
 });
