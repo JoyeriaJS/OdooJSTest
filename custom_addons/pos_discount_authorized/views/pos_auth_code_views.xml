@@ -9,7 +9,7 @@
                 <field name="used"/>
                 <field name="fecha_creacion"/>
                 <field name="fecha_uso"/>
-                <field name="usado_por_id"/>
+                <field name="usuario_id"/>
             </tree>
         </field>
     </record>
@@ -25,7 +25,7 @@
                         <field name="used" readonly="1"/>
                         <field name="fecha_creacion" readonly="1"/>
                         <field name="fecha_uso" readonly="1"/>
-                        <field name="usado_por_id" readonly="1"/>
+                        <field name="usuario_id" readonly="1"/>
                     </group>
                 </sheet>
             </form>
