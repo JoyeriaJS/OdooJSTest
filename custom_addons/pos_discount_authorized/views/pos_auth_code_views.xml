@@ -7,7 +7,6 @@
             <tree>
                 <field name="codigo"/>
                 <field name="used"/>
-                <field name="expired"/>
                 <field name="fecha_creacion"/>
                 <field name="fecha_uso"/>
                 <field name="usado_por_id"/>
@@ -24,7 +23,6 @@
                     <group>
                         <field name="codigo" readonly="1"/>
                         <field name="used" readonly="1"/>
-                        <field name="expired" readonly="1"/>
                         <field name="fecha_creacion" readonly="1"/>
                         <field name="fecha_uso" readonly="1"/>
                         <field name="usado_por_id" readonly="1"/>
