@@ -6,7 +6,7 @@
     "depends": ["point_of_sale"],
     "data": [
         "views/pos_authcode_views.xml",
-        "views/pos_assets.xml",
+
         
     ],
     "assets": {
