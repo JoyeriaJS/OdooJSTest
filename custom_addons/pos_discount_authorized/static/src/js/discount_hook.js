@@ -1,33 +1,51 @@
+/** @odoo-module **/
+
 odoo.define("pos_discount_authorized.discount_hook", function (require) {
     "use strict";
 
     const models = require("point_of_sale.models");
     const rpc = require("web.rpc");
 
-    const _super_order = models.Order.prototype.set_discount;
+    // Guardamos la función original
+    const _super_orderline = models.Orderline.prototype.set_discount;
 
-    models.Order.prototype.set_discount = function (discount) {
+    models.Orderline.prototype.set_discount = function (discount) {
 
-        // ⚠ Detener DESCUENTOS de CUALQUIER TIPO si no hay código
-        let codigo = window.prompt("Ingrese código de autorización:");
+        const self = this;
 
-        if (!codigo) {
-            alert("Descuento rechazado. No se ingresó código.");
-            return;
+        // Si el descuento es menor o igual a 10%, permitir normal
+        if (discount <= 10) {
+            return _super_orderline.apply(this, arguments);
         }
 
-        // Llamada RPC al backend
-        return rpc.query({
-            model: "pos.discount.authcode",
-            method: "validar_codigo",
-            args: [codigo, this.pos.cashier.id],
-        }).then((valid) => {
-            if (valid) {
-                return _super_order.apply(this, arguments);
-            } else {
-                alert("Código inválido o expirado.");
-                return;
+        // Solicitar código
+        return new Promise(function (resolve, reject) {
+
+            const code = window.prompt("Descuento mayor al 10%. Ingrese código de autorización:");
+
+            if (!code) {
+                alert("Operación cancelada.");
+                return resolve(false);
             }
+
+            // Validación en backend
+            rpc.query({
+                model: "pos.discount.authcode",
+                method: "validar_codigo",
+                args: [[], code, self.pos.get_cashier().id],
+            })
+            .then(function (valid) {
+                if (valid) {
+                    resolve(_super_orderline.apply(self, arguments));
+                } else {
+                    alert("Código inválido, usado o expirado.");
+                    resolve(false);
+                }
+            })
+            .catch(function () {
+                alert("Error de comunicación con el servidor.");
+                resolve(false);
+            });
         });
     };
 });
