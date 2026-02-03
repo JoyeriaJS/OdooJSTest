@@ -1,1 +1,1 @@
-from . import discount_code
+from . import pos_auth_code

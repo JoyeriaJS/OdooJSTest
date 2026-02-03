@@ -1,16 +1,17 @@
 {
     "name": "POS Discount Authorized",
-    "version": "17.0.1.0.0",
+    "version": "1.0",
+    "summary": "Autoriza descuentos en POS mediante códigos",
     "depends": ["point_of_sale"],
-    "category": "Point of Sale",
-    "author": "Joyería Sebastián",
-    "license": "LGPL-3",
-    "installable": True,
-
+    "data": [
+        "views/pos_auth_code_views.xml",
+    ],
     "assets": {
-        "point_of_sale._assets_pos_frontend": [
-            "pos_discount_authorized/static/src/js/discount_pos.js",
+        "point_of_sale._assets_pos": [
+            "pos_discount_authorized/static/src/js/discount_hook.js",
             "pos_discount_authorized/static/src/xml/discount_popup.xml",
         ],
     },
+    "installable": True,
+    "license": "LGPL-3",
 }
