@@ -1,17 +1,20 @@
 {
     "name": "POS Discount Authorized",
-    "version": "17.0.1.0.0",
+    "version": "1.0",
     "category": "Point of Sale",
+    "summary": "Requiere código para aplicar descuentos en POS",
     "depends": ["point_of_sale"],
     "data": [
-        "views/pos_auth_code_views.xml",
-        "security/ir.model.access.csv",
+        "views/pos_authcode_views.xml",
+        "views/pos_assets.xml",
+        
     ],
     "assets": {
-        "point_of_sale._assets_pos": [
+        "point_of_sale.assets": [
             "pos_discount_authorized/static/src/js/discount_hook.js",
-        ],
+            "pos_discount_authorized/static/src/xml/discount_popup.xml",
+        ]
     },
     "installable": True,
-    "license": "LGPL-3"
+    "license": "LGPL-3",
 }

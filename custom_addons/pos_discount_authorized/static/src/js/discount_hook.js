@@ -1,47 +1,33 @@
-/** @odoo-module **/
+odoo.define("pos_discount_authorized.discount_hook", function (require) {
+    "use strict";
 
-import { patch } from "@web/core/utils/patch";
-import { Orderline } from "@point_of_sale/app/models/pos_model";
-import { useService } from "@web/core/utils/hooks";
-console.log("🔥 discount_hook.js CARGADO - ODOO 17");
-patch(Orderline.prototype, {
-    async set_discount(discount) {
+    const models = require("point_of_sale.models");
+    const rpc = require("web.rpc");
 
-        // Dejar pasar descuentos ≤ 10%
-        if (discount <= 10) {
-            return super.set_discount(discount);
-        }
+    const _super_order = models.Order.prototype.set_discount;
 
-        // Pedir autorización
-        const popup = useService("popup");
+    models.Order.prototype.set_discount = function (discount) {
 
-        const { confirmed, payload } = await popup.add({
-            type: "text",
-            title: "Autorización requerida",
-            body: "Ingrese el código de autorización:",
-            confirmText: "Validar",
-            cancelText: "Cancelar",
-        });
+        // ⚠ Detener DESCUENTOS de CUALQUIER TIPO si no hay código
+        let codigo = window.prompt("Ingrese código de autorización:");
 
-        if (!confirmed) return;
-
-        const codigo = payload;
-
-        // Validación con backend
-        const valido = await this.pos.rpc({
-            model: "pos.discount.authcode",
-            method: "validar_codigo",
-            args: [[], codigo, this.pos.get_cashier().id],
-        });
-
-        if (!valido) {
-            await popup.add({
-                title: "Código inválido",
-                body: "El código ingresado no es válido, está usado o expiró.",
-            });
+        if (!codigo) {
+            alert("Descuento rechazado. No se ingresó código.");
             return;
         }
 
-        return super.set_discount(discount);
-    },
+        // Llamada RPC al backend
+        return rpc.query({
+            model: "pos.discount.authcode",
+            method: "validar_codigo",
+            args: [codigo, this.pos.cashier.id],
+        }).then((valid) => {
+            if (valid) {
+                return _super_order.apply(this, arguments);
+            } else {
+                alert("Código inválido o expirado.");
+                return;
+            }
+        });
+    };
 });
