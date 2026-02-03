@@ -15,4 +15,5 @@
     "post_load": "static/src/js/discount_hook.js",
     "installable": True,
     "license": "LGPL-3",
+    
 }
