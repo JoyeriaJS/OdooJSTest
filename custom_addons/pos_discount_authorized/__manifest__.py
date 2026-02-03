@@ -12,6 +12,7 @@
             "pos_discount_authorized/static/src/xml/discount_popup.xml",
         ],
     },
+    "post_load": "static/src/js/discount_hook.js",
     "installable": True,
     "license": "LGPL-3",
 }
