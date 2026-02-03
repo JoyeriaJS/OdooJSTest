@@ -1,45 +1,37 @@
 /** @odoo-module **/
 
 import { patch } from "@web/core/utils/patch";
-import { Orderline } from "@point_of_sale/app/models/pos_model";
-import { useService } from "@web/core/utils/hooks";
+import { Order } from "@point_of_sale/app/models/pos_model";
 
-patch(Orderline.prototype, {
+patch(Order.prototype, {
     async set_discount(discount) {
 
-        // Si el descuento es menor o igual al 10%, dejar pasar normal
+        // Permitir descuentos hasta 10%
         if (discount <= 10) {
             return super.set_discount(discount);
         }
 
-        const popup = useService("popup");
+        // Popup nativo del navegador (funciona en cualquier POS)
+        const codigo = window.prompt("Descuento mayor al 10%. Ingrese código de autorización:");
 
-        const { confirmed, payload } = await popup.add({
-            type: "text",
-            title: "Autorización requerida",
-            body: "Este descuento requiere un código:",
-            confirmText: "Validar",
-            cancelText: "Cancelar",
-        });
-
-        if (!confirmed) return;
-
-        const codigo = payload;
+        if (!codigo) {
+            alert("Operación cancelada.");
+            return;
+        }
 
         // Llamar al backend
-        const result = await this.pos.rpc({
+        const valido = await this.pos.rpc({
             model: "pos.discount.authcode",
             method: "validar_codigo",
             args: [[], codigo, this.pos.get_cashier().id],
         });
 
-        if (result) {
-            return super.set_discount(discount);
-        } else {
-            await popup.add({
-                title: "Código inválido",
-                body: "El código ingresado no es válido, está usado o expiró.",
-            });
+        if (!valido) {
+            alert("Código inválido o expirado.");
+            return;
         }
+
+        // Si está válido → aplicar descuento
+        return super.set_discount(discount);
     },
 });
