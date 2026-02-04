@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- MENÚ PADRE SEGURO -->
+    <!-- MENÚ RAÍZ INDEPENDIENTE (NO USA PARENT) -->
     <menuitem id="menu_non_inventory_root"
               name="Productos No Inventariados"
-              parent="stock.menu_product"
-              sequence="50"/>
+              sequence="30"/>
 
     <!-- ACCIÓN -->
     <record id="action_non_inventory" model="ir.actions.act_window">
@@ -14,10 +13,10 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-    <!-- VINCULAR MENÚ CON LA ACCIÓN -->
+    <!-- SUBMENÚ PARA ABRIR LA ACCIÓN -->
     <menuitem id="menu_non_inventory_action"
+              name="Listado"
               parent="menu_non_inventory_root"
               action="action_non_inventory"
               sequence="1"/>
-
 </odoo>
