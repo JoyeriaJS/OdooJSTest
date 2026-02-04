@@ -5,8 +5,8 @@
     "category": "Inventory",
     "depends": ["base", "stock"],
     "data": [
-        "views/menu.xml",
         "views/non_inventory_views.xml",
+        "views/menu.xml",
     ],
     "installable": True,
     "license": "LGPL-3",

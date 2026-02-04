@@ -28,8 +28,8 @@
                 <sheet>
 
                     <group>
-                        <field name="fecha"/>
-                        <field name="user_id"/>
+                        <field name="fecha" readonly="1"/>
+                        <field name="user_id" readonly="1"/>
                         <field name="sucursal_id"/>
                         <field name="estado"/>
                         <field name="codigo_interno"/>
@@ -51,7 +51,7 @@
         </field>
     </record>
 
-    <!-- ACTION -->
+    <!-- ACTION (NECESARIA ANTES DEL MENÚ) -->
     <record id="action_non_inventory" model="ir.actions.act_window">
         <field name="name">Productos No Inventariados</field>
         <field name="res_model">joyeria.non.inventory</field>

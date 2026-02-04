@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Menú bajo INVENTARIO -->
     <menuitem
         id="menu_non_inventory_root"
         name="Productos No Inventariados"
         parent="stock.menu_stock_root"
+        action="joyeria_non_inventory.action_non_inventory"
         sequence="99"
-        action="action_non_inventory"
     />
 
 </odoo>
