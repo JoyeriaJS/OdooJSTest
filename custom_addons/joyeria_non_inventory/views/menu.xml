@@ -6,7 +6,7 @@
         name="Productos No Inventariados"
         parent="stock.menu_stock_root"
         action="joyeria_non_inventory.action_non_inventory"
-        sequence="99"
+        sequence="10"
     />
 
 </odoo>
