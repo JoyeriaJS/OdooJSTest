@@ -1,0 +1,1 @@
+from . import non_inventory_product
