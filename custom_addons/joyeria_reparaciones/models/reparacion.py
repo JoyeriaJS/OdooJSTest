@@ -73,18 +73,7 @@ class Reparacion(models.Model):
     apellido_cliente = fields.Char(string="Apellido del cliente", required=False)
     correo_cliente = fields.Char(string="Correo electrónico")
     telefono = fields.Char(string='Teléfono', required=True)
-    direccion_entrega = fields.Selection([
-        ('local 345', 'Paseo Estado 344, Local 345, Santiago Centro, Metro Plaza de Armas (Galería Pasaje Matte)'),
-        ('local 906', 'Paseo Estado 344, Local 906, Santiago Centro, Metro Plaza de Armas (Galería Pasaje Matte)'),
-        ('local 392', 'Paseo Estado 344, Local 392, Santiago Centro, Metro Plaza de Armas (Galería Pasaje Matte)'),
-        ('local 329', 'Paseo Estado 344, Local 329, Santiago Centro, Metro Plaza de Armas (Galería Pasaje Matte)'),
-        ('local 325', 'Paseo Estado 344, Local 325, Santiago Centro, Metro Plaza de Armas (Galería Pasaje Matte)'),
-        ('local 383 online', 'Paseo Estado 344, Local 383 Online, Santiago Centro, Metro Plaza de Armas (Galería Pasaje Matte)'),
-        ('local 921', 'Paseo Estado 344, Local 921, Santiago Centro, Metro Plaza de Armas (Galería Pasaje Matte)'),
-        ('local 584', 'Monjitas 873, Local 584, Santiago Centro, Metro Plaza de Armas'),
-        ('local maipu', 'Jumbo, Av. Los Pajaritos 3302 (Local Maipú), Metro Santiago Bueras')
-    ], string='Dirección de entrega', required=True)
-
+    direccion_entrega = fields.Char(string='Dirección de entrega')
     vencimiento_garantia = fields.Date(string='Vencimiento de la garantía',compute='_compute_vencimiento_garantia',store=True)
     fecha_entrega = fields.Date(string='Fecha de entrega', tracking=True)
     responsable_id = fields.Many2one('res.users', string="Responsable", default=False, tracking=True)
@@ -301,25 +290,36 @@ class Reparacion(models.Model):
 
     @api.onchange('local_tienda')
     def _onchange_local_tienda(self):
+        """Actualiza dirección al elegir tienda.
+        - Maipú: dirección especial
+        - Local 584: dirección especial nueva
+        - Resto: dirección estándar
+        """
         for rec in self:
             if not rec.local_tienda:
                 continue
 
-            mapping = {
-                "local 345": "local 345",
-                "local 906": "local 906",
-                "local 392": "local 392",
-                "local 329": "local 329",
-                "local 325": "local 325",
-                "local 383 online": "local 383 online",
-                "local 921": "local 921",
-                "local 584": "local 584",
-                "local maipu": "local maipu",
-            }
+            # Obtener la etiqueta visible del selection (ej: 'Local 906')
+            label = dict(rec._fields['local_tienda'].selection).get(rec.local_tienda, rec.local_tienda)
 
-            # Si existe la clave, la usa; si no, no rompe
-            rec.direccion_entrega = mapping.get(rec.local_tienda)
+            # Caso especial: Local Maipú
+            if rec.local_tienda == 'local maipu':
+                rec.direccion_entrega = (
+                    "Jumbo, Av. Los Pajaritos 3302 (Local Maipú), Metro Santiago Bueras"
+                )
 
+            # 🔥 Nuevo caso especial: Local 584
+            elif rec.local_tienda == 'local 584':
+                rec.direccion_entrega = (
+                    "Monjitas 873, Local 584, Santiago Centro, Metro Plaza de Armas"
+                )
+
+            # Resto de locales (comportamiento normal)
+            else:
+                rec.direccion_entrega = (
+                    f"Paseo Estado 344, {label}, Santiago Centro, "
+                    f"Metro Plaza de Armas (Galería Pasaje Matte)"
+                )
 
     @api.onchange('responsable_id')
     def _onchange_responsable_id(self):
@@ -818,7 +818,7 @@ class Reparacion(models.Model):
             self.apellido_cliente = partes[1] if len(partes) > 1 else ''
             self.correo_cliente = self.cliente_id.email or ''
             self.telefono = self.cliente_id.phone or ''
-            #self.direccion_entrega = self.cliente_id.street or ''
+            self.direccion_entrega = self.cliente_id.street or ''
 
 
     @api.model
