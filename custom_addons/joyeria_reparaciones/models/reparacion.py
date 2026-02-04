@@ -818,7 +818,7 @@ class Reparacion(models.Model):
             self.apellido_cliente = partes[1] if len(partes) > 1 else ''
             self.correo_cliente = self.cliente_id.email or ''
             self.telefono = self.cliente_id.phone or ''
-            self.direccion_entrega = self.cliente_id.street or ''
+            #self.direccion_entrega = self.cliente_id.street or ''
 
 
     @api.model
