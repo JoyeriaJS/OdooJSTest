@@ -301,36 +301,25 @@ class Reparacion(models.Model):
 
     @api.onchange('local_tienda')
     def _onchange_local_tienda(self):
-        """Actualiza dirección al elegir tienda.
-        - Maipú: dirección especial
-        - Local 584: dirección especial nueva
-        - Resto: dirección estándar
-        """
         for rec in self:
             if not rec.local_tienda:
                 continue
 
-            # Obtener la etiqueta visible del selection (ej: 'Local 906')
-            label = dict(rec._fields['local_tienda'].selection).get(rec.local_tienda, rec.local_tienda)
+            mapping = {
+                "local 345": "local 345",
+                "local 906": "local 906",
+                "local 392": "local 392",
+                "local 329": "local 329",
+                "local 325": "local 325",
+                "local 383 online": "local 383 online",
+                "local 921": "local 921",
+                "local 584": "local 584",
+                "local maipu": "local maipu",
+            }
 
-            # Caso especial: Local Maipú
-            if rec.local_tienda == 'local maipu':
-                rec.direccion_entrega = (
-                    "Jumbo, Av. Los Pajaritos 3302 (Local Maipú), Metro Santiago Bueras"
-                )
+            # Si existe la clave, la usa; si no, no rompe
+            rec.direccion_entrega = mapping.get(rec.local_tienda)
 
-            # 🔥 Nuevo caso especial: Local 584
-            elif rec.local_tienda == 'local 584':
-                rec.direccion_entrega = (
-                    "Monjitas 873, Local 584, Santiago Centro, Metro Plaza de Armas"
-                )
-
-            # Resto de locales (comportamiento normal)
-            else:
-                rec.direccion_entrega = (
-                    f"Paseo Estado 344, {label}, Santiago Centro, "
-                    f"Metro Plaza de Armas (Galería Pasaje Matte)"
-                )
 
     @api.onchange('responsable_id')
     def _onchange_responsable_id(self):
