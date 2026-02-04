@@ -48,6 +48,8 @@
         'report/report_monthly_rma_pos_template.xml',  
         
     ],
+    "pre_init_hook": "migrate_direccion_entrega",
+
     'installable': True,
     'application': True,
 }
