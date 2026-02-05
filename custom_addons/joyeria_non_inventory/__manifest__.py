@@ -5,6 +5,7 @@
     "category": "Inventory",
     "depends": ["base", "stock"],
     "data": [
+        "security/ir.model.access.csv",
         "views/non_inventory_views.xml",
         "views/menu.xml",
     ],
