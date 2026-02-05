@@ -583,16 +583,19 @@ class Reparacion(models.Model):
 
         if (not is_admin) and (not is_import) and vals.get('peso') == 'especial' and not vals.get('peso_valor'):
             raise ValidationError("Debe ingresar un valor para el campo 'Peso' si selecciona tipo de peso 'Especial'.")
-        if (not is_admin) and (not is_import):
+        if not is_import and not is_admin:
+
             peso_tipo = vals.get('peso')
             peso_valor = vals.get('peso_valor')
 
-            # Cuando selecciona ESTÁNDAR, el peso debe ser SIEMPRE 0
-        if peso_tipo == 'estandar' and peso_valor not in (0, False, None):
-            raise ValidationError(
-                "❌ Para tipo de peso 'Estándar', el campo 'Peso' debe ser 0.\n"
-                "No puede ingresar un valor distinto."
-            )
+            # Si selecciona tipo 'estandar', peso_valor DEBE ser 0
+        if peso_tipo == 'estandar':
+                # Si viene con ANY valor que no sea 0 → error
+            if peso_valor not in (0, False, None):
+                 raise ValidationError(
+                    "❌ Para tipo de peso 'Estándar', el campo 'Peso' debe ser 0.\n"
+                    "Ingrese 0 o deje el campo vacío."
+                )
 
         if vals.get('name', 'Nuevo') == 'Nuevo':
             secuencia = self.env['ir.sequence'].next_by_code('joyeria.reparacion')
