@@ -1,9 +1,7 @@
-from odoo import models, fields, api
-from datetime import datetime
-
+from odoo import models, fields
 
 class NonInventoryProduct(models.Model):
-    _name = "joyeria.non.inventory"
+    _name = "joyeria.non_inventory_product"
     _description = "Producto no inventariado"
     _order = "fecha desc"
 

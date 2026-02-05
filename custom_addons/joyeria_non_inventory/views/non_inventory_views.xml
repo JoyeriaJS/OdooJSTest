@@ -1,28 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- TREE VIEW -->
-    <record id="view_non_inventory_tree" model="ir.ui.view">
-        <field name="name">non.inventory.tree</field>
-        <field name="model">joyeria.non.inventory</field>
+    <record id="view_non_inventory_product_tree" model="ir.ui.view">
+        <field name="name">non.inventory.product.tree</field>
+        <field name="model">joyeria.non_inventory_product</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="fecha"/>
                 <field name="descripcion"/>
-                <field name="metal"/>
                 <field name="peso"/>
+                <field name="metal"/>
                 <field name="sucursal_id"/>
                 <field name="estado"/>
-                <field name="codigo_interno"/>
                 <field name="user_id"/>
             </tree>
         </field>
     </record>
 
-    <!-- FORM VIEW -->
-    <record id="view_non_inventory_form" model="ir.ui.view">
-        <field name="name">non.inventory.form</field>
-        <field name="model">joyeria.non.inventory</field>
+    <record id="view_non_inventory_product_form" model="ir.ui.view">
+        <field name="name">non.inventory.product.form</field>
+        <field name="model">joyeria.non_inventory_product</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
@@ -30,32 +27,33 @@
                     <group>
                         <field name="fecha" readonly="1"/>
                         <field name="user_id" readonly="1"/>
-                        <field name="sucursal_id"/>
                         <field name="estado"/>
-                        <field name="codigo_interno"/>
                     </group>
 
                     <group>
                         <field name="descripcion"/>
-                        <field name="metal"/>
-                        <field name="peso"/>
-                        <field name="foto" widget="image"/>
+                        <field name="codigo_interno"/>
                     </group>
 
                     <group>
-                        <field name="observaciones"/>
+                        <field name="peso"/>
+                        <field name="metal"/>
+                        <field name="sucursal_id"/>
                     </group>
+
+                    <notebook>
+                        <page string="Foto">
+                            <field name="foto" widget="image"/>
+                        </page>
+
+                        <page string="Observaciones">
+                            <field name="observaciones"/>
+                        </page>
+                    </notebook>
 
                 </sheet>
             </form>
         </field>
-    </record>
-
-    <!-- ACTION (NECESARIA ANTES DEL MENÚ) -->
-    <record id="action_non_inventory" model="ir.actions.act_window">
-        <field name="name">Productos No Inventariados</field>
-        <field name="res_model">joyeria.non.inventory</field>
-        <field name="view_mode">tree,form</field>
     </record>
 
 </odoo>

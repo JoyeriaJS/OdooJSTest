@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- MENÚ RAÍZ INDEPENDIENTE (NO USA PARENT) -->
+    <!-- Menú raíz -->
     <menuitem id="menu_non_inventory_root"
               name="Productos No Inventariados"
-              sequence="30"/>
+              parent="stock.menu_stock_root"
+              sequence="50"/>
 
-    <!-- ACCIÓN -->
-    <record id="action_non_inventory" model="ir.actions.act_window">
+    <!-- Acción -->
+    <record id="action_non_inventory_product" model="ir.actions.act_window">
         <field name="name">Productos No Inventariados</field>
-        <field name="res_model">joyeria.non_inventory</field>
+        <field name="res_model">joyeria.non_inventory_product</field>
         <field name="view_mode">tree,form</field>
     </record>
 
-    <!-- SUBMENÚ PARA ABRIR LA ACCIÓN -->
-    <menuitem id="menu_non_inventory_action"
+    <!-- Submenú -->
+    <menuitem id="menu_non_inventory_product"
               name="Listado"
               parent="menu_non_inventory_root"
-              action="action_non_inventory"
+              action="action_non_inventory_product"
               sequence="1"/>
+
 </odoo>
