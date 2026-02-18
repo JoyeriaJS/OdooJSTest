@@ -51,15 +51,24 @@ class VentaVendedoraLine(models.Model):
         tarjeta = 0.0
 
         for payment in order.payment_ids:
-            metodo = payment.payment_method_id.name.strip()
 
-            if metodo == 'Venta Efectivo':
+            metodo = payment.payment_method_id.name.lower()
+
+            # Clasificación más flexible
+            if 'efectivo' in metodo:
                 efectivo += payment.amount
-            elif metodo == 'Venta Transferencia':
+
+            elif 'transfer' in metodo:
                 transferencia += payment.amount
-            elif metodo == 'Venta Tarjeta Credito':
+
+            elif 'tarjeta' in metodo or 'credito' in metodo or 'debito' in metodo:
+                tarjeta += payment.amount
+
+            else:
+                # Si no coincide, lo mandamos a tarjeta por seguridad
                 tarjeta += payment.amount
 
         self.efectivo = efectivo
         self.transferencia = transferencia
         self.tarjeta = tarjeta
+
