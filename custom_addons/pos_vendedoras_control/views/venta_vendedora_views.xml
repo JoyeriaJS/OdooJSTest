@@ -1,5 +1,8 @@
 <odoo>
 
+    <!-- ===========================
+         FORMULARIO PRINCIPAL
+    ============================ -->
     <record id="view_venta_vendedora_form" model="ir.ui.view">
         <field name="name">venta.vendedora.form</field>
         <field name="model">venta.vendedora</field>
@@ -33,12 +36,14 @@
                                    readonly="state == 'closed'">
 
                                 <tree editable="bottom">
-                                    <field name="pos_order_id"
-                                            options="{'no_create': True, 'no_create_edit': True}"/>
-                                    <field name="pos_reference" readonly="1"/>
+
+                                    <!-- 👇 AQUÍ VA EL NUEVO CAMPO -->
+                                    <field name="pos_reference_input"/>
+
                                     <field name="efectivo" readonly="1"/>
                                     <field name="transferencia" readonly="1"/>
                                     <field name="tarjeta" readonly="1"/>
+
                                 </tree>
 
                             </field>
@@ -60,7 +65,10 @@
         </field>
     </record>
 
-    <!-- VISTA TREE -->
+
+    <!-- ===========================
+         VISTA LISTA
+    ============================ -->
     <record id="view_venta_vendedora_tree" model="ir.ui.view">
         <field name="name">venta.vendedora.tree</field>
         <field name="model">venta.vendedora</field>
@@ -77,14 +85,20 @@
         </field>
     </record>
 
-    <!-- ACCIÓN -->
+
+    <!-- ===========================
+         ACCIÓN
+    ============================ -->
     <record id="action_venta_vendedora" model="ir.actions.act_window">
         <field name="name">Cierre Diario</field>
         <field name="res_model">venta.vendedora</field>
         <field name="view_mode">tree,form</field>
     </record>
 
-    <!-- MENÚ -->
+
+    <!-- ===========================
+         MENÚ
+    ============================ -->
     <menuitem id="menu_venta_vendedora_root"
               name="Control Vendedoras"
               parent="point_of_sale.menu_point_root"
