@@ -21,8 +21,8 @@ class VentaVendedoraLine(models.Model):
     pos_order_id = fields.Many2one(
         'pos.order',
         string="Orden POS",
+        required=True,
         domain="[('state','=','paid')]",
-        required=True
     )
 
     pos_reference = fields.Char(
