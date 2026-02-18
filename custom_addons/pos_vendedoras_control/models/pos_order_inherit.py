@@ -10,3 +10,4 @@ class PosOrderInherit(models.Model):
         if name:
             args += ['|', ('name', operator, name), ('pos_reference', operator, name)]
         return self.search(args, limit=limit).name_get()
+
