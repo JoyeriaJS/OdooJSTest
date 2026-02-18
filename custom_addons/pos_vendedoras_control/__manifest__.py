@@ -9,6 +9,8 @@
         'security/ir.model.access.csv',
         'data/sequence.xml',
         'views/venta_vendedora_views.xml',
+        'report/reporte_cierre.xml',
+
     ],
     'installable': True,
     'application': True,
