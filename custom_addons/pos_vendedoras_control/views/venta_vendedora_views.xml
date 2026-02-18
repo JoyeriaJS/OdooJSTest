@@ -1,0 +1,59 @@
+<odoo>
+    <record id="view_venta_vendedora_form" model="ir.ui.view">
+        <field name="name">venta.vendedora.form</field>
+        <field name="model">venta.vendedora</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="user_id"/>
+                        <field name="fecha"/>
+                        <field name="pos_reference_input"/>
+                        <field name="pos_order_id" readonly="1"/>
+                    </group>
+
+                    <group string="Ventas por Método">
+                        <field name="efectivo"/>
+                        <field name="transferencia"/>
+                        <field name="tarjeta"/>
+                        <field name="total_ventas"/>
+                    </group>
+
+                    <group string="Gastos">
+                        <field name="gastos"/>
+                        <field name="venta_neta"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_venta_vendedora_tree" model="ir.ui.view">
+        <field name="name">venta.vendedora.tree</field>
+        <field name="model">venta.vendedora</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="fecha"/>
+                <field name="user_id"/>
+                <field name="total_ventas"/>
+                <field name="gastos"/>
+                <field name="venta_neta"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_venta_vendedora" model="ir.actions.act_window">
+        <field name="name">Control Ventas Vendedoras</field>
+        <field name="res_model">venta.vendedora</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_control_vendedoras_root"
+              name="Control Vendedoras"
+              sequence="50"/>
+
+    <menuitem id="menu_control_vendedoras"
+              name="Ventas Netas"
+              parent="menu_control_vendedoras_root"
+              action="action_venta_vendedora"/>
+</odoo>
