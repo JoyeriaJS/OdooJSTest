@@ -11,18 +11,19 @@ class VentaVendedoraLine(models.Model):
         ondelete='cascade'
     )
 
-    # 👇 AHORA ES CHAR
-    pos_reference_input = fields.Char(string="Número Ticket", required=True)
+    pos_reference_input = fields.Char(
+        string="Número Ticket",
+        required=True
+    )
 
     pos_order_id = fields.Many2one(
         'pos.order',
-        string="Orden POS",
-        readonly=True
+        string="Orden POS"
     )
 
-    efectivo = fields.Float(string="Efectivo", readonly=True)
-    transferencia = fields.Float(string="Transferencia", readonly=True)
-    tarjeta = fields.Float(string="Tarjeta", readonly=True)
+    efectivo = fields.Float(string="Efectivo")
+    transferencia = fields.Float(string="Transferencia")
+    tarjeta = fields.Float(string="Tarjeta")
 
     _sql_constraints = [
         ('unique_ticket',
@@ -30,12 +31,10 @@ class VentaVendedoraLine(models.Model):
          'Este ticket ya fue agregado.')
     ]
 
-    # 🔥 BUSCAR ORDEN AUTOMÁTICAMENTE
-    @api.onchange('pos_reference_input')
-    def _onchange_buscar_ticket(self):
-
-        if not self.pos_reference_input:
-            return
+    # ==============================
+    # FUNCIÓN CENTRAL DE CÁLCULO
+    # ==============================
+    def _calcular_pagos(self):
 
         order = self.env['pos.order'].search([
             ('pos_reference', '=', self.pos_reference_input)
@@ -51,24 +50,44 @@ class VentaVendedoraLine(models.Model):
         tarjeta = 0.0
 
         for payment in order.payment_ids:
-
             metodo = payment.payment_method_id.name.lower()
 
-            # Clasificación más flexible
             if 'efectivo' in metodo:
                 efectivo += payment.amount
-
             elif 'transfer' in metodo:
                 transferencia += payment.amount
-
             elif 'tarjeta' in metodo or 'credito' in metodo or 'debito' in metodo:
                 tarjeta += payment.amount
-
             else:
-                # Si no coincide, lo mandamos a tarjeta por seguridad
                 tarjeta += payment.amount
 
         self.efectivo = efectivo
         self.transferencia = transferencia
         self.tarjeta = tarjeta
 
+    # ==============================
+    # ONCHANGE (solo visual)
+    # ==============================
+    @api.onchange('pos_reference_input')
+    def _onchange_ticket(self):
+        if self.pos_reference_input:
+            self._calcular_pagos()
+
+    # ==============================
+    # CREATE (al guardar)
+    # ==============================
+    @api.model
+    def create(self, vals):
+        record = super().create(vals)
+        record._calcular_pagos()
+        return record
+
+    # ==============================
+    # WRITE (si editas)
+    # ==============================
+    def write(self, vals):
+        res = super().write(vals)
+        for record in self:
+            if 'pos_reference_input' in vals:
+                record._calcular_pagos()
+        return res
