@@ -6,7 +6,7 @@
             <form string="AI Business Engine">
                 <sheet>
                     <group>
-                        <field name="analysis_result" readonly="1"/>
+                        <field name="analysis_result" readonly="1" nolabel="1" widget="text"/>
                     </group>
                     <footer>
                         <button name="run_full_analysis"
@@ -25,6 +25,7 @@
         <field name="view_mode">form</field>
         <field name="target">current</field>
     </record>
+
 
     <menuitem id="menu_ai_root" name="AI Intelligence" sequence="10"/>
     <menuitem id="menu_ai_engine"
