@@ -4,7 +4,7 @@ class AIBusinessEngine(models.Model):
     _name = 'ai.business.engine'
     _description = 'AI Business Decision Engine'
 
-    analysis_result = fields.Text()
+    analysis_result = fields.Html()
 
     def run_full_analysis(self):
 
@@ -26,52 +26,32 @@ class AIBusinessEngine(models.Model):
 
         # Determinar tendencia
         if variation > 10:
-            trend_color = "#16a34a"
             trend_text = "📈 Crecimiento fuerte"
             decision = "Recomendación: aumentar inventario en productos de mayor rotación."
         elif variation < -10:
-            trend_color = "#dc2626"
             trend_text = "📉 Disminución importante"
             decision = "Recomendación: activar promociones o revisar precios."
         else:
-            trend_color = "#f59e0b"
             trend_text = "📊 Estabilidad"
             decision = "Recomendación: mantener estrategia actual y monitorear."
 
         message = f"""
-        <h1 style="margin-bottom:10px;">🤖 AI Business Intelligence</h1>
+        <h1>🤖 AI Business Intelligence</h1>
+        <hr/>
 
-        <div style="display:flex;gap:20px;margin-bottom:20px;">
+        <h2>📊 Indicadores Clave</h2>
+        <ul>
+            <li><strong>💰 Ventas Última Semana:</strong> ${round(total_last, 2)}</li>
+            <li><strong>🧾 Órdenes:</strong> {orders_count}</li>
+            <li><strong>🎯 Ticket Promedio:</strong> ${round(avg_ticket, 2)}</li>
+        </ul>
 
-            <div style="flex:1;background:#f3f4f6;padding:20px;border-radius:10px;">
-                <h3>💰 Ventas Última Semana</h3>
-                <p style="font-size:26px;font-weight:bold;">${round(total_last,2)}</p>
-            </div>
+        <h2>📈 Comparación Semanal</h2>
+        <p><strong>Ventas Semana Anterior:</strong> ${round(total_prev, 2)}</p>
+        <p><strong>Variación:</strong> {variation}% — {trend_text}</p>
 
-            <div style="flex:1;background:#f3f4f6;padding:20px;border-radius:10px;">
-                <h3>🧾 Órdenes</h3>
-                <p style="font-size:26px;font-weight:bold;">{orders_count}</p>
-            </div>
-
-            <div style="flex:1;background:#f3f4f6;padding:20px;border-radius:10px;">
-                <h3>🎯 Ticket Promedio</h3>
-                <p style="font-size:26px;font-weight:bold;">${round(avg_ticket,2)}</p>
-            </div>
-
-        </div>
-
-        <div style="background:white;padding:20px;border-radius:10px;border:1px solid #e5e7eb;">
-            <h3>📈 Comparación Semanal</h3>
-            <p><b>Ventas Semana Anterior:</b> ${round(total_prev,2)}</p>
-            <p style="color:{trend_color};font-size:18px;font-weight:bold;">
-                Variación: {variation}% — {trend_text}
-            </p>
-        </div>
-
-        <div style="margin-top:20px;background:#eef2ff;padding:20px;border-radius:10px;">
-            <h3>🧠 Recomendación Estratégica</h3>
-            <p style="font-size:16px;">{decision}</p>
-        </div>
+        <h2>🧠 Recomendación Estratégica</h2>
+        <p>{decision}</p>
         """
 
         self.write({
