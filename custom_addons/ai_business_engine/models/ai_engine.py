@@ -23,17 +23,17 @@ class AIBusinessEngine(models.Model):
     def run_full_analysis(self):
 
         sales_data = self.env['ai.sales.analyzer'].analyze()
-        vendor_data = self.env['ai.vendor.analyzer'].analyze()
-        stock_data = self.env['ai.stock.predictor'].analyze()
 
-        recommendation = self.env['ai.recommendation.engine'].generate(
-            sales_data,
-            vendor_data,
-            stock_data
-        )
+        recommendation = f"""
+ANÁLISIS IA
+
+Órdenes última semana: {sales_data.get('orders_count_last_week')}
+Total última semana: {sales_data.get('total_last_week')}
+Variación: {round(sales_data.get('variation', 0), 2)}%
+"""
 
         self.sudo().write({
-            'analysis_result': recommendation or "No se generó análisis."
+            'analysis_result': recommendation
         })
 
         return {'type': 'ir.actions.client', 'tag': 'reload'}

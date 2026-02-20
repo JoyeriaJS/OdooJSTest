@@ -6,7 +6,7 @@
         <field name="name">ai.business.engine.form</field>
         <field name="model">ai.business.engine</field>
         <field name="arch" type="xml">
-            <form string="AI Business Engine">
+            <form string="AI Business Engine" create="false" edit="false">
                 <sheet>
                     <group>
                         <field name="analysis_result" readonly="1" nolabel="1"/>
@@ -22,12 +22,14 @@
         </field>
     </record>
 
-    <!-- Acción tipo ventana normal -->
-    <record id="action_ai_engine" model="ir.actions.act_window">
+    <!-- Acción tipo servidor -->
+    <record id="action_ai_engine" model="ir.actions.server">
         <field name="name">AI Business Engine</field>
-        <field name="res_model">ai.business.engine</field>
-        <field name="view_mode">form</field>
-        <field name="target">current</field>
+        <field name="model_id" ref="model_ai_business_engine"/>
+        <field name="state">code</field>
+        <field name="code">
+action = model.action_open_dashboard()
+        </field>
     </record>
 
     <!-- Menú -->
