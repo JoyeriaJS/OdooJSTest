@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Vista formulario -->
     <record id="view_ai_engine_form" model="ir.ui.view">
         <field name="name">ai.business.engine.form</field>
         <field name="model">ai.business.engine</field>
         <field name="arch" type="xml">
-            <form string="AI Business Engine" create="false" edit="false">
+            <form string="AI Business Engine">
                 <sheet>
                     <group>
-                        <field name="analysis_result" readonly="1" nolabel="1"/>
+                        <field name="analysis_result" readonly="1"/>
                     </group>
                     <footer>
                         <button name="run_full_analysis"
@@ -22,18 +21,14 @@
         </field>
     </record>
 
-    <!-- Acción tipo servidor -->
-    <record id="action_ai_engine" model="ir.actions.server">
+    <record id="action_ai_engine" model="ir.actions.act_window">
         <field name="name">AI Business Engine</field>
-        <field name="model_id" ref="model_ai_business_engine"/>
-        <field name="state">code</field>
-        <field name="code">
-action = model.action_open_dashboard()
-        </field>
+        <field name="res_model">ai.business.engine</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
     </record>
 
-    <!-- Menú -->
-    <menuitem id="menu_ai_root" name="AI Intelligence" sequence="10"/>
+    <menuitem id="menu_ai_root" name="AI Intelligence"/>
     <menuitem id="menu_ai_engine"
               name="Motor de Decisiones"
               parent="menu_ai_root"
