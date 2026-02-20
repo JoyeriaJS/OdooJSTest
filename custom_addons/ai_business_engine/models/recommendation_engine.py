@@ -6,25 +6,23 @@ class RecommendationEngine(models.Model):
 
     def generate(self, sales_data, vendor_data, stock_data):
 
-        message = ""
+        message = "📊 ANÁLISIS SEMANAL\n\n"
 
-        # Ventas
-        if sales_data['variation'] < -10:
-            message += f"⚠ Ventas bajaron {abs(round(sales_data['variation'],2))}% esta semana.\n"
-        elif sales_data['variation'] > 10:
-            message += f"📈 Ventas aumentaron {round(sales_data['variation'],2)}% esta semana.\n"
+        message += f"Órdenes última semana: {sales_data.get('orders_count_last_week')}\n"
+        message += f"Órdenes semana anterior: {sales_data.get('orders_count_prev_week')}\n"
+        message += f"Total última semana: {sales_data.get('total_last_week')}\n"
+        message += f"Total semana anterior: {sales_data.get('total_prev_week')}\n\n"
+
+        variation = sales_data.get('variation', 0)
+
+        if variation < -10:
+            message += f"⚠ Ventas bajaron {abs(round(variation,2))}%\n"
+        elif variation > 10:
+            message += f"📈 Ventas aumentaron {round(variation,2)}%\n"
         else:
             message += "Ventas estables.\n"
 
-        # Vendedores
-        if vendor_data:
-            top_vendor = max(vendor_data, key=vendor_data.get)
-            message += f"🏆 Mejor rendimiento: {top_vendor}\n"
-
-        # Stock
-        if stock_data:
-            message += "\n⚠ Productos con bajo stock:\n"
-            for product in stock_data:
-                message += f"- {product['product']} (Stock: {product['qty']})\n"
+        if not sales_data.get('orders_count_last_week'):
+            message += "\n⚠ No hay ventas registradas en los últimos 7 días.\n"
 
         return message
