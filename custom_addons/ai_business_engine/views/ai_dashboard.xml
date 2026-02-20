@@ -15,7 +15,7 @@
 
                 <sheet>
                     <group>
-                        <field name="analysis_result" readonly="1"/>
+                        <field name="analysis_result" readonly="1" widget="html"/>
                     </group>
                 </sheet>
             </form>
