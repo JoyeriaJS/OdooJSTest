@@ -6,16 +6,17 @@
         <field name="model">ai.business.engine</field>
         <field name="arch" type="xml">
             <form string="AI Business Engine">
+                <header>
+                    <button name="run_full_analysis"
+                            type="object"
+                            string="Ejecutar Análisis"
+                            class="btn-primary"/>
+                </header>
+
                 <sheet>
                     <group>
                         <field name="analysis_result" readonly="1"/>
                     </group>
-                    <footer>
-                        <button name="run_full_analysis"
-                                type="object"
-                                string="Ejecutar Análisis"
-                                class="btn-primary"/>
-                    </footer>
                 </sheet>
             </form>
         </field>
