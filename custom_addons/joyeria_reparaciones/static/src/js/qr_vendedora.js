@@ -2,8 +2,7 @@
 
 import { patch } from "@web/core/utils/patch";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
-import { Order } from "@point_of_sale/app/store/models";
-import { TextInputPopup } from "@point_of_sale/app/utils/input_popups/text_input_popup";
+import { rpc } from "@web/core/network/rpc";
 
 patch(PaymentScreen.prototype, {
 
@@ -11,35 +10,43 @@ patch(PaymentScreen.prototype, {
 
         const order = this.currentOrder;
 
-        if (!order.codigo_qr_vendedora) {
+        let valid = false;
+        let codigo = false;
 
-            const { confirmed, payload } = await this.popup.add(TextInputPopup, {
-                title: "Escanear QR de Vendedora",
-                body: "Debe escanear el código QR antes de validar la venta.",
+        while (!valid) {
+
+            const { confirmed, payload } = await this.showPopup('TextInputPopup', {
+                title: 'Escanear QR de Vendedora',
+                body: 'Debe escanear el código QR antes de validar.',
             });
 
             if (!confirmed || !payload) {
                 return;
             }
 
-            order.codigo_qr_vendedora = payload;
+            codigo = payload.trim();
+
+            // 🔎 Validamos contra backend antes de guardar
+            const result = await rpc('/web/dataset/call_kw', {
+                model: 'joyeria.vendedora',
+                method: 'search_read',
+                args: [[['codigo_qr', '=', codigo]], ['id']],
+                kwargs: { limit: 1 }
+            });
+
+            if (result.length > 0) {
+                valid = true;
+            } else {
+                await this.showPopup('ErrorPopup', {
+                    title: 'QR inválido',
+                    body: 'El código escaneado no corresponde a ninguna vendedora.'
+                });
+            }
         }
 
-        await super.validateOrder(...arguments);
-    },
-});
+        // Solo si es válido se guarda
+        order.codigo_qr_vendedora = codigo;
 
-
-patch(Order.prototype, {
-
-    export_as_JSON() {
-        const json = super.export_as_JSON(...arguments);
-        json.codigo_qr_vendedora = this.codigo_qr_vendedora || false;
-        return json;
-    },
-
-    init_from_JSON(json) {
-        super.init_from_JSON(...arguments);
-        this.codigo_qr_vendedora = json.codigo_qr_vendedora || false;
-    },
+        await super.validateOrder(isForceValidate);
+    }
 });

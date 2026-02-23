@@ -19,11 +19,9 @@ class PosOrder(models.Model):
                 limit=1
             )
 
-            if not vendedora:
-                raise ValidationError("QR inválido.")
-
-            result['vendedora_id'] = vendedora.id
-            result['codigo_qr_vendedora'] = codigo
+            if vendedora:
+                result['vendedora_id'] = vendedora.id
+                result['codigo_qr_vendedora'] = codigo
 
         else:
             raise ValidationError("Debe escanear QR de vendedora.")
