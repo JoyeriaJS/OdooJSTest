@@ -49,6 +49,13 @@
         
     ],
     "pre_init_hook": "migrate_direccion_entrega",
+    'depends': ['point_of_sale'],
+    'assets': {
+        'point_of_sale._assets_pos': [
+            'joyeria_reparaciones/static/src/js/qr_vendedora.js',
+            'joyeria_reparaciones/static/src/xml/qr_vendedora.xml',
+        ],
+    },
 
     'installable': True,
     'application': True,
