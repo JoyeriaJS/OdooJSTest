@@ -53,7 +53,7 @@
     'assets': {
         'point_of_sale._assets_pos': [
             'joyeria_reparaciones/static/src/js/qr_vendedora.js',
-            'joyeria_reparaciones/static/src/xml/qr_vendedora.xml',
+            #'joyeria_reparaciones/static/src/xml/qr_vendedora.xml',
             'joyeria_reparaciones/static/src/xml/receipt_override.xml',
         ],
     },
