@@ -11,19 +11,18 @@ patch(PaymentScreen.prototype, {
 
         const order = this.currentOrder;
 
-        if (!order.codigo_qr_vendedora) {
+        // 🔥 SIEMPRE pedir QR
+        const { confirmed, payload } = await this.popup.add(TextInputPopup, {
+            title: "Escanear QR de Vendedora",
+            body: "Debe escanear el código QR antes de validar la venta.",
+        });
 
-            const { confirmed, payload } = await this.popup.add(TextInputPopup, {
-                title: "Escanear QR de Vendedora",
-                body: "Debe escanear el código QR antes de validar la venta.",
-            });
-
-            if (!confirmed || !payload) {
-                return;
-            }
-
-            order.codigo_qr_vendedora = payload;
+        if (!confirmed || !payload) {
+            return;
         }
+
+        // 🔁 Siempre reemplazamos
+        order.codigo_qr_vendedora = payload.trim();
 
         await super.validateOrder(...arguments);
     },
@@ -42,4 +41,9 @@ patch(Order.prototype, {
         super.init_from_JSON(...arguments);
         this.codigo_qr_vendedora = json.codigo_qr_vendedora || false;
     },
+
+    // 🔥 Para el recibo
+    get_vendedora_name() {
+        return this.codigo_qr_vendedora || "";
+    }
 });
