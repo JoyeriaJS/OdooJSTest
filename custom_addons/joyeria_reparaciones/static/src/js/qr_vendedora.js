@@ -2,7 +2,8 @@
 
 import { patch } from "@web/core/utils/patch";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
-import { useService } from "@web/core/utils/hooks";
+import { Order } from "@point_of_sale/app/store/models";
+import { TextInputPopup } from "@point_of_sale/app/utils/input_popups/text_input_popup";
 
 patch(PaymentScreen.prototype, {
 
@@ -12,9 +13,9 @@ patch(PaymentScreen.prototype, {
 
         if (!order.codigo_qr_vendedora) {
 
-            const { confirmed, payload } = await this.showPopup('TextInputPopup', {
-                title: 'Escanear QR de Vendedora',
-                body: 'Debe escanear el código QR antes de validar.',
+            const { confirmed, payload } = await this.popup.add(TextInputPopup, {
+                title: "Escanear QR de Vendedora",
+                body: "Debe escanear el código QR antes de validar la venta.",
             });
 
             if (!confirmed || !payload) {
@@ -24,11 +25,10 @@ patch(PaymentScreen.prototype, {
             order.codigo_qr_vendedora = payload;
         }
 
-        await super.validateOrder(isForceValidate);
-    }
+        await super.validateOrder(...arguments);
+    },
 });
 
-import { Order } from "@point_of_sale/app/store/models";
 
 patch(Order.prototype, {
 
@@ -40,6 +40,6 @@ patch(Order.prototype, {
 
     init_from_JSON(json) {
         super.init_from_JSON(...arguments);
-        this.codigo_qr_vendedora = json.codigo_qr_vendedora;
+        this.codigo_qr_vendedora = json.codigo_qr_vendedora || false;
     },
 });
