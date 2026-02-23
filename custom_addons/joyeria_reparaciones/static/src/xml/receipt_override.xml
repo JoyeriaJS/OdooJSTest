@@ -7,10 +7,11 @@
         <xpath expr="//div[contains(@class,'cashier')]" position="replace">
 
             <div class="cashier">
-                <t t-if="order.get_vendedora_name()">
-                    Atendido por:
-                    <t t-esc="order.get_vendedora_name()"/>
-                </t>
+            <t t-if="props.data.vendedora_name">
+                <div>
+                    Atendido por: <t t-esc="props.data.vendedora_name"/>
+                </div>
+            </t>
                 <t t-else="">
                     Atendido por:
                     <t t-esc="order.get_cashier().name"/>
