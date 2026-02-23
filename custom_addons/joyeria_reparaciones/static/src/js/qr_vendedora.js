@@ -5,13 +5,14 @@ import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment
 import { Order } from "@point_of_sale/app/store/models";
 import { TextInputPopup } from "@point_of_sale/app/utils/input_popups/text_input_popup";
 
+
+// 🔹 PEDIR QR SIEMPRE
 patch(PaymentScreen.prototype, {
 
     async validateOrder(isForceValidate) {
 
         const order = this.currentOrder;
 
-        // 🔥 SIEMPRE pedir QR
         const { confirmed, payload } = await this.popup.add(TextInputPopup, {
             title: "Escanear QR de Vendedora",
             body: "Debe escanear el código QR antes de validar la venta.",
@@ -21,7 +22,7 @@ patch(PaymentScreen.prototype, {
             return;
         }
 
-        // 🔁 Siempre reemplazamos
+        // Guardamos el código escaneado
         order.codigo_qr_vendedora = payload.trim();
 
         await super.validateOrder(...arguments);
@@ -29,6 +30,7 @@ patch(PaymentScreen.prototype, {
 });
 
 
+// 🔹 HACER QUE EL RECIBO RECIBA LA VENDEDORA
 patch(Order.prototype, {
 
     export_as_JSON() {
@@ -42,8 +44,14 @@ patch(Order.prototype, {
         this.codigo_qr_vendedora = json.codigo_qr_vendedora || false;
     },
 
-    // 🔥 Para el recibo
-    get_vendedora_name() {
-        return this.codigo_qr_vendedora || "";
-    }
+    // 👇 ESTE ES EL MÉTODO QUE FALTABA
+    export_for_printing() {
+        const result = super.export_for_printing(...arguments);
+
+        // Pasamos la vendedora al receipt
+        result.vendedora_name = this.codigo_qr_vendedora || null;
+
+        return result;
+    },
+
 });
