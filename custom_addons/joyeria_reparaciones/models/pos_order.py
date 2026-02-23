@@ -22,8 +22,3 @@ class PosOrder(models.Model):
             if vendedora:
                 result['vendedora_id'] = vendedora.id
                 result['codigo_qr_vendedora'] = codigo
-
-        else:
-            raise ValidationError("Debe escanear QR de vendedora.")
-
-        return result
