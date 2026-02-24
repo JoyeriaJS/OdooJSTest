@@ -6,6 +6,7 @@ import { Order } from "@point_of_sale/app/store/models";
 import { TextInputPopup } from "@point_of_sale/app/utils/input_popups/text_input_popup";
 import { PosGlobalState } from "@point_of_sale/app/store/pos_global_state";
 import { registry } from "@web/core/registry";
+import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 
 
 // ======================================================
@@ -43,35 +44,34 @@ patch(PaymentScreen.prototype, {
             body: "Debe escanear o ingresar el código antes de validar la venta.",
         });
 
-        if (!confirmed || !payload) {
+        if (!confirmed) {
             return;
         }
 
-        const codigo = payload.trim().toUpperCase();
+        const codigo = (payload || "").trim().toUpperCase();
 
-        if (!this.pos.vendedoras || !this.pos.vendedoras.length) {
-            await this.popup.add(TextInputPopup, {
-                title: "Error interno",
-                body: "No se cargaron las vendedoras en el POS.",
+        if (!codigo) {
+            await this.popup.add(ErrorPopup, {
+                title: "Código requerido",
+                body: "Debe ingresar un código válido.",
             });
             return;
         }
 
-        const vendedora = this.pos.vendedoras.find(v =>
+        const vendedora = this.pos.vendedoras?.find(v =>
             (v.codigo_qr && v.codigo_qr.toUpperCase() === codigo) ||
             (v.clave_qr && v.clave_qr.toUpperCase() === codigo) ||
             (v.clave_autenticacion && v.clave_autenticacion.toUpperCase() === codigo)
         );
 
         if (!vendedora) {
-            await this.popup.add(TextInputPopup, {
+            await this.popup.add(ErrorPopup, {
                 title: "Código inválido",
                 body: "No existe una vendedora con ese código.",
             });
             return;
         }
 
-        // Guardamos en la orden
         order.vendedora_id = vendedora.id;
         order.vendedora_name = vendedora.name;
         order.codigo_qr_vendedora = codigo;
