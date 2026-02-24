@@ -94,9 +94,3 @@ patch(Order.prototype, {
     },
 });
 
-patch(PosStore.prototype, {
-    async _processData(loadedData) {
-        await super._processData(...arguments);
-        this.vendedoras = loadedData["joyeria.vendedora"];
-    },
-});
