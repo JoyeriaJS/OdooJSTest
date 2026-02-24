@@ -945,3 +945,21 @@ class Vendedora(models.Model):
     def imprimir_etiqueta_vendedora(self):
         return self.env.ref('joyeria_reparaciones.action_report_etiqueta_vendedora').report_action(self)
 
+    @api.model
+    def validar_vendedora_pos(self, codigo):
+        codigo = (codigo or "").strip()
+
+        vendedora = self.search([
+            '|', '|',
+            ('codigo_qr', '=', codigo),
+            ('clave_qr', '=', codigo),
+            ('clave_autenticacion', '=', codigo),
+        ], limit=1)
+
+        if not vendedora:
+            return False
+
+        return {
+            'id': vendedora.id,
+            'name': vendedora.name,
+        }

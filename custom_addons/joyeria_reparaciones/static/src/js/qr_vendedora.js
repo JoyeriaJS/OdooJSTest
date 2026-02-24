@@ -2,88 +2,71 @@
 
 import { patch } from "@web/core/utils/patch";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
-import { Order } from "@point_of_sale/app/store/models";
 import { TextInputPopup } from "@point_of_sale/app/utils/input_popups/text_input_popup";
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
+import { Order } from "@point_of_sale/app/store/models";
 
-
-// 🔹 PEDIR QR SIEMPRE
 patch(PaymentScreen.prototype, {
 
     async validateOrder(isForceValidate) {
 
-        const order = this.currentOrder;
-
-        if (!this.pos.vendedoras || !this.pos.vendedoras.length) {
-            await this.popup.add(ErrorPopup, {
-                title: "Error",
-                body: "No hay vendedoras cargadas en el POS.",
-            });
-            return;
-        }
-
         const { confirmed, payload } = await this.popup.add(TextInputPopup, {
-            title: "Escanear QR de Vendedora",
-            body: "Ingrese o escanee el código.",
+            title: "Clave de Vendedora",
+            body: "Ingrese o escanee la clave para validar la venta",
         });
 
-        if (!confirmed) {
+        if (!confirmed || !payload) {
             return;
         }
 
-        const codigo = (payload || "").trim().toLowerCase();
+        const codigo = payload.trim();
 
-        if (!codigo) {
-            await this.popup.add(ErrorPopup, {
-                title: "Código requerido",
-                body: "Debe ingresar un código válido.",
-            });
-            return;
-        }
-
-        const vendedora = this.pos.vendedoras.find(v =>
-            String(v.codigo_qr || "")
-                .trim()
-                .toLowerCase() === codigo
+        // 🔥 Validación directa en backend
+        const result = await this.orm.call(
+            'joyeria.vendedora',
+            'validar_vendedora_pos',
+            [codigo]
         );
 
-        if (!vendedora) {
+        if (!result) {
             await this.popup.add(ErrorPopup, {
-                title: "Código inválido",
-                body: "No existe una vendedora con ese código.",
+                title: "Clave inválida",
+                body: "No se encontró una vendedora con esa clave.",
             });
             return;
         }
 
-        order.vendedora_id = vendedora.id;
-        order.vendedora_name = vendedora.name;
+        // 🔹 Asignamos a la orden
+        this.currentOrder.vendedora_id = result.id;
+        this.currentOrder.vendedora_name = result.name;
 
         return super.validateOrder(isForceValidate);
     },
 });
 
 
-// 🔹 EXTENDER ORDER
 patch(Order.prototype, {
+
+    setup() {
+        super.setup(...arguments);
+        this.vendedora_id = false;
+        this.vendedora_name = false;
+    },
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
-        json.vendedora_id = this.vendedora_id || false;
-        json.vendedora_name = this.vendedora_name || false;
+        json.vendedora_id = this.vendedora_id;
         return json;
     },
 
     init_from_JSON(json) {
         super.init_from_JSON(...arguments);
-        this.vendedora_id = json.vendedora_id || false;
-        this.vendedora_name = json.vendedora_name || false;
+        this.vendedora_id = json.vendedora_id;
     },
 
     export_for_printing() {
         const result = super.export_for_printing(...arguments);
-
-        result.vendedora_name = this.vendedora_name || null;
-
+        result.vendedora_name = this.vendedora_name;
         return result;
     },
 });
