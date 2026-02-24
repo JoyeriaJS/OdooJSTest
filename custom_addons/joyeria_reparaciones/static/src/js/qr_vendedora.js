@@ -4,70 +4,75 @@ import { patch } from "@web/core/utils/patch";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
 import { Order } from "@point_of_sale/app/store/models";
 import { TextInputPopup } from "@point_of_sale/app/utils/input_popups/text_input_popup";
-import { PosStore } from "@point_of_sale/app/store/pos_store";
 
 
-// 🔹 CARGAR VENDEDORAS EN EL POS
-patch(PosStore.prototype, {
-
-    async _processData(loadedData) {
-        await super._processData(...arguments);
-
-        // Guardamos las vendedoras en memoria del POS
-        this.vendedoras = loadedData['joyeria.vendedora'] || [];
-    },
-
-});
-
-
-// 🔹 PEDIR QR SIEMPRE ANTES DE VALIDAR
+/* ============================================================
+   🔹 VALIDAR QR ANTES DE CONFIRMAR LA VENTA
+============================================================ */
 patch(PaymentScreen.prototype, {
 
     async validateOrder(isForceValidate) {
 
         const order = this.currentOrder;
 
-        // Verificar que el modelo esté cargado
-        if (!this.pos || !this.pos.vendedoras) {
-            console.error("No se cargaron las vendedoras en el POS");
+        // 🔹 Verificar que existan vendedoras cargadas
+        if (!this.pos.vendedoras || this.pos.vendedoras.length === 0) {
+            console.error("No hay vendedoras cargadas en el POS");
+            await this.popup.add(TextInputPopup, {
+                title: "Error",
+                body: "No hay vendedoras cargadas en el sistema.",
+            });
             return;
         }
 
+        // 🔹 Pedir QR
         const { confirmed, payload } = await this.popup.add(TextInputPopup, {
             title: "Escanear QR de Vendedora",
-            body: "Debe escanear o ingresar el código antes de validar la venta.",
+            body: "Debe escanear o ingresar el código antes de validar.",
         });
 
         if (!confirmed || !payload) {
             return;
         }
 
-        const codigo = payload.trim();
+        const codigoIngresado = String(payload).trim().toLowerCase();
 
-        // Buscar vendedora
-        const vendedora = this.pos.vendedoras.find(
-            v => v.codigo_qr === codigo
+        // 🔹 Buscar vendedora de forma segura
+        const vendedora = this.pos.vendedoras.find(v =>
+            String(v.codigo_qr || "")
+                .trim()
+                .toLowerCase() === codigoIngresado
         );
 
         if (!vendedora) {
             await this.popup.add(TextInputPopup, {
                 title: "Código inválido",
-                body: "No existe una vendedora con ese QR.",
+                body: "No existe una vendedora con ese código.",
             });
             return;
         }
 
-        // Guardamos datos en la orden
+        // 🔹 Guardar en la orden
         order.vendedora_id = vendedora.id;
         order.vendedora_name = vendedora.name;
+
+        console.log("Vendedora asignada:", vendedora.name);
 
         await super.validateOrder(...arguments);
     },
 });
 
 
-// 🔹 EXTENDER ORDER
+/* ============================================================
+   🔹 EXTENDER ORDER PARA GUARDAR DATOS
+============================================================ */
 patch(Order.prototype, {
+
+    setup() {
+        super.setup(...arguments);
+        this.vendedora_id = this.vendedora_id || false;
+        this.vendedora_name = this.vendedora_name || false;
+    },
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
@@ -84,8 +89,14 @@ patch(Order.prototype, {
 
     export_for_printing() {
         const result = super.export_for_printing(...arguments);
-        result.vendedora_name = this.vendedora_name || null;
+        result.vendedora_name = this.vendedora_name || "";
         return result;
     },
+});
 
+patch(PosStore.prototype, {
+    async _processData(loadedData) {
+        await super._processData(...arguments);
+        this.vendedoras = loadedData["joyeria.vendedora"];
+    },
 });
