@@ -4,18 +4,38 @@ import { patch } from "@web/core/utils/patch";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
 import { Order } from "@point_of_sale/app/store/models";
 import { TextInputPopup } from "@point_of_sale/app/utils/input_popups/text_input_popup";
+import { PosStore } from "@point_of_sale/app/store/pos_store";
 
 
-// 🔹 PEDIR QR SIEMPRE
+// 🔹 CARGAR VENDEDORAS EN EL POS
+patch(PosStore.prototype, {
+
+    async _processData(loadedData) {
+        await super._processData(...arguments);
+
+        // Guardamos las vendedoras en memoria del POS
+        this.vendedoras = loadedData['joyeria.vendedora'] || [];
+    },
+
+});
+
+
+// 🔹 PEDIR QR SIEMPRE ANTES DE VALIDAR
 patch(PaymentScreen.prototype, {
 
     async validateOrder(isForceValidate) {
 
         const order = this.currentOrder;
 
+        // Verificar que el modelo esté cargado
+        if (!this.pos || !this.pos.vendedoras) {
+            console.error("No se cargaron las vendedoras en el POS");
+            return;
+        }
+
         const { confirmed, payload } = await this.popup.add(TextInputPopup, {
             title: "Escanear QR de Vendedora",
-            body: "Debe escanear el código QR antes de validar la venta.",
+            body: "Debe escanear o ingresar el código antes de validar la venta.",
         });
 
         if (!confirmed || !payload) {
@@ -24,8 +44,8 @@ patch(PaymentScreen.prototype, {
 
         const codigo = payload.trim();
 
-        // 🔹 BUSCAR VENDEDORA EN CACHE POS
-        const vendedora = this.env.pos.vendedoras?.find(
+        // Buscar vendedora
+        const vendedora = this.pos.vendedoras.find(
             v => v.codigo_qr === codigo
         );
 
@@ -37,7 +57,7 @@ patch(PaymentScreen.prototype, {
             return;
         }
 
-        // Guardamos nombre y id
+        // Guardamos datos en la orden
         order.vendedora_id = vendedora.id;
         order.vendedora_name = vendedora.name;
 
@@ -64,9 +84,8 @@ patch(Order.prototype, {
 
     export_for_printing() {
         const result = super.export_for_printing(...arguments);
-
         result.vendedora_name = this.vendedora_name || null;
-
         return result;
     },
+
 });
