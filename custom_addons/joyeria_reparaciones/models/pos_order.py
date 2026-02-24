@@ -16,5 +16,9 @@ class PosOrder(models.Model):
 
     def export_for_ui(self):
         result = super().export_for_ui()
-        result['vendedora_name'] = self.vendedora_id.name if self.vendedora_id else ""
+
+        for order in result:
+            pos_order = self.browse(order['id'])
+            order['vendedora_name'] = pos_order.vendedora_id.name if pos_order.vendedora_id else ""
+
         return result
