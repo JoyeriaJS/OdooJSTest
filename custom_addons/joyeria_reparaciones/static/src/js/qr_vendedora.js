@@ -22,36 +22,51 @@ patch(PaymentScreen.prototype, {
             return;
         }
 
-        // Guardamos el código escaneado
-        order.codigo_qr_vendedora = payload.trim();
+        const codigo = payload.trim();
+
+        // 🔹 BUSCAR VENDEDORA EN CACHE POS
+        const vendedora = this.env.pos.vendedoras?.find(
+            v => v.codigo_qr === codigo
+        );
+
+        if (!vendedora) {
+            await this.popup.add(TextInputPopup, {
+                title: "Código inválido",
+                body: "No existe una vendedora con ese QR.",
+            });
+            return;
+        }
+
+        // Guardamos nombre y id
+        order.vendedora_id = vendedora.id;
+        order.vendedora_name = vendedora.name;
 
         await super.validateOrder(...arguments);
     },
 });
 
 
-// 🔹 HACER QUE EL RECIBO RECIBA LA VENDEDORA
+// 🔹 EXTENDER ORDER
 patch(Order.prototype, {
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
-        json.codigo_qr_vendedora = this.codigo_qr_vendedora || false;
+        json.vendedora_id = this.vendedora_id || false;
+        json.vendedora_name = this.vendedora_name || false;
         return json;
     },
 
     init_from_JSON(json) {
         super.init_from_JSON(...arguments);
-        this.codigo_qr_vendedora = json.codigo_qr_vendedora || false;
+        this.vendedora_id = json.vendedora_id || false;
+        this.vendedora_name = json.vendedora_name || false;
     },
 
-    // 👇 ESTE ES EL MÉTODO QUE FALTABA
     export_for_printing() {
         const result = super.export_for_printing(...arguments);
 
-        // Pasamos la vendedora al receipt
-        result.vendedora_name = this.codigo_qr_vendedora || null;
+        result.vendedora_name = this.vendedora_name || null;
 
         return result;
     },
-
 });

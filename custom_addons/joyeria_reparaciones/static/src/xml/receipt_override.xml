@@ -18,7 +18,7 @@
                 <t t-else="">
                     <div>
                         Atendido por:
-                        <t t-esc="props.data.cashier"/>
+                        <t t-esc="order.vendedora_id.name"/>
                     </div>
                 </t>
 
