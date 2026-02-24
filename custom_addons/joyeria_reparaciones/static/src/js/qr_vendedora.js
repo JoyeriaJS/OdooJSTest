@@ -11,38 +11,40 @@ patch(PaymentScreen.prototype, {
 
     async validateOrder(isForceValidate) {
 
-        const order = this.currentOrder;
+        const popup = this.popup;
 
-        const { confirmed, payload } = await this.popup.add(TextInputPopup, {
-            title: "Escanear QR de Vendedora",
-            body: "Debe escanear el código QR antes de validar la venta.",
+        const { confirmed, payload } = await popup.add(this.env.services.popup.constructor, {
+            title: "Código de Vendedora",
+            body: "Ingrese el código de la vendedora",
         });
 
         if (!confirmed || !payload) {
             return;
         }
 
-        const codigo = payload.trim();
+        const codigoIngresado = payload.trim();
 
-        // 🔹 BUSCAR VENDEDORA EN CACHE POS
-        const vendedora = this.env.pos.vendedoras?.find(
-            v => v.codigo_qr === codigo
+        // 🔥 AQUÍ ESTÁ LA CLAVE
+        const usuarios = this.env.pos.users || [];
+
+        const vendedora = usuarios.find(user =>
+            user.codigo_vendedora === codigoIngresado
         );
 
         if (!vendedora) {
-            await this.popup.add(TextInputPopup, {
-                title: "Código inválido",
-                body: "No existe una vendedora con ese QR.",
+            await popup.add(this.env.services.popup.constructor, {
+                title: "Error",
+                body: "Debe escanear o ingresar el código de la vendedora.",
             });
             return;
         }
 
-        // Guardamos nombre y id
-        order.vendedora_id = vendedora.id;
-        order.vendedora_name = vendedora.name;
+        // Guardamos la vendedora en la orden
+        this.currentOrder.codigo_vendedora = codigoIngresado;
 
-        await super.validateOrder(...arguments);
-    },
+        return super.validateOrder(isForceValidate);
+    }
+
 });
 
 

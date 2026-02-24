@@ -8,13 +8,10 @@ class PosSession(models.Model):
         result.append('joyeria.vendedora')
         return result
 
-    def _loader_params_joyeria_vendedora(self):
-        return {
-            'search_params': {
-                'domain': [],
-                'fields': ['name', 'codigo_qr'],
-            },
-        }
+    def _loader_params_res_users(self):
+        result = super()._loader_params_res_users()
+        result['search_params']['fields'].extend(['codigo_vendedora'])
+        return result
 
     def _get_pos_ui_joyeria_vendedora(self, params):
         return self.env['joyeria.vendedora'].search_read(**params['search_params'])
