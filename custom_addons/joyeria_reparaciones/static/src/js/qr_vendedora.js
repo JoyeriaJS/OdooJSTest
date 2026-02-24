@@ -67,8 +67,11 @@ patch(Order.prototype, {
     },
 
     export_for_printing() {
-        const result = super.export_for_printing(...arguments);
-        result.vendedora_name = this.vendedora_name || "";
-        return result;
+    const result = super.export_for_printing(...arguments);
+
+    // 👇 Tomar siempre del backend
+    result.vendedora_name = this.vendedora_name || this.vendedora_id?.name || "";
+
+    return result;
     },
 });

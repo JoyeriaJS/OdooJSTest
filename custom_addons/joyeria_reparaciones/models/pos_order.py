@@ -1,5 +1,4 @@
 from odoo import models, fields, api
-from odoo.exceptions import ValidationError
 
 class PosOrder(models.Model):
     _inherit = 'pos.order'
@@ -8,33 +7,14 @@ class PosOrder(models.Model):
         'joyeria.vendedora',
         string='Vendedora'
     )
-    codigo_qr_vendedora = fields.Char()
-
-    @api.model
-    def _order_fields(self, ui_order):
-        result = super()._order_fields(ui_order)
-
-        codigo = ui_order.get('codigo_qr_vendedora')
-
-        if codigo:
-            vendedora = self.env['joyeria.vendedora'].search(
-                [('codigo_qr', '=', codigo.strip())],
-                limit=1
-            )
-
-            if vendedora:
-                raise ValidationError("QR inválido.")
-
-            result['vendedora_id'] = vendedora.id
-            result['codigo_qr_vendedora'] = codigo
-
-        else:
-            raise ValidationError("Debe escanear QR de vendedora.")
-
-        return result
 
     @api.model
     def _order_fields(self, ui_order):
         result = super()._order_fields(ui_order)
         result['vendedora_id'] = ui_order.get('vendedora_id')
+        return result
+
+    def export_for_ui(self):
+        result = super().export_for_ui()
+        result['vendedora_name'] = self.vendedora_id.name if self.vendedora_id else ""
         return result
