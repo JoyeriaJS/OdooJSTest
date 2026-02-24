@@ -1,7 +1,6 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 
-
 class PosOrder(models.Model):
     _inherit = 'pos.order'
 
@@ -9,10 +8,7 @@ class PosOrder(models.Model):
         'joyeria.vendedora',
         string='Vendedora'
     )
-
-    codigo_qr_vendedora = fields.Char(
-        string='Código QR Vendedora'
-    )
+    codigo_qr_vendedora = fields.Char()
 
     @api.model
     def _order_fields(self, ui_order):
@@ -20,22 +16,25 @@ class PosOrder(models.Model):
 
         codigo = ui_order.get('codigo_qr_vendedora')
 
-        if not codigo:
-            raise ValidationError("Debe escanear o ingresar el código de la vendedora.")
+        if codigo:
+            vendedora = self.env['joyeria.vendedora'].search(
+                [('codigo_qr', '=', codigo.strip())],
+                limit=1
+            )
 
-        codigo = str(codigo).strip().upper()
+            if vendedora:
+                raise ValidationError("QR inválido.")
 
-        vendedora = self.env['joyeria.vendedora'].search([
-            '|', '|',
-            ('clave_autenticacion', '=', codigo),
-            ('clave_qr', '=', codigo),
-            ('codigo_qr', '=', codigo),
-        ], limit=1)
+            result['vendedora_id'] = vendedora.id
+            result['codigo_qr_vendedora'] = codigo
 
-        if not vendedora:
-            raise ValidationError("QR o código de vendedora inválido.")
+        else:
+            raise ValidationError("Debe escanear QR de vendedora.")
 
-        result['vendedora_id'] = vendedora.id
-        result['codigo_qr_vendedora'] = codigo
+        return result
 
+    @api.model
+    def _order_fields(self, ui_order):
+        result = super()._order_fields(ui_order)
+        result['vendedora_id'] = ui_order.get('vendedora_id')
         return result

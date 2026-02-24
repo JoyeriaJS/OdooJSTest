@@ -6,73 +6,48 @@ import { Order } from "@point_of_sale/app/store/models";
 import { TextInputPopup } from "@point_of_sale/app/utils/input_popups/text_input_popup";
 
 
-/* ============================================================
-   🔹 VALIDAR QR ANTES DE CONFIRMAR LA VENTA
-============================================================ */
+// 🔹 PEDIR QR SIEMPRE
 patch(PaymentScreen.prototype, {
 
     async validateOrder(isForceValidate) {
 
         const order = this.currentOrder;
 
-        // 🔹 Verificar que existan vendedoras cargadas
-        if (!this.pos.vendedoras || this.pos.vendedoras.length === 0) {
-            console.error("No hay vendedoras cargadas en el POS");
-            await this.popup.add(TextInputPopup, {
-                title: "Error",
-                body: "No hay vendedoras cargadas en el sistema.",
-            });
-            return;
-        }
-
-        // 🔹 Pedir QR
         const { confirmed, payload } = await this.popup.add(TextInputPopup, {
             title: "Escanear QR de Vendedora",
-            body: "Debe escanear o ingresar el código antes de validar.",
+            body: "Debe escanear el código QR antes de validar la venta.",
         });
 
         if (!confirmed || !payload) {
             return;
         }
 
-        const codigoIngresado = String(payload).trim().toLowerCase();
+        const codigo = payload.trim();
 
-        // 🔹 Buscar vendedora de forma segura
-        const vendedora = this.pos.vendedoras.find(v =>
-            String(v.codigo_qr || "")
-                .trim()
-                .toLowerCase() === codigoIngresado
+        // 🔹 BUSCAR VENDEDORA EN CACHE POS
+        const vendedora = this.env.pos.vendedoras?.find(
+            v => v.codigo_qr === codigo
         );
 
         if (!vendedora) {
             await this.popup.add(TextInputPopup, {
                 title: "Código inválido",
-                body: "No existe una vendedora con ese código.",
+                body: "No existe una vendedora con ese QR.",
             });
             return;
         }
 
-        // 🔹 Guardar en la orden
+        // Guardamos nombre y id
         order.vendedora_id = vendedora.id;
         order.vendedora_name = vendedora.name;
-
-        console.log("Vendedora asignada:", vendedora.name);
 
         await super.validateOrder(...arguments);
     },
 });
 
 
-/* ============================================================
-   🔹 EXTENDER ORDER PARA GUARDAR DATOS
-============================================================ */
+// 🔹 EXTENDER ORDER
 patch(Order.prototype, {
-
-    setup() {
-        super.setup(...arguments);
-        this.vendedora_id = this.vendedora_id || false;
-        this.vendedora_name = this.vendedora_name || false;
-    },
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
@@ -89,8 +64,9 @@ patch(Order.prototype, {
 
     export_for_printing() {
         const result = super.export_for_printing(...arguments);
-        result.vendedora_name = this.vendedora_name || "";
+
+        result.vendedora_name = this.vendedora_name || null;
+
         return result;
     },
 });
-
