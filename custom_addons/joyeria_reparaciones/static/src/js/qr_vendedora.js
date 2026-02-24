@@ -49,24 +49,26 @@ patch(Order.prototype, {
 
     setup() {
         super.setup(...arguments);
-        this.vendedora_id = false;
-        this.vendedora_name = false;
+        this.vendedora_id = null;
+        this.vendedora_name = null;
     },
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
-        json.vendedora_id = this.vendedora_id;
+        json.vendedora_id = this.vendedora_id || null;
+        json.vendedora_name = this.vendedora_name || null;
         return json;
     },
 
     init_from_JSON(json) {
         super.init_from_JSON(...arguments);
-        this.vendedora_id = json.vendedora_id;
+        this.vendedora_id = json.vendedora_id || null;
+        this.vendedora_name = json.vendedora_name || null;
     },
 
     export_for_printing() {
         const result = super.export_for_printing(...arguments);
-        result.vendedora_name = this.vendedora_name;
+        result.vendedora_name = this.vendedora_name || "";
         return result;
     },
 });

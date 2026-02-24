@@ -11,7 +11,7 @@
                 <t t-if="props.data.vendedora_name">
                     <div>
                         Atendido por:
-                        <t t-esc="props.data.vendedora_name"/>
+                        <t t-esc="receipt.vendedora_name"/>
                     </div>
                 </t>
 
