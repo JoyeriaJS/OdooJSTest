@@ -49,13 +49,15 @@ patch(Order.prototype, {
 
     setup() {
         super.setup(...arguments);
-        this.vendedora_id = this.vendedora_id || null;
-        this.vendedora_name = this.vendedora_name || null;
+        this.vendedora_id = null;
     },
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
+
+        // 🔥 Esto es lo que realmente guarda en backend
         json.vendedora_id = this.vendedora_id;
+
         return json;
     },
 
@@ -64,14 +66,4 @@ patch(Order.prototype, {
         this.vendedora_id = json.vendedora_id || null;
     },
 
-    export_for_printing() {
-    const result = super.export_for_printing(...arguments);
-
-    // 🔥 Si existe vendedora_id, usamos el nombre guardado en la orden
-    if (this.vendedora_id && this.vendedora_name) {
-        result.cashier = this.vendedora_name;  // 👈 AQUÍ está la clave
-    }
-
-    return result;
-    },
 });
