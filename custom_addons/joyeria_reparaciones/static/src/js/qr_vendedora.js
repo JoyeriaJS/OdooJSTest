@@ -37,7 +37,7 @@ patch(PaymentScreen.prototype, {
         }
 
         // 🔹 Asignamos a la orden
-        this.currentOrder.set('vendedora_id', result.id);
+        this.currentOrder.vendedora_id = result.id;
         this.currentOrder.vendedora_name = result.name;
 
         return super.validateOrder(isForceValidate);
@@ -49,18 +49,25 @@ patch(Order.prototype, {
 
     setup() {
         super.setup(...arguments);
-        this.vendedora_id = this.get('vendedora_id') || null;
+        this.vendedora_id = this.vendedora_id || null;
+        this.vendedora_name = this.vendedora_name || null;
     },
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
-        json.vendedora_id = this.get('vendedora_id');
+        json.vendedora_id = this.vendedora_id || null;
         return json;
     },
 
     init_from_JSON(json) {
         super.init_from_JSON(...arguments);
-        this.set('vendedora_id', json.vendedora_id || null);
+        this.vendedora_id = json.vendedora_id || null;
+    },
+
+    export_for_printing() {
+        const result = super.export_for_printing(...arguments);
+        result.vendedora_name = this.vendedora_name || "";
+        return result;
     },
 
 });
