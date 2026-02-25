@@ -49,29 +49,31 @@ patch(Order.prototype, {
 
     setup() {
         super.setup(...arguments);
-        this.vendedora_id = null;
-        this.vendedora_name = null;
+        this.vendedora_id = this.vendedora_id || null;
+        this.vendedora_name = this.vendedora_name || null;
     },
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
-        json.vendedora_id = this.vendedora_id || null;
-        json.vendedora_name = this.vendedora_name || null;
+        json.vendedora_id = this.vendedora_id;
         return json;
     },
 
     init_from_JSON(json) {
         super.init_from_JSON(...arguments);
         this.vendedora_id = json.vendedora_id || null;
-        this.vendedora_name = json.vendedora_name || null;
     },
 
     export_for_printing() {
-    const result = super.export_for_printing(...arguments);
+        const result = super.export_for_printing(...arguments);
 
-    // 👇 Tomar siempre del backend
-    result.vendedora_name = this.vendedora_name || this.vendedora_id?.name || "";
+        // 🔥 Aquí traemos el nombre real desde backend
+        if (this.vendedora_id && this.pos.db) {
+            const vendedora = this.pos.db.get_partner_by_id?.(this.vendedora_id);
+        }
 
-    return result;
+        result.vendedora_name = this.vendedora_name || "";
+
+        return result;
     },
 });
