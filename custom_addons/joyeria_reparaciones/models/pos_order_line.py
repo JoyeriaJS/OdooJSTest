@@ -10,6 +10,14 @@ class PosOrderLine(models.Model):
     @api.model
     def _order_line_fields(self, line, session_id=None):
         result = super()._order_line_fields(line, session_id)
-        result['gramos'] = line.get('gramos')
-        result['descripcion_personalizada'] = line.get('descripcion_personalizada')
+
+        # 🔥 En Odoo 17 la línea viene como lista [0, 0, values]
+        if isinstance(line, (list, tuple)) and len(line) > 2:
+            values = line[2]
+        else:
+            values = line
+
+        result['gramos'] = values.get('gramos')
+        result['descripcion_personalizada'] = values.get('descripcion_personalizada')
+
         return result
