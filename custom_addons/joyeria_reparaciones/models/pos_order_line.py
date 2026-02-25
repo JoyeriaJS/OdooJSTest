@@ -29,3 +29,4 @@ class PosOrderLine(models.Model):
 
         return result
     
+    
