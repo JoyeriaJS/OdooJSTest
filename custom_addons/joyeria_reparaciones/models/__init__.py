@@ -12,6 +12,7 @@ from . import report_monthly_rma_pos_xlsx
 from . import reparacion_auth_code
 from . import pos_order
 from . import pos_session
+from . import pos_order_line
 
 
 #from . import res_users
