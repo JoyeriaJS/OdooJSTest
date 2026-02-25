@@ -28,3 +28,4 @@ class PosOrderLine(models.Model):
             result['descripcion_personalizada'] = values.get('descripcion_personalizada', False)
 
         return result
+    
