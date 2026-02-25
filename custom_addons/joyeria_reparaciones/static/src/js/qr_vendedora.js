@@ -65,15 +65,13 @@ patch(Order.prototype, {
     },
 
     export_for_printing() {
-        const result = super.export_for_printing(...arguments);
+    const result = super.export_for_printing(...arguments);
 
-        // 🔥 Aquí traemos el nombre real desde backend
-        if (this.vendedora_id && this.pos.db) {
-            const vendedora = this.pos.db.get_partner_by_id?.(this.vendedora_id);
-        }
+    // 🔥 Si existe vendedora_id, usamos el nombre guardado en la orden
+    if (this.vendedora_id && this.vendedora_name) {
+        result.cashier = this.vendedora_name;  // 👈 AQUÍ está la clave
+    }
 
-        result.vendedora_name = this.vendedora_name || "";
-
-        return result;
+    return result;
     },
 });
