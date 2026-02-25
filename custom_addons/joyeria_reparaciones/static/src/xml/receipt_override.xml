@@ -4,14 +4,26 @@
     <t t-inherit="point_of_sale.ReceiptHeader"
        t-inherit-mode="extension">
 
-        <xpath expr="//div[contains(@class,'cashier')]" position="after">
+        <!-- Reemplazamos completamente el cashier -->
+        <xpath expr="//div[contains(@class,'cashier')]" position="replace">
 
-            <t t-if="props.data.vendedora_name">
-                <div class="vendedora-line">
-                    Atendido por:
-                    <t t-esc="props.data.vendedora_name"/>
-                </div>
-            </t>
+            <div class="cashier">
+
+                <t t-if="props.data.vendedora_name">
+                    <div>
+                        Atendido por:
+                        <t t-esc="props.data.vendedora_name"/>
+                    </div>
+                </t>
+
+                <t t-else="">
+                    <div>
+                        Atendido por:
+                        <t t-esc="props.data.cashier"/>
+                    </div>
+                </t>
+
+            </div>
 
         </xpath>
 
