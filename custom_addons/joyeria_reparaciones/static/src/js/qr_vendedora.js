@@ -37,7 +37,7 @@ patch(PaymentScreen.prototype, {
         }
 
         // 🔹 Asignamos a la orden
-        this.currentOrder.vendedora_id = result.id;
+        this.currentOrder.set('vendedora_id', result.id);
         this.currentOrder.vendedora_name = result.name;
 
         return super.validateOrder(isForceValidate);
@@ -49,21 +49,18 @@ patch(Order.prototype, {
 
     setup() {
         super.setup(...arguments);
-        this.vendedora_id = null;
+        this.vendedora_id = this.get('vendedora_id') || null;
     },
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
-
-        // 🔥 Esto es lo que realmente guarda en backend
-        json.vendedora_id = this.vendedora_id;
-
+        json.vendedora_id = this.get('vendedora_id');
         return json;
     },
 
     init_from_JSON(json) {
         super.init_from_JSON(...arguments);
-        this.vendedora_id = json.vendedora_id || null;
+        this.set('vendedora_id', json.vendedora_id || null);
     },
 
 });
