@@ -105,4 +105,12 @@ patch(Orderline.prototype, {
         this.gramos = json.gramos || "";
         this.descripcion_personalizada = json.descripcion_personalizada || "";
     },
+
+    export_for_printing() {
+        const line = super.export_for_printing(...arguments);
+        line.gramos = this.gramos || "";
+        line.descripcion_personalizada = this.descripcion_personalizada || "";
+        return line;
+    },
+
 });
