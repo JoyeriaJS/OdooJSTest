@@ -12,7 +12,7 @@ patch(ProductScreen.prototype, {
     async addProductToCurrentOrder(product, options = {}) {
 
         // 🔵 PRODUCTO NO INVENTARIADO
-        if (product.display_name === "Producto No Inventariado") {
+        if (product.name === "Producto No Inventariado") {
 
             const gramos = await this.popup.add(NumberPopup, {
                 title: "Ingrese gramos",
@@ -64,7 +64,7 @@ patch(ProductScreen.prototype, {
         }
 
         // 🔴 PRODUCTO RMA
-        if (product.display_name === "Producto RMA") {
+        if (product.name === "Producto RMA") {
 
             const precio = await this.popup.add(NumberPopup, {
                 title: "Ingrese precio RMA",
