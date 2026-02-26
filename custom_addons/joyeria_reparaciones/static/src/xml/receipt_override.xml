@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
 
-    <!-- HEADER -->
+    <!-- HEADER (el que ya funciona) -->
     <t t-inherit="point_of_sale.ReceiptHeader"
        t-inherit-mode="extension">
 
@@ -28,23 +28,23 @@
     </t>
 
 
-    <!-- LINEAS DEL TICKET -->
-    <t t-inherit="point_of_sale.OrderlineReceipt"
+    <!-- EXTENSION SEGURA SOBRE RECEIPT -->
+    <t t-inherit="point_of_sale.Receipt"
        t-inherit-mode="extension">
 
-        <xpath expr="//div[contains(@class,'product-name')]" position="after">
+        <xpath expr="//t[@t-foreach='props.data.orderlines']" position="inside">
 
-            <t t-if="props.line.gramos">
-                <div style="font-size:12px; margin-left:10px;">
+            <t t-if="line.gramos">
+                <div style="font-size:12px; margin-left:15px;">
                     <strong>Gramos:</strong>
-                    <t t-esc="props.line.gramos"/>
+                    <t t-esc="line.gramos"/>
                 </div>
             </t>
 
-            <t t-if="props.line.descripcion_personalizada">
-                <div style="font-size:12px; margin-left:10px;">
+            <t t-if="line.descripcion_personalizada">
+                <div style="font-size:12px; margin-left:15px;">
                     <strong>Detalle:</strong>
-                    <t t-esc="props.line.descripcion_personalizada"/>
+                    <t t-esc="line.descripcion_personalizada"/>
                 </div>
             </t>
 
