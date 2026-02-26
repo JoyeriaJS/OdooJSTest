@@ -11,23 +11,13 @@ class PosOrderLine(models.Model):
     def _order_line_fields(self, line, session_id=None):
         result = super()._order_line_fields(line, session_id)
 
-        values = {}
-
-        # Caso 1: viene como [0, 0, {...}]
-        if isinstance(line, (list, tuple)):
-            if len(line) >= 3 and isinstance(line[2], dict):
-                values = line[2]
-
-        # Caso 2: viene como dict directo
-        elif isinstance(line, dict):
-            values = line
-
-        # Solo asignamos si realmente es dict
-        if isinstance(values, dict):
-            result['gramos'] = values.get('gramos', False)
-            result['descripcion_personalizada'] = values.get('descripcion_personalizada', False)
+        # 🔥 Solo si viene en formato ORM estándar
+        if isinstance(line, (list, tuple)) and len(line) >= 3:
+            values = line[2]
+            if isinstance(values, dict):
+                result.update({
+                    'gramos': values.get('gramos'),
+                    'descripcion_personalizada': values.get('descripcion_personalizada'),
+                })
 
         return result
-    
-
-    
