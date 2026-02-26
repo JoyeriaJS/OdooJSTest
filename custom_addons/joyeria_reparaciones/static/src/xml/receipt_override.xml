@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
 
+    <!-- ============================= -->
+    <!-- HEADER - VENDEDORA (ORIGINAL) -->
+    <!-- ============================= -->
     <t t-inherit="point_of_sale.ReceiptHeader"
        t-inherit-mode="extension">
 
-        <!-- Reemplazamos completamente el cashier -->
         <xpath expr="//div[contains(@class,'cashier')]" position="replace">
 
             <div class="cashier">
@@ -24,6 +26,33 @@
                 </t>
 
             </div>
+
+        </xpath>
+
+    </t>
+
+
+    <!-- ====================================== -->
+    <!-- AGREGAR GRAMOS Y DESCRIPCION POR LINEA -->
+    <!-- ====================================== -->
+    <t t-inherit="point_of_sale.Orderline"
+       t-inherit-mode="extension">
+
+        <xpath expr="//div[contains(@class,'product-name')]" position="after">
+
+            <t t-if="props.line.gramos">
+                <div style="font-size:12px; margin-left:10px;">
+                    <strong>Gramos:</strong>
+                    <t t-esc="props.line.gramos"/>
+                </div>
+            </t>
+
+            <t t-if="props.line.descripcion_personalizada">
+                <div style="font-size:12px; margin-left:10px;">
+                    <strong>Detalle:</strong>
+                    <t t-esc="props.line.descripcion_personalizada"/>
+                </div>
+            </t>
 
         </xpath>
 
