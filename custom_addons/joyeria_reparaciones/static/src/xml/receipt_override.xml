@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
 
-    <!-- HEADER (el que ya funciona) -->
-    <t t-inherit="point_of_sale.ReceiptHeader"
+    <!-- HEADER (este ya te funciona) -->
+    <t t-name="joyeria_reparaciones.ReceiptHeaderExtension"
+       t-inherit="point_of_sale.ReceiptHeader"
        t-inherit-mode="extension">
 
         <xpath expr="//div[contains(@class,'cashier')]" position="replace">
@@ -28,8 +29,9 @@
     </t>
 
 
-    <!-- EXTENSION SEGURA SOBRE RECEIPT -->
-    <t t-inherit="point_of_sale.Receipt"
+    <!-- LINEAS DEL TICKET -->
+    <t t-name="joyeria_reparaciones.OrderReceiptExtension"
+       t-inherit="point_of_sale.OrderReceipt"
        t-inherit-mode="extension">
 
         <xpath expr="//t[@t-foreach='props.data.orderlines']" position="inside">
