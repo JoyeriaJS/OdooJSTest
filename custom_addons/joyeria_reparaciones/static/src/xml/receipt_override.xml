@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
 
-    <!-- ================================= -->
-    <!-- HEADER - VENDEDORA (YA FUNCIONAL) -->
-    <!-- ================================= -->
+    <!-- HEADER -->
     <t t-inherit="point_of_sale.ReceiptHeader"
        t-inherit-mode="extension">
 
         <xpath expr="//div[contains(@class,'cashier')]" position="replace">
-
             <div class="cashier">
 
                 <t t-if="props.data.vendedora_name">
@@ -26,16 +23,13 @@
                 </t>
 
             </div>
-
         </xpath>
 
     </t>
 
 
-    <!-- ======================================= -->
-    <!-- AGREGAR GRAMOS Y DETALLE EN CADA LINEA -->
-    <!-- ======================================= -->
-    <t t-inherit="point_of_sale.Orderline"
+    <!-- LINEAS DEL TICKET -->
+    <t t-inherit="point_of_sale.OrderlineReceipt"
        t-inherit-mode="extension">
 
         <xpath expr="//div[contains(@class,'product-name')]" position="after">
