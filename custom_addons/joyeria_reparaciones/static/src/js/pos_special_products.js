@@ -5,11 +5,11 @@ import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product
 import { TextInputPopup } from "@point_of_sale/app/utils/input_popups/text_input_popup";
 import { NumberPopup } from "@point_of_sale/app/utils/input_popups/number_popup";
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
-import { Orderline } from "@point_of_sale/app/store/models";
 
 patch(ProductScreen.prototype, {
 
-    async addProductToCurrentOrder(product, options = {}) {
+    async _onClickProduct(event) {
+        const product = event.detail;
 
         // 🔵 PRODUCTO NO INVENTARIADO
         if (product.name === "Producto No Inventariado") {
@@ -87,26 +87,6 @@ patch(ProductScreen.prototype, {
             return;
         }
 
-        return super.addProductToCurrentOrder(product, options);
+        return super._onClickProduct(event);
     },
-});
-
-
-/* 🔥 EXTENSIÓN DE ORDERLINE PARA GUARDAR DATOS */
-
-patch(Orderline.prototype, {
-
-    export_as_JSON() {
-        const json = super.export_as_JSON(...arguments);
-        json.gramos = this.gramos || "";
-        json.descripcion_personalizada = this.descripcion_personalizada || "";
-        return json;
-    },
-
-    init_from_JSON(json) {
-        super.init_from_JSON(...arguments);
-        this.gramos = json.gramos || "";
-        this.descripcion_personalizada = json.descripcion_personalizada || "";
-    },
-
 });
