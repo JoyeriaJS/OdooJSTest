@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
 
-    <!-- HEADER (este ya te funciona) -->
-    <t t-name="joyeria_reparaciones.ReceiptHeaderExtension"
-       t-inherit="point_of_sale.ReceiptHeader"
+    <!-- HEADER (EL TUYO - NO TOCAR) -->
+    <t t-inherit="point_of_sale.ReceiptHeader"
        t-inherit-mode="extension">
 
         <xpath expr="//div[contains(@class,'cashier')]" position="replace">
+
             <div class="cashier">
 
                 <t t-if="props.data.vendedora_name">
@@ -24,29 +24,29 @@
                 </t>
 
             </div>
+
         </xpath>
 
     </t>
 
 
-    <!-- LINEAS DEL TICKET -->
-    <t t-name="joyeria_reparaciones.OrderReceiptExtension"
-       t-inherit="point_of_sale.OrderReceipt"
+    <!-- EXTENSIÓN DE CADA LÍNEA DEL TICKET -->
+    <t t-inherit="point_of_sale.Orderline"
        t-inherit-mode="extension">
 
-        <xpath expr="//t[@t-foreach='props.data.orderlines']" position="inside">
+        <xpath expr="//div[contains(@class,'info')]" position="inside">
 
-            <t t-if="line.gramos">
-                <div style="font-size:12px; margin-left:15px;">
+            <t t-if="props.line.gramos">
+                <div style="font-size:12px;">
                     <strong>Gramos:</strong>
-                    <t t-esc="line.gramos"/>
+                    <t t-esc="props.line.gramos"/>
                 </div>
             </t>
 
-            <t t-if="line.descripcion_personalizada">
-                <div style="font-size:12px; margin-left:15px;">
+            <t t-if="props.line.descripcion_personalizada">
+                <div style="font-size:12px;">
                     <strong>Detalle:</strong>
-                    <t t-esc="line.descripcion_personalizada"/>
+                    <t t-esc="props.line.descripcion_personalizada"/>
                 </div>
             </t>
 
