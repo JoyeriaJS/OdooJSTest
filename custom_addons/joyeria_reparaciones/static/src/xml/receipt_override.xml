@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
 
-    <!-- ============================= -->
-    <!-- HEADER - VENDEDORA (YA TENIAS) -->
-    <!-- ============================= -->
     <t t-inherit="point_of_sale.ReceiptHeader"
        t-inherit-mode="extension">
 
@@ -27,33 +24,6 @@
                 </t>
 
             </div>
-
-        </xpath>
-
-    </t>
-
-
-    <!-- ====================================== -->
-    <!-- AGREGAR GRAMOS Y DESCRIPCION AL TICKET -->
-    <!-- ====================================== -->
-    <t t-inherit="point_of_sale.OrderReceipt"
-       t-inherit-mode="extension">
-
-        <xpath expr="//t[@t-foreach='receipt.orderlines']" position="inside">
-
-            <t t-if="line.gramos">
-                <div style="margin-left:10px; font-size:12px;">
-                    <strong>Gramos:</strong>
-                    <t t-esc="line.gramos"/>
-                </div>
-            </t>
-
-            <t t-if="line.descripcion_personalizada">
-                <div style="margin-left:10px; font-size:12px;">
-                    <strong>Detalle:</strong>
-                    <t t-esc="line.descripcion_personalizada"/>
-                </div>
-            </t>
 
         </xpath>
 
