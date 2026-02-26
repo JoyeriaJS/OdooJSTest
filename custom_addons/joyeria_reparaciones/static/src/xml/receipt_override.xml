@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
 
-    <!-- ============================= -->
-    <!-- HEADER - VENDEDORA (ORIGINAL) -->
-    <!-- ============================= -->
+    <!-- ================================= -->
+    <!-- HEADER - VENDEDORA (YA FUNCIONAL) -->
+    <!-- ================================= -->
     <t t-inherit="point_of_sale.ReceiptHeader"
        t-inherit-mode="extension">
 
@@ -32,9 +32,9 @@
     </t>
 
 
-    <!-- ====================================== -->
-    <!-- AGREGAR GRAMOS Y DESCRIPCION POR LINEA -->
-    <!-- ====================================== -->
+    <!-- ======================================= -->
+    <!-- AGREGAR GRAMOS Y DETALLE EN CADA LINEA -->
+    <!-- ======================================= -->
     <t t-inherit="point_of_sale.Orderline"
        t-inherit-mode="extension">
 
