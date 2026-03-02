@@ -205,49 +205,6 @@ class Reparacion(models.Model):
     cobros_extras = fields.Float("Cobros extras")
     total_salida_taller = fields.Float("Total salida del taller", compute="_compute_total_salida", store=True)
     peso_total = fields.Float("Peso total", compute="_compute_peso_total", store=True)
-    # ===============================
-    # PLATA
-    # ===============================
-
-    plata_diseno = fields.Boolean("Diseño")
-    plata_casting = fields.Boolean("Casting")
-    plata_piedras = fields.Boolean("Piedras")
-    plata_cantidad_piedras = fields.Integer("Cantidad de Piedras")
-    plata_total = fields.Float("Total Plata", compute="_compute_totales", store=True)
-
-
-    # ===============================
-    # ORO AMARILLO
-    # ===============================
-
-    oro_amarillo_diseno = fields.Boolean("Diseño")
-    oro_amarillo_casting = fields.Boolean("Casting")
-    oro_amarillo_piedras = fields.Boolean("Piedras")
-    oro_amarillo_cantidad_piedras = fields.Integer("Cantidad de Piedras")
-    oro_amarillo_total = fields.Float("Total Oro Amarillo", compute="_compute_totales", store=True)
-
-
-    # ===============================
-    # ORO ROSADO
-    # ===============================
-
-    oro_rosado_diseno = fields.Boolean("Diseño")
-    oro_rosado_casting = fields.Boolean("Casting")
-    oro_rosado_piedras = fields.Boolean("Piedras")
-    oro_rosado_cantidad_piedras = fields.Integer("Cantidad de Piedras")
-    oro_rosado_total = fields.Float("Total Oro Rosado", compute="_compute_totales", store=True)
-
-
-    # ===============================
-    # OTROS METALES
-    # ===============================
-
-    otros_casting = fields.Boolean("Casting")
-    otros_piedras = fields.Boolean("Piedras")
-    otros_cantidad_piedras = fields.Integer("Cantidad de Piedras")
-    otros_total = fields.Float("Total Otros", compute="_compute_totales", store=True)
-        
-        
 
 
     #firma_salida_id = fields.Many2one('joyeria.vendedora', string="Firma salida del taller", readonly=True)
@@ -255,55 +212,6 @@ class Reparacion(models.Model):
     firma_id = fields.Many2one('joyeria.vendedora', string='Retirado por', readonly=True, tracking=True)
     fecha_firma = fields.Datetime(string='Fecha de firma', readonly=True)
     clave_firma_manual = fields.Char(string='QR de quien retira')
-
-    @api.depends('plata_diseno','plata_casting','plata_piedras','plata_cantidad_piedras')
-    def _compute_total_plata(self):
-        for r in self:
-            total = 0
-            if r.plata_diseno:
-                total += 4000
-            if r.plata_casting:
-                total += 4000
-            if r.plata_piedras:
-                total += r.plata_cantidad_piedras * 300
-            r.plata_total = total
-
-
-    @api.depends('oro_amarillo_diseno','oro_amarillo_casting','oro_amarillo_piedras','oro_amarillo_cantidad_piedras')
-    def _compute_total_oro_amarillo(self):
-        for r in self:
-            total = 0
-            if r.oro_amarillo_diseno:
-                total += 4000
-            if r.oro_amarillo_casting:
-                total += 4000
-            if r.oro_amarillo_piedras:
-                total += r.oro_amarillo_cantidad_piedras * 300
-            r.oro_amarillo_total = total
-
-
-    @api.depends('oro_rosado_diseno','oro_rosado_casting','oro_rosado_piedras','oro_rosado_cantidad_piedras')
-    def _compute_total_oro_rosado(self):
-        for r in self:
-            total = 0
-            if r.oro_rosado_diseno:
-                total += 4000
-            if r.oro_rosado_casting:
-                total += 4000
-            if r.oro_rosado_piedras:
-                total += r.oro_rosado_cantidad_piedras * 300
-            r.oro_rosado_total = total
-
-
-    @api.depends('otros_casting','otros_piedras','otros_cantidad_piedras')
-    def _compute_total_otros(self):
-        for r in self:
-            total = 0
-            if r.otros_casting:
-                total += 4000
-            if r.otros_piedras:
-                total += r.otros_cantidad_piedras * 300
-            r.otros_total = total
 
     @api.depends('precio_unitario', 'extra', 'extra2', 'extra3', 'abono', 'saldo')
     def _compute_requiere_autorizacion(self):
