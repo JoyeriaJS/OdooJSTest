@@ -43,63 +43,89 @@
                         <!-- ========================== -->
 
                         <!-- PLATA -->
-                        <group string="Configuración Plata"
-                            groups="base.group_system"
-                            visibility_condition="metal_utilizado == 'plata'">
+                        <group string="Configuración Plata" groups="base.group_system">
 
-                            <field name="plata_diseno"/>
-                            <field name="plata_casting"/>
-                            <field name="plata_piedras"/>
-                            <field name="plata_cantidad_piedras"/>
+                            <field name="plata_diseno"
+                                visibility_condition="metal_utilizado == 'plata'"/>
+
+                            <field name="plata_casting"
+                                visibility_condition="metal_utilizado == 'plata'"/>
+
+                            <field name="plata_piedras"
+                                visibility_condition="metal_utilizado == 'plata'"/>
+
+                            <field name="plata_cantidad_piedras"
+                                visibility_condition="metal_utilizado == 'plata'"/>
+
                             <field name="plata_total"
                                 readonly="1"
+                                visibility_condition="metal_utilizado == 'plata'"
                                 style="background-color:#fff8b3; font-weight:bold;"/>
 
                         </group>
 
 
                         <!-- ORO AMARILLO -->
-                        <group string="Configuración Oro Amarillo"
-                            groups="base.group_system"
-                            visibility_condition="metal_utilizado == 'oro 18k amarillo'">
+                        <group string="Configuración Oro Amarillo" groups="base.group_system">
 
-                            <field name="oro_amarillo_diseno"/>
-                            <field name="oro_amarillo_casting"/>
-                            <field name="oro_amarillo_piedras"/>
-                            <field name="oro_amarillo_cantidad_piedras"/>
+                            <field name="oro_amarillo_diseno"
+                                visibility_condition="metal_utilizado == 'oro_18k_amarillo'"/>
+
+                            <field name="oro_amarillo_casting"
+                                visibility_condition="metal_utilizado == 'oro_18k_amarillo'"/>
+
+                            <field name="oro_amarillo_piedras"
+                                visibility_condition="metal_utilizado == 'oro_18k_amarillo'"/>
+
+                            <field name="oro_amarillo_cantidad_piedras"
+                                visibility_condition="metal_utilizado == 'oro_18k_amarillo'"/>
+
                             <field name="oro_amarillo_total"
                                 readonly="1"
+                                visibility_condition="metal_utilizado == 'oro_18k_amarillo'"
                                 style="background-color:#fff8b3; font-weight:bold;"/>
 
                         </group>
 
 
                         <!-- ORO ROSADO -->
-                        <group string="Configuración Oro Rosado"
-                            groups="base.group_system"
-                            visibility_condition="metal_utilizado == 'oro 18k rosado'">
+                        <group string="Configuración Oro Rosado" groups="base.group_system">
 
-                            <field name="oro_rosado_diseno"/>
-                            <field name="oro_rosado_casting"/>
-                            <field name="oro_rosado_piedras"/>
-                            <field name="oro_rosado_cantidad_piedras"/>
+                            <field name="oro_rosado_diseno"
+                                visibility_condition="metal_utilizado == 'oro_18k_rosado'"/>
+
+                            <field name="oro_rosado_casting"
+                                visibility_condition="metal_utilizado == 'oro_18k_rosado'"/>
+
+                            <field name="oro_rosado_piedras"
+                                visibility_condition="metal_utilizado == 'oro_18k_rosado'"/>
+
+                            <field name="oro_rosado_cantidad_piedras"
+                                visibility_condition="metal_utilizado == 'oro_18k_rosado'"/>
+
                             <field name="oro_rosado_total"
                                 readonly="1"
+                                visibility_condition="metal_utilizado == 'oro_18k_rosado'"
                                 style="background-color:#fff8b3; font-weight:bold;"/>
 
                         </group>
 
 
                         <!-- TODOS LOS DEMAS METALES -->
-                        <group string="Configuración Otros Metales"
-                            groups="base.group_system"
-                            visibility_condition="metal_utilizado not in ['plata','oro 18k amarillo','oro 18k rosado']">
+                        <group string="Configuración Otros Metales" groups="base.group_system">
 
-                            <field name="otros_casting"/>
-                            <field name="otros_piedras"/>
-                            <field name="otros_cantidad_piedras"/>
+                            <field name="otros_casting"
+                                visibility_condition="metal_utilizado not in ['plata','oro_18k_amarillo','oro_18k_rosado']"/>
+
+                            <field name="otros_piedras"
+                                visibility_condition="metal_utilizado not in ['plata','oro_18k_amarillo','oro_18k_rosado']"/>
+
+                            <field name="otros_cantidad_piedras"
+                                visibility_condition="metal_utilizado not in ['plata','oro_18k_amarillo','oro_18k_rosado']"/>
+
                             <field name="otros_total"
                                 readonly="1"
+                                visibility_condition="metal_utilizado not in ['plata','oro_18k_amarillo','oro_18k_rosado']"
                                 style="background-color:#fff8b3; font-weight:bold;"/>
 
                         </group>
