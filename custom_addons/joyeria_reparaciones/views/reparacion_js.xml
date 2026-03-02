@@ -47,7 +47,7 @@
                             groups="base.group_system"
                             visibility_condition="metal_utilizado == 'plata'">
 
-                            <field name="plata_diseño"/>
+                            <field name="plata_diseno"/>
                             <field name="plata_casting"/>
                             <field name="plata_piedras"/>
                             <field name="plata_cantidad_piedras"/>
@@ -63,7 +63,7 @@
                             groups="base.group_system"
                             visibility_condition="metal_utilizado == 'oro_18k_amarillo'">
 
-                            <field name="oro_amarillo_diseño"/>
+                            <field name="oro_amarillo_diseno"/>
                             <field name="oro_amarillo_casting"/>
                             <field name="oro_amarillo_piedras"/>
                             <field name="oro_amarillo_cantidad_piedras"/>
@@ -79,7 +79,7 @@
                             groups="base.group_system"
                             visibility_condition="metal_utilizado == 'oro_18k_rosado'">
 
-                            <field name="oro_rosado_diseño"/>
+                            <field name="oro_rosado_diseno"/>
                             <field name="oro_rosado_casting"/>
                             <field name="oro_rosado_piedras"/>
                             <field name="oro_rosado_cantidad_piedras"/>

@@ -209,7 +209,7 @@ class Reparacion(models.Model):
     # PLATA
     # ===============================
 
-    plata_diseño = fields.Boolean("Diseño")
+    plata_diseno = fields.Boolean("Diseño")
     plata_casting = fields.Boolean("Casting")
     plata_piedras = fields.Boolean("Piedras")
     plata_cantidad_piedras = fields.Integer("Cantidad de Piedras")
@@ -220,7 +220,7 @@ class Reparacion(models.Model):
     # ORO AMARILLO
     # ===============================
 
-    oro_amarillo_diseño = fields.Boolean("Diseño")
+    oro_amarillo_diseno = fields.Boolean("Diseño")
     oro_amarillo_casting = fields.Boolean("Casting")
     oro_amarillo_piedras = fields.Boolean("Piedras")
     oro_amarillo_cantidad_piedras = fields.Integer("Cantidad de Piedras")
@@ -231,7 +231,7 @@ class Reparacion(models.Model):
     # ORO ROSADO
     # ===============================
 
-    oro_rosado_diseño = fields.Boolean("Diseño")
+    oro_rosado_diseno = fields.Boolean("Diseño")
     oro_rosado_casting = fields.Boolean("Casting")
     oro_rosado_piedras = fields.Boolean("Piedras")
     oro_rosado_cantidad_piedras = fields.Integer("Cantidad de Piedras")
