@@ -84,6 +84,15 @@
                         <!-- Datos Financieros -->
                         <group string="Datos Financieros" col="2">
                             <field name="precio_unitario"/>
+                            <separator string="Operaciones de taller"/>
+                            <field name="casting"/>
+                            <field name="precio_casting" readonly="1"/>
+
+                            <field name="diseno"/>
+                            <field name="precio_diseno" readonly="1"/>
+
+                            <field name="piedras"/>
+                            <field name="precio_piedras" readonly="1"/>
                             <field name="extra"/>
                             <field name="extra2"/>
                             <field name="extra3"/>
