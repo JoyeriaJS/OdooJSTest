@@ -205,39 +205,17 @@ class Reparacion(models.Model):
     cobros_extras = fields.Float("Cobros extras")
     total_salida_taller = fields.Float("Total salida del taller", compute="_compute_total_salida", store=True)
     peso_total = fields.Float("Peso total", compute="_compute_peso_total", store=True)
-    # ==========================================
-    # OPCIONES DE OPERACIONES AUTOMÁTICAS
-    # ==========================================
 
-    casting = fields.Selection([
-        ('no', 'No'),
-        ('si', 'Sí')
-    ], string="Casting", default='no')
+    
+    # OPCIONES METAL
 
-    diseno = fields.Selection([
-        ('no', 'No'),
-        ('si', 'Sí')
-    ], string="Diseño", default='no')
+    plata_diseno = fields.Boolean("Diseño (+2000)")
+    plata_piedras = fields.Integer("Cantidad de piedras")
 
-    piedras = fields.Integer(string="Cantidad de piedras")
+    oro_rosado_diseno = fields.Boolean("Diseño (+4000)")
+    oro_amarillo_diseno = fields.Boolean("Diseño (+4000)")
 
-    precio_casting = fields.Float(
-        string="Precio Casting",
-        compute="_compute_precios_operaciones",
-        store=True
-    )
-
-    precio_diseno = fields.Float(
-        string="Precio Diseño",
-        compute="_compute_precios_operaciones",
-        store=True
-    )
-
-    precio_piedras = fields.Float(
-        string="Precio Piedras",
-        compute="_compute_precios_operaciones",
-        store=True
-    )
+    otros_diseno = fields.Boolean("Diseño")
 
 
     #firma_salida_id = fields.Many2one('joyeria.vendedora', string="Firma salida del taller", readonly=True)
@@ -245,29 +223,6 @@ class Reparacion(models.Model):
     firma_id = fields.Many2one('joyeria.vendedora', string='Retirado por', readonly=True, tracking=True)
     fecha_firma = fields.Datetime(string='Fecha de firma', readonly=True)
     clave_firma_manual = fields.Char(string='QR de quien retira')
-
-    @api.depends('casting','diseno','piedras','metal')
-    def _compute_precios_operaciones(self):
-        for rec in self:
-
-            rec.precio_casting = 0
-            rec.precio_diseno = 0
-            rec.precio_piedras = 0
-
-            # CASTING
-            if rec.casting == 'si':
-                rec.precio_casting = 0
-
-            # DISEÑO
-            if rec.diseno == 'si':
-                rec.precio_diseno = 4000
-
-            # PIEDRAS
-            if rec.piedras:
-                if rec.metal == 'plata':
-                    rec.precio_piedras = rec.piedras * 300
-                else:
-                    rec.precio_piedras = rec.piedras * 300
 
     @api.depends('precio_unitario', 'extra', 'extra2', 'extra3', 'abono', 'saldo')
     def _compute_requiere_autorizacion(self):
@@ -482,34 +437,10 @@ class Reparacion(models.Model):
             if not self.env.user.has_group('joyeria_reparaciones.grupo_gestion_estado_reparacion'):
                 rec.estado = rec.estado  # No cambia el valor, pero evita la edición
 
-    @api.depends(
-    'cantidad',
-    'precio_unitario',
-    'extra',
-    'extra2',
-    'extra3',
-    'precio_casting',
-    'precio_diseno',
-    'precio_piedras'
-    )
+    @api.depends('cantidad', 'precio_unitario', 'extra', 'extra2', 'extra3')
     def _compute_subtotal(self):
         for rec in self:
-
-            base = rec.cantidad * rec.precio_unitario
-
-            extras = (
-                (rec.extra or 0) +
-                (rec.extra2 or 0) +
-                (rec.extra3 or 0)
-            )
-
-            operaciones = (
-                (rec.precio_casting or 0) +
-                (rec.precio_diseno or 0) +
-                (rec.precio_piedras or 0)
-            )
-
-            rec.subtotal = base + extras + operaciones
+            rec.subtotal = rec.cantidad * rec.precio_unitario + rec.extra + rec.extra2 + rec.extra3
 
     @api.depends('subtotal', 'abono')
     def _compute_saldo(self):
@@ -530,10 +461,35 @@ class Reparacion(models.Model):
          #       raise ValidationError("Debe ingresar un valor para el peso si selecciona tipo 'Especial'.")
         #return super().write(vals)
 
-    @api.depends('cobro_interno', 'hechura', 'cobros_extras')
+    @api.depends(
+    'cobro_interno',
+    'hechura',
+    'cobros_extras',
+    'plata_diseno',
+    'plata_piedras',
+    'oro_rosado_diseno',
+    'oro_amarillo_diseno'
+    )
     def _compute_total_salida(self):
         for rec in self:
-            rec.total_salida_taller = (rec.cobro_interno or 0) + (rec.hechura or 0) + (rec.cobros_extras or 0)
+
+            total = (rec.cobro_interno or 0) + (rec.hechura or 0) + (rec.cobros_extras or 0)
+
+            # PLATA
+            if rec.plata_diseno:
+                total += 2000
+
+            if rec.plata_piedras:
+                total += rec.plata_piedras * 300
+
+            # ORO
+            if rec.oro_rosado_diseno:
+                total += 4000
+
+            if rec.oro_amarillo_diseno:
+                total += 4000
+
+            rec.total_salida_taller = total
 
     @api.onchange('clave_firma_manual')
     def _onchange_clave_firma_manual(self):
