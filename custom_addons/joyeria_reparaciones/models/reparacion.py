@@ -257,9 +257,9 @@ class Reparacion(models.Model):
     clave_firma_manual = fields.Char(string='QR de quien retira')
 
     @api.depends(
-    'plata_diseño','plata_casting','plata_piedras','plata_cantidad_piedras',
-    'oro_amarillo_diseño','oro_amarillo_casting','oro_amarillo_piedras','oro_amarillo_cantidad_piedras',
-    'oro_rosado_diseño','oro_rosado_casting','oro_rosado_piedras','oro_rosado_cantidad_piedras',
+    'plata_diseno','plata_casting','plata_piedras','plata_cantidad_piedras',
+    'oro_amarillo_diseno','oro_amarillo_casting','oro_amarillo_piedras','oro_amarillo_cantidad_piedras',
+    'oro_rosado_diseno','oro_rosado_casting','oro_rosado_piedras','oro_rosado_cantidad_piedras',
     'otros_casting','otros_piedras','otros_cantidad_piedras'
     )
     def _compute_totales(self):
@@ -268,7 +268,7 @@ class Reparacion(models.Model):
 
             # PLATA
             total_plata = 0
-            if rec.plata_diseño:
+            if rec.plata_diseno:
                 total_plata += 2000
             if rec.plata_casting:
                 total_plata += 4000
@@ -280,7 +280,7 @@ class Reparacion(models.Model):
 
             # ORO AMARILLO
             total_oro_amarillo = 0
-            if rec.oro_amarillo_diseño:
+            if rec.oro_amarillo_diseno:
                 total_oro_amarillo += 4000
             if rec.oro_amarillo_casting:
                 total_oro_amarillo += 4000
@@ -292,7 +292,7 @@ class Reparacion(models.Model):
 
             # ORO ROSADO
             total_oro_rosado = 0
-            if rec.oro_rosado_diseño:
+            if rec.oro_rosado_diseno:
                 total_oro_rosado += 4000
             if rec.oro_rosado_casting:
                 total_oro_rosado += 4000
