@@ -45,7 +45,7 @@
                         <!-- PLATA -->
                         <group string="Configuración Plata"
                             groups="base.group_system"
-                            visibility_condition="metal_utilizado == 'Plata'">
+                            visibility_condition="metal_utilizado == 'plata'">
 
                             <field name="plata_diseno"/>
                             <field name="plata_casting"/>
@@ -61,7 +61,7 @@
                         <!-- ORO AMARILLO -->
                         <group string="Configuración Oro Amarillo"
                             groups="base.group_system"
-                            visibility_condition="metal_utilizado == 'Oro 18K Amarillo'">
+                            visibility_condition="metal_utilizado == 'oro 18k amarillo'">
 
                             <field name="oro_amarillo_diseno"/>
                             <field name="oro_amarillo_casting"/>
@@ -77,7 +77,7 @@
                         <!-- ORO ROSADO -->
                         <group string="Configuración Oro Rosado"
                             groups="base.group_system"
-                            visibility_condition="metal_utilizado == 'Oro 18K Rosado'">
+                            visibility_condition="metal_utilizado == 'oro 18k rosado'">
 
                             <field name="oro_rosado_diseno"/>
                             <field name="oro_rosado_casting"/>
@@ -93,7 +93,7 @@
                         <!-- TODOS LOS DEMAS METALES -->
                         <group string="Configuración Otros Metales"
                             groups="base.group_system"
-                            visibility_condition="metal_utilizado not in ['Plata','Oro 18K Amarillo','Oro 18K Rosado']">
+                            visibility_condition="metal_utilizado not in ['plata','oro 18k amarillo','oro 18k rosado']">
 
                             <field name="otros_casting"/>
                             <field name="otros_piedras"/>
