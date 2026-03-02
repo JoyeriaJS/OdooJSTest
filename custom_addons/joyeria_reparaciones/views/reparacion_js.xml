@@ -40,8 +40,10 @@
                         <field name="metal_utilizado" groups="base.group_system"/>
 
                         <!-- PLATA -->
+                        <!-- PLATA -->
                         <group string="Configuración Plata"
-                        visibility_condition="metal_utilizado == 'plata'">
+                            groups="base.group_system"
+                            invisible="metal_utilizado != 'plata'">
 
                             <field name="plata_diseno"/>
                             <field name="plata_casting"/>
@@ -54,7 +56,8 @@
 
                         <!-- ORO AMARILLO -->
                         <group string="Configuración Oro Amarillo"
-                        visibility_condition="metal_utilizado == 'oro 18k amarillo'">
+                            groups="base.group_system"
+                            invisible="metal_utilizado != 'oro 18k amarillo'">
 
                             <field name="oro_amarillo_diseno"/>
                             <field name="oro_amarillo_casting"/>
@@ -67,7 +70,8 @@
 
                         <!-- ORO ROSADO -->
                         <group string="Configuración Oro Rosado"
-                        visibility_condition="metal_utilizado == 'oro 18k rosado'">
+                            groups="base.group_system"
+                            invisible="metal_utilizado != 'oro 18k rosado'">
 
                             <field name="oro_rosado_diseno"/>
                             <field name="oro_rosado_casting"/>
@@ -80,7 +84,8 @@
 
                         <!-- OTROS METALES -->
                         <group string="Configuración Otros Metales"
-                        visibility_condition="metal_utilizado not in ['plata','oro 18k amarillo','oro 18k rosado']">
+                            groups="base.group_system"
+                            invisible="metal_utilizado in ['plata','oro 18k amarillo','oro 18k rosado']">
 
                             <field name="otros_casting"/>
                             <field name="otros_piedras"/>
