@@ -256,60 +256,54 @@ class Reparacion(models.Model):
     fecha_firma = fields.Datetime(string='Fecha de firma', readonly=True)
     clave_firma_manual = fields.Char(string='QR de quien retira')
 
-    @api.depends(
-    'plata_diseno','plata_casting','plata_piedras','plata_cantidad_piedras',
-    'oro_amarillo_diseno','oro_amarillo_casting','oro_amarillo_piedras','oro_amarillo_cantidad_piedras',
-    'oro_rosado_diseno','oro_rosado_casting','oro_rosado_piedras','oro_rosado_cantidad_piedras',
-    'otros_casting','otros_piedras','otros_cantidad_piedras'
-    )
-    def _compute_totales(self):
-
-        for rec in self:
-
-            # PLATA
-            total_plata = 0
-            if rec.plata_diseno:
-                total_plata += 2000
-            if rec.plata_casting:
-                total_plata += 4000
-            if rec.plata_piedras:
-                total_plata += rec.plata_cantidad_piedras * 300
-
-            rec.plata_total = total_plata
+    @api.depends('plata_diseno','plata_casting','plata_piedras','plata_cantidad_piedras')
+    def _compute_total_plata(self):
+        for r in self:
+            total = 0
+            if r.plata_diseno:
+                total += 4000
+            if r.plata_casting:
+                total += 4000
+            if r.plata_piedras:
+                total += r.plata_cantidad_piedras * 300
+            r.plata_total = total
 
 
-            # ORO AMARILLO
-            total_oro_amarillo = 0
-            if rec.oro_amarillo_diseno:
-                total_oro_amarillo += 4000
-            if rec.oro_amarillo_casting:
-                total_oro_amarillo += 4000
-            if rec.oro_amarillo_piedras:
-                total_oro_amarillo += rec.oro_amarillo_cantidad_piedras * 300
-
-            rec.oro_amarillo_total = total_oro_amarillo
-
-
-            # ORO ROSADO
-            total_oro_rosado = 0
-            if rec.oro_rosado_diseno:
-                total_oro_rosado += 4000
-            if rec.oro_rosado_casting:
-                total_oro_rosado += 4000
-            if rec.oro_rosado_piedras:
-                total_oro_rosado += rec.oro_rosado_cantidad_piedras * 300
-
-            rec.oro_rosado_total = total_oro_rosado
+    @api.depends('oro_amarillo_diseno','oro_amarillo_casting','oro_amarillo_piedras','oro_amarillo_cantidad_piedras')
+    def _compute_total_oro_amarillo(self):
+        for r in self:
+            total = 0
+            if r.oro_amarillo_diseno:
+                total += 4000
+            if r.oro_amarillo_casting:
+                total += 4000
+            if r.oro_amarillo_piedras:
+                total += r.oro_amarillo_cantidad_piedras * 300
+            r.oro_amarillo_total = total
 
 
-            # OTROS METALES
-            total_otros = 0
-            if rec.otros_casting:
-                total_otros += 4000
-            if rec.otros_piedras:
-                total_otros += rec.otros_cantidad_piedras * 300
+    @api.depends('oro_rosado_diseno','oro_rosado_casting','oro_rosado_piedras','oro_rosado_cantidad_piedras')
+    def _compute_total_oro_rosado(self):
+        for r in self:
+            total = 0
+            if r.oro_rosado_diseno:
+                total += 4000
+            if r.oro_rosado_casting:
+                total += 4000
+            if r.oro_rosado_piedras:
+                total += r.oro_rosado_cantidad_piedras * 300
+            r.oro_rosado_total = total
 
-            rec.otros_total = total_otros
+
+    @api.depends('otros_casting','otros_piedras','otros_cantidad_piedras')
+    def _compute_total_otros(self):
+        for r in self:
+            total = 0
+            if r.otros_casting:
+                total += 4000
+            if r.otros_piedras:
+                total += r.otros_cantidad_piedras * 300
+            r.otros_total = total
 
     @api.depends('precio_unitario', 'extra', 'extra2', 'extra3', 'abono', 'saldo')
     def _compute_requiere_autorizacion(self):
