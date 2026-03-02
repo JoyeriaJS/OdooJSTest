@@ -37,8 +37,7 @@
 
                         <!-- Datos de salida del taller -->
                         <group string="🔧 Datos de salida del taller" col="2" groups="base.group_system">
-                            <field name="metal_utilizado" groups="base.group_system"/>
-                            <field name="metal_utilizado" groups="base.group_system"/>
+                        <field name="metal_utilizado" groups="base.group_system"/>
 
                         <!-- PLATA -->
                         <group string="Configuración Plata"
