@@ -205,17 +205,49 @@ class Reparacion(models.Model):
     cobros_extras = fields.Float("Cobros extras")
     total_salida_taller = fields.Float("Total salida del taller", compute="_compute_total_salida", store=True)
     peso_total = fields.Float("Peso total", compute="_compute_peso_total", store=True)
+    # ===============================
+    # PLATA
+    # ===============================
 
-    
-    # OPCIONES METAL
+    plata_diseño = fields.Boolean("Diseño")
+    plata_casting = fields.Boolean("Casting")
+    plata_piedras = fields.Boolean("Piedras")
+    plata_cantidad_piedras = fields.Integer("Cantidad de Piedras")
+    plata_total = fields.Float("Total Plata", compute="_compute_totales", store=True)
 
-    plata_diseno = fields.Boolean("Diseño (+2000)")
-    plata_piedras = fields.Integer("Cantidad de piedras")
 
-    oro_rosado_diseno = fields.Boolean("Diseño (+4000)")
-    oro_amarillo_diseno = fields.Boolean("Diseño (+4000)")
+    # ===============================
+    # ORO AMARILLO
+    # ===============================
 
-    otros_diseno = fields.Boolean("Diseño")
+    oro_amarillo_diseño = fields.Boolean("Diseño")
+    oro_amarillo_casting = fields.Boolean("Casting")
+    oro_amarillo_piedras = fields.Boolean("Piedras")
+    oro_amarillo_cantidad_piedras = fields.Integer("Cantidad de Piedras")
+    oro_amarillo_total = fields.Float("Total Oro Amarillo", compute="_compute_totales", store=True)
+
+
+    # ===============================
+    # ORO ROSADO
+    # ===============================
+
+    oro_rosado_diseño = fields.Boolean("Diseño")
+    oro_rosado_casting = fields.Boolean("Casting")
+    oro_rosado_piedras = fields.Boolean("Piedras")
+    oro_rosado_cantidad_piedras = fields.Integer("Cantidad de Piedras")
+    oro_rosado_total = fields.Float("Total Oro Rosado", compute="_compute_totales", store=True)
+
+
+    # ===============================
+    # OTROS METALES
+    # ===============================
+
+    otros_casting = fields.Boolean("Casting")
+    otros_piedras = fields.Boolean("Piedras")
+    otros_cantidad_piedras = fields.Integer("Cantidad de Piedras")
+    otros_total = fields.Float("Total Otros", compute="_compute_totales", store=True)
+        
+        
 
 
     #firma_salida_id = fields.Many2one('joyeria.vendedora', string="Firma salida del taller", readonly=True)
@@ -223,6 +255,61 @@ class Reparacion(models.Model):
     firma_id = fields.Many2one('joyeria.vendedora', string='Retirado por', readonly=True, tracking=True)
     fecha_firma = fields.Datetime(string='Fecha de firma', readonly=True)
     clave_firma_manual = fields.Char(string='QR de quien retira')
+
+    @api.depends(
+    'plata_diseño','plata_casting','plata_piedras','plata_cantidad_piedras',
+    'oro_amarillo_diseño','oro_amarillo_casting','oro_amarillo_piedras','oro_amarillo_cantidad_piedras',
+    'oro_rosado_diseño','oro_rosado_casting','oro_rosado_piedras','oro_rosado_cantidad_piedras',
+    'otros_casting','otros_piedras','otros_cantidad_piedras'
+    )
+    def _compute_totales(self):
+
+        for rec in self:
+
+            # PLATA
+            total_plata = 0
+            if rec.plata_diseño:
+                total_plata += 2000
+            if rec.plata_casting:
+                total_plata += 4000
+            if rec.plata_piedras:
+                total_plata += rec.plata_cantidad_piedras * 300
+
+            rec.plata_total = total_plata
+
+
+            # ORO AMARILLO
+            total_oro_amarillo = 0
+            if rec.oro_amarillo_diseño:
+                total_oro_amarillo += 4000
+            if rec.oro_amarillo_casting:
+                total_oro_amarillo += 4000
+            if rec.oro_amarillo_piedras:
+                total_oro_amarillo += rec.oro_amarillo_cantidad_piedras * 300
+
+            rec.oro_amarillo_total = total_oro_amarillo
+
+
+            # ORO ROSADO
+            total_oro_rosado = 0
+            if rec.oro_rosado_diseño:
+                total_oro_rosado += 4000
+            if rec.oro_rosado_casting:
+                total_oro_rosado += 4000
+            if rec.oro_rosado_piedras:
+                total_oro_rosado += rec.oro_rosado_cantidad_piedras * 300
+
+            rec.oro_rosado_total = total_oro_rosado
+
+
+            # OTROS METALES
+            total_otros = 0
+            if rec.otros_casting:
+                total_otros += 4000
+            if rec.otros_piedras:
+                total_otros += rec.otros_cantidad_piedras * 300
+
+            rec.otros_total = total_otros
 
     @api.depends('precio_unitario', 'extra', 'extra2', 'extra3', 'abono', 'saldo')
     def _compute_requiere_autorizacion(self):
@@ -461,35 +548,10 @@ class Reparacion(models.Model):
          #       raise ValidationError("Debe ingresar un valor para el peso si selecciona tipo 'Especial'.")
         #return super().write(vals)
 
-    @api.depends(
-    'cobro_interno',
-    'hechura',
-    'cobros_extras',
-    'plata_diseno',
-    'plata_piedras',
-    'oro_rosado_diseno',
-    'oro_amarillo_diseno'
-    )
+    @api.depends('cobro_interno', 'hechura', 'cobros_extras')
     def _compute_total_salida(self):
         for rec in self:
-
-            total = (rec.cobro_interno or 0) + (rec.hechura or 0) + (rec.cobros_extras or 0)
-
-            # PLATA
-            if rec.plata_diseno:
-                total += 2000
-
-            if rec.plata_piedras:
-                total += rec.plata_piedras * 300
-
-            # ORO
-            if rec.oro_rosado_diseno:
-                total += 4000
-
-            if rec.oro_amarillo_diseno:
-                total += 4000
-
-            rec.total_salida_taller = total
+            rec.total_salida_taller = (rec.cobro_interno or 0) + (rec.hechura or 0) + (rec.cobros_extras or 0)
 
     @api.onchange('clave_firma_manual')
     def _onchange_clave_firma_manual(self):
