@@ -1,205 +1,210 @@
 <odoo>
 
-    <!-- =========================
-                        INFORMACIÓN GENERAL
-                    ========================== -->
+    <!-- ======================================
+                FORMULARIO REPARACION
+    ====================================== -->
 
-                    <group string="Información General" col="2">
+    <record id="view_joyeria_reparacion_form" model="ir.ui.view">
+        <field name="name">joyeria.reparacion.form</field>
+        <field name="model">joyeria.reparacion</field>
 
-                        <field name="name" readonly="1"/>
-                        <field name="cliente_id"/>
+        <field name="arch" type="xml">
 
-                        <field name="tipo_cliente"/>
-                        <field name="correo_cliente"/>
+            <form string="Orden de Reparación">
 
-                        <field name="telefono"/>
-                        <field name="direccion_entrega"/>
+                <sheet>
 
-                        <field name="responsable_id" groups="base.group_system"/>
+                    <group col="2">
 
-                        <field name="qr"
-                               widget="image"
-                               class="oe_avatar"
-                               readonly="1"/>
+                        <!-- INFORMACIÓN GENERAL -->
 
-                    </group>
+                        <group string="Información General" col="2">
 
+                            <field name="name" readonly="1"/>
+                            <field name="cliente_id"/>
 
-                    <!-- =========================
-                        PRODUCTO Y SERVICIO
-                    ========================== -->
+                            <field name="tipo_cliente"/>
+                            <field name="correo_cliente"/>
 
-                    <group string="Producto y Servicio" col="2">
+                            <field name="telefono"/>
+                            <field name="direccion_entrega"/>
 
-                        <field name="servicio"/>
+                            <field name="responsable_id" groups="base.group_system"/>
 
-                        <field name="tipo_joya"
-                               visibility_condition="servicio == 'reparacion'"/>
-
-                        <field name="modelo"/>
-                        <field name="cantidad"/>
-
-                        <field name="metal"/>
-                        <field name="peso"/>
-
-                        <field name="n_cm_reparacion"
-                               visibility_condition="servicio == 'reparacion'"/>
-
-                        <field name="n_cm_fabricacion"
-                               visibility_condition="servicio == 'fabricacion'"/>
-
-                        <field name="peso_valor"/>
-
-                        <field name="solicitud_cliente" colspan="2"/>
-
-                    </group>
-
-
-                    <!-- =========================
-                        SALIDA DEL TALLER
-                    ========================== -->
-
-                    <group string="Datos de salida del taller"
-                           groups="base.group_system"
-                           col="2">
-
-                        <field name="metal_utilizado"/>
-
-
-                        <!-- PLATA -->
-
-                        <group string="Configuración Plata"
-                               invisible="metal_utilizado != 'plata'"
-                               col="2">
-
-                            <field name="plata_diseno"/>
-                            <field name="plata_casting"/>
-
-                            <field name="plata_piedras"/>
-                            <field name="plata_cantidad_piedras"/>
-
-                            <field name="plata_total" readonly="1"/>
+                            <field name="qr"
+                                   widget="image"
+                                   class="oe_avatar"
+                                   readonly="1"/>
 
                         </group>
 
 
-                        <!-- ORO AMARILLO -->
+                        <!-- PRODUCTO Y SERVICIO -->
 
-                        <group string="Configuración Oro Amarillo"
-                               invisible="metal_utilizado != 'oro 18k amarillo'"
-                               col="2">
+                        <group string="Producto y Servicio" col="2">
 
-                            <field name="oro_amarillo_diseno"/>
-                            <field name="oro_amarillo_casting"/>
+                            <field name="servicio"/>
 
-                            <field name="oro_amarillo_piedras"/>
-                            <field name="oro_amarillo_cantidad_piedras"/>
+                            <field name="tipo_joya"
+                                   visibility_condition="servicio == 'reparacion'"/>
 
-                            <field name="oro_amarillo_total" readonly="1"/>
+                            <field name="modelo"/>
+                            <field name="cantidad"/>
 
-                        </group>
+                            <field name="metal"/>
+                            <field name="peso"/>
 
+                            <field name="n_cm_reparacion"
+                                   visibility_condition="servicio == 'reparacion'"/>
 
-                        <!-- ORO ROSADO -->
+                            <field name="n_cm_fabricacion"
+                                   visibility_condition="servicio == 'fabricacion'"/>
 
-                        <group string="Configuración Oro Rosado"
-                               invisible="metal_utilizado != 'oro 18k rosado'"
-                               col="2">
+                            <field name="peso_valor"/>
 
-                            <field name="oro_rosado_diseno"/>
-                            <field name="oro_rosado_casting"/>
-
-                            <field name="oro_rosado_piedras"/>
-                            <field name="oro_rosado_cantidad_piedras"/>
-
-                            <field name="oro_rosado_total" readonly="1"/>
+                            <field name="solicitud_cliente" colspan="2"/>
 
                         </group>
 
 
-                        <!-- OTROS METALES -->
+                        <!-- SALIDA DEL TALLER -->
 
-                        <group string="Configuración Otros Metales"
-                               invisible="metal_utilizado in ['plata','oro 18k amarillo','oro 18k rosado']"
+                        <group string="Datos de salida del taller"
+                               groups="base.group_system"
                                col="2">
 
-                            <field name="otros_casting"/>
-                            <field name="otros_piedras"/>
+                            <field name="metal_utilizado"/>
 
-                            <field name="otros_cantidad_piedras"/>
-                            <field name="otros_total" readonly="1"/>
+                            <!-- PLATA -->
+
+                            <group string="Configuración Plata"
+                                   invisible="metal_utilizado != 'plata'"
+                                   col="2">
+
+                                <field name="plata_diseno"/>
+                                <field name="plata_casting"/>
+
+                                <field name="plata_piedras"/>
+                                <field name="plata_cantidad_piedras"/>
+
+                                <field name="plata_total" readonly="1"/>
+
+                            </group>
+
+
+                            <!-- ORO AMARILLO -->
+
+                            <group string="Configuración Oro Amarillo"
+                                   invisible="metal_utilizado != 'oro 18k amarillo'"
+                                   col="2">
+
+                                <field name="oro_amarillo_diseno"/>
+                                <field name="oro_amarillo_casting"/>
+
+                                <field name="oro_amarillo_piedras"/>
+                                <field name="oro_amarillo_cantidad_piedras"/>
+
+                                <field name="oro_amarillo_total" readonly="1"/>
+
+                            </group>
+
+
+                            <!-- ORO ROSADO -->
+
+                            <group string="Configuración Oro Rosado"
+                                   invisible="metal_utilizado != 'oro 18k rosado'"
+                                   col="2">
+
+                                <field name="oro_rosado_diseno"/>
+                                <field name="oro_rosado_casting"/>
+
+                                <field name="oro_rosado_piedras"/>
+                                <field name="oro_rosado_cantidad_piedras"/>
+
+                                <field name="oro_rosado_total" readonly="1"/>
+
+                            </group>
+
+
+                            <!-- OTROS METALES -->
+
+                            <group string="Configuración Otros Metales"
+                                   invisible="metal_utilizado in ['plata','oro 18k amarillo','oro 18k rosado']"
+                                   col="2">
+
+                                <field name="otros_casting"/>
+                                <field name="otros_piedras"/>
+
+                                <field name="otros_cantidad_piedras"/>
+                                <field name="otros_total" readonly="1"/>
+
+                            </group>
+
+
+                            <separator string="Cálculos Internos"/>
+
+                            <field name="gramos_utilizado"/>
+                            <field name="metales_extra"/>
+
+                            <field name="peso_total" readonly="1"/>
+
+                            <field name="cobro_interno"/>
+                            <field name="hechura"/>
+
+                            <field name="cobros_extras"/>
+
+                            <field name="total_salida_taller" readonly="1"/>
+
+                            <field name="clave_firma_manual" password="True"/>
+                            <field name="firma_id" readonly="1"/>
+                            <field name="fecha_firma" readonly="1"/>
 
                         </group>
 
 
-                        <separator string="Cálculos Internos"/>
+                        <!-- RECEPCIÓN Y ENTREGA -->
 
-                        <field name="gramos_utilizado"/>
-                        <field name="metales_extra"/>
+                        <group string="Recepción y Entrega" col="2">
 
-                        <field name="peso_total" readonly="1"/>
+                            <field name="vendedora_id"
+                                   readonly="1"
+                                   options="{'no_open': True, 'no_create': True}"/>
 
-                        <field name="cobro_interno"/>
-                        <field name="hechura"/>
+                            <field name="clave_autenticacion_manual"
+                                   password="True"/>
 
-                        <field name="cobros_extras"/>
+                            <field name="local_tienda"/>
 
-                        <field name="total_salida_taller" readonly="1"/>
+                            <field name="fecha_recepcion" readonly="1"/>
+                            <field name="fecha_entrega"/>
 
-                        <field name="clave_firma_manual" password="True"/>
-                        <field name="firma_id" readonly="1"/>
-                        <field name="fecha_firma" readonly="1"/>
+                            <field name="estado" groups="base.group_system"/>
+                            <field name="express"/>
 
-                    </group>
+                        </group>
 
 
-                    <!-- =========================
-                        RECEPCIÓN Y ENTREGA
-                    ========================== -->
+                        <!-- FINANZAS -->
 
-                    <group string="Recepción y Entrega" col="2">
+                        <group string="Datos Financieros" col="2">
 
-                        <field name="vendedora_id"
-                               readonly="1"
-                               options="{'no_open': True, 'no_create': True}"/>
+                            <field name="precio_unitario"/>
+                            <field name="extra"/>
 
-                        <field name="clave_autenticacion_manual"
-                               password="True"/>
+                            <field name="extra2"/>
+                            <field name="extra3"/>
 
-                        <field name="local_tienda"/>
+                            <field name="subtotal" readonly="1"/>
+                            <field name="abono"/>
 
-                        <field name="fecha_recepcion" readonly="1"/>
-                        <field name="fecha_entrega"/>
+                            <field name="saldo" readonly="1"/>
 
-                        <field name="estado" groups="base.group_system"/>
-                        <field name="express"/>
+                        </group>
 
                     </group>
 
 
-                    <!-- =========================
-                        FINANZAS
-                    ========================== -->
-
-                    <group string="Datos Financieros" col="2">
-
-                        <field name="precio_unitario"/>
-                        <field name="extra"/>
-
-                        <field name="extra2"/>
-                        <field name="extra3"/>
-
-                        <field name="subtotal" readonly="1"/>
-                        <field name="abono"/>
-
-                        <field name="saldo" readonly="1"/>
-
-                    </group>
-
-
-                    <!-- =========================
-                        NOTAS
-                    ========================== -->
+                    <!-- NOTAS -->
 
                     <group string="Notas y Comentarios">
 
@@ -209,9 +214,7 @@
                     </group>
 
 
-                    <!-- =========================
-                        OPERACIONES
-                    ========================== -->
+                    <!-- OPERACIONES -->
 
                     <notebook>
 
@@ -253,12 +256,10 @@
     </record>
 
 
-</odoo>
 
-
-    <!-- =========================
-        TREE
-    ========================== -->
+    <!-- ======================================
+                    TREE VIEW
+    ====================================== -->
 
     <record id="view_custom_repair_order_tree" model="ir.ui.view">
 
@@ -283,9 +284,10 @@
     </record>
 
 
-    <!-- =========================
-        ACCIONES
-    ========================== -->
+
+    <!-- ======================================
+                    ACCION
+    ====================================== -->
 
     <record id="action_joyeria_reparacion_listado" model="ir.actions.act_window">
         <field name="name">Órdenes de Reparación</field>
@@ -294,9 +296,10 @@
     </record>
 
 
-    <!-- =========================
-        MENU
-    ========================== -->
+
+    <!-- ======================================
+                    MENU
+    ====================================== -->
 
     <menuitem id="menu_joyeria_root"
               name="Reparaciones"
