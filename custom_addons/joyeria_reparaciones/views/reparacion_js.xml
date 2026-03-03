@@ -13,10 +13,6 @@
 
                 <sheet>
 
-                    <!-- =========================
-                        CONTENIDO PRINCIPAL
-                    ========================== -->
-
                     <group col="2">
 
                         <!-- =========================
@@ -33,7 +29,6 @@
                             <field name="responsable_id" groups="base.group_system"/>
                             <field name="qr" widget="image" class="oe_avatar" readonly="1"/>
                         </group>
-
 
                         <!-- =========================
                             PRODUCTO Y SERVICIO
@@ -64,9 +59,7 @@
 
                             <field name="metal_utilizado"/>
 
-                            <!-- =========================
-                                CONFIGURACION PLATA
-                            ========================== -->
+                            <!-- PLATA -->
 
                             <group string="Configuración Plata"
                                    invisible="metal_utilizado != 'plata'">
@@ -80,9 +73,7 @@
                             </group>
 
 
-                            <!-- =========================
-                                ORO AMARILLO
-                            ========================== -->
+                            <!-- ORO AMARILLO -->
 
                             <group string="Configuración Oro Amarillo"
                                    invisible="metal_utilizado != 'oro 18k amarillo'">
@@ -96,9 +87,7 @@
                             </group>
 
 
-                            <!-- =========================
-                                ORO ROSADO
-                            ========================== -->
+                            <!-- ORO ROSADO -->
 
                             <group string="Configuración Oro Rosado"
                                    invisible="metal_utilizado != 'oro 18k rosado'">
@@ -112,9 +101,7 @@
                             </group>
 
 
-                            <!-- =========================
-                                OTROS METALES
-                            ========================== -->
+                            <!-- OTROS METALES -->
 
                             <group string="Configuración Otros Metales"
                                    invisible="metal_utilizado in ['plata','oro 18k amarillo','oro 18k rosado']">
@@ -131,34 +118,34 @@
                                 CALCULOS
                             ========================== -->
 
-                            <!-- CALCULOS -->
-
                             <group string="Cálculos del Taller" col="2">
 
                                 <field name="gramos_utilizado"
-                                    style="background-color:#e6f0ff; color:#003366;"/>
+                                       style="background-color:#e6f0ff; color:#003366;"/>
 
                                 <field name="metales_extra"
-                                    style="background-color:#e6f0ff; color:#003366;"/>
+                                       style="background-color:#e6f0ff; color:#003366;"/>
 
                                 <field name="peso_total"
-                                    readonly="1"
-                                    style="background-color:#fff8b3; color:#665c00; font-weight:bold;"/>
+                                       readonly="1"
+                                       style="background-color:#fff8b3; color:#665c00; font-weight:bold;"/>
 
                                 <field name="cobro_interno"
-                                    style="background-color:#d9fdd3; color:#1c6b1c;"/>
+                                       style="background-color:#d9fdd3; color:#1c6b1c;"/>
 
                                 <field name="hechura"
-                                    style="background-color:#d9fdd3; color:#1c6b1c;"/>
+                                       style="background-color:#d9fdd3; color:#1c6b1c;"/>
 
                                 <field name="cobros_extras"
-                                    style="background-color:#d9fdd3; color:#1c6b1c;"/>
+                                       style="background-color:#d9fdd3; color:#1c6b1c;"/>
 
                                 <field name="total_salida_taller"
-                                    readonly="1"
-                                    style="background-color:#fff8b3; color:#665c00; font-weight:bold;"/>
+                                       readonly="1"
+                                       style="background-color:#fff8b3; color:#665c00; font-weight:bold;"/>
 
                             </group>
+
+                        </group>
 
 
                         <!-- =========================
@@ -211,9 +198,7 @@
                     </group>
 
 
-                    <!-- =========================
-                        AUTORIZACION RMA
-                    ========================== -->
+                    <!-- AUTORIZACION -->
 
                     <group string="Autorización (solo si es sin costo)"
                            visibility_condition="requiere_autorizacion == True">
@@ -225,9 +210,7 @@
                     </group>
 
 
-                    <!-- =========================
-                        NOTAS
-                    ========================== -->
+                    <!-- NOTAS -->
 
                     <group string="Notas y Comentarios" col="2">
                         <field name="notas"/>
@@ -235,34 +218,30 @@
                     </group>
 
 
-                    <!-- =========================
-                        OPERACIONES
-                    ========================== -->
+                    <!-- OPERACIONES -->
 
                     <notebook>
+
                         <page string="Operaciones">
 
                             <field name="lineas_operacion_ids">
 
                                 <tree editable="bottom">
-
                                     <field name="producto_id"/>
                                     <field name="descripcion"/>
                                     <field name="cantidad"/>
                                     <field name="unidad_medida"/>
                                     <field name="precio_unitario"/>
-
                                 </tree>
 
                             </field>
 
                         </page>
+
                     </notebook>
 
 
-                    <!-- =========================
-                        CHATTER
-                    ========================== -->
+                    <!-- CHATTER -->
 
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers"/>
@@ -274,63 +253,5 @@
             </form>
         </field>
     </record>
-
-
-    <!-- =========================
-        TREE VIEW
-    ========================== -->
-
-    <record id="view_custom_repair_order_tree" model="ir.ui.view">
-        <field name="name">custom.repair.order.tree</field>
-        <field name="model">joyeria.reparacion</field>
-
-        <field name="arch" type="xml">
-
-            <tree string="Órdenes de Reparación"
-                  create="1"
-                  decoration-info="estado == 'presupuesto'"
-                  decoration-success="estado == 'confirmado'"
-                  decoration-primary="estado == 'reparado'"
-                  decoration-danger="estado == 'reparado y entregado'">
-
-                <field name="name" type="open"/>
-                <field name="tipo_joya"/>
-                <field name="cliente_id"/>
-                <field name="direccion_entrega"/>
-                <field name="vencimiento_garantia"/>
-                <field name="estado"/>
-
-            </tree>
-
-        </field>
-    </record>
-
-
-    <!-- =========================
-        ACCIONES
-    ========================== -->
-
-    <record id="action_joyeria_reparacion_listado" model="ir.actions.act_window">
-        <field name="name">Órdenes de Reparación</field>
-        <field name="res_model">joyeria.reparacion</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-
-
-    <record id="action_joyeria_reparacion" model="ir.actions.act_window">
-        <field name="name">Reparaciones</field>
-        <field name="res_model">joyeria.reparacion</field>
-        <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="view_joyeria_reparacion_form"/>
-    </record>
-
-
-    <!-- =========================
-        MENU
-    ========================== -->
-
-    <menuitem id="menu_joyeria_root"
-              name="Reparaciones"
-              action="action_joyeria_reparacion_listado"/>
 
 </odoo>
