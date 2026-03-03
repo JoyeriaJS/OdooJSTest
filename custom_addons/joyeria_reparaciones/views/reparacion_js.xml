@@ -131,34 +131,34 @@
                                 CALCULOS
                             ========================== -->
 
-                            <field name="gramos_utilizado"
-                                   style="background-color:#e6f0ff; color:#003366;"/>
+                            <!-- CALCULOS -->
 
-                            <field name="metales_extra"
-                                   style="background-color:#e6f0ff; color:#003366;"/>
+                            <group string="Cálculos del Taller" col="2">
 
-                            <field name="peso_total"
-                                   readonly="1"
-                                   style="background-color:#fff8b3; color:#665c00; font-weight:bold;"/>
+                                <field name="gramos_utilizado"
+                                    style="background-color:#e6f0ff; color:#003366;"/>
 
-                            <field name="cobro_interno"
-                                   style="background-color:#d9fdd3; color:#1c6b1c;"/>
+                                <field name="metales_extra"
+                                    style="background-color:#e6f0ff; color:#003366;"/>
 
-                            <field name="hechura"
-                                   style="background-color:#d9fdd3; color:#1c6b1c;"/>
+                                <field name="peso_total"
+                                    readonly="1"
+                                    style="background-color:#fff8b3; color:#665c00; font-weight:bold;"/>
 
-                            <field name="cobros_extras"
-                                   style="background-color:#d9fdd3; color:#1c6b1c;"/>
+                                <field name="cobro_interno"
+                                    style="background-color:#d9fdd3; color:#1c6b1c;"/>
 
-                            <field name="total_salida_taller"
-                                   readonly="1"
-                                   style="background-color:#fff8b3; color:#665c00; font-weight:bold;"/>
+                                <field name="hechura"
+                                    style="background-color:#d9fdd3; color:#1c6b1c;"/>
 
-                            <field name="clave_firma_manual" password="True"/>
-                            <field name="firma_id" readonly="1"/>
-                            <field name="fecha_firma" readonly="1"/>
+                                <field name="cobros_extras"
+                                    style="background-color:#d9fdd3; color:#1c6b1c;"/>
 
-                        </group>
+                                <field name="total_salida_taller"
+                                    readonly="1"
+                                    style="background-color:#fff8b3; color:#665c00; font-weight:bold;"/>
+
+                            </group>
 
 
                         <!-- =========================
