@@ -145,7 +145,7 @@
                                 CALCULOS
                             ========================== -->
 
-                            <separator string="Cálculos Internos"/>
+                        <separator string="Cálculos Internos"/>
 
                             <field name="gramos_utilizado"/>
                             <field name="metales_extra"/>
