@@ -534,10 +534,10 @@ class Reparacion(models.Model):
          #       raise ValidationError("Debe ingresar un valor para el peso si selecciona tipo 'Especial'.")
         #return super().write(vals)
 
-    @api.depends('cobro_interno', 'hechura', 'cobros_extras', 'otros_total')
+    @api.depends('cobro_interno', 'hechura', 'cobros_extras', 'otros_total', 'oro_rosado_total', 'oro_amarillo_total', 'plata_total')
     def _compute_total_salida(self):
         for rec in self:
-            rec.total_salida_taller = (rec.cobro_interno or 0) + (rec.hechura or 0) + (rec.cobros_extras or 0) + (rec.otros_total or 0)
+            rec.total_salida_taller = (rec.cobro_interno or 0) + (rec.hechura or 0) + (rec.cobros_extras or 0) + (rec.otros_total or 0) + (rec.oro_rosado_total or 0) + (rec.oro_amarillo_total or 0) + (rec.plata_total or 0)
 
     @api.onchange('clave_firma_manual')
     def _onchange_clave_firma_manual(self):
