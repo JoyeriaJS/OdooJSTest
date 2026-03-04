@@ -162,6 +162,7 @@
                                 <field name="fecha_firma" readonly="1"/>
 
                             </group>
+                            </group>
 
 
                         <!-- RECEPCIÓN Y ENTREGA -->
