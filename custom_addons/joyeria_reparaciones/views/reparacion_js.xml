@@ -142,24 +142,26 @@
 
 
                             <separator string="Cálculos Internos"/>
+                            
+                            <group col="2">
 
-                            <field name="gramos_utilizado"/>
-                            <field name="metales_extra"/>
+                                <field name="gramos_utilizado"/>
+                                <field name="metales_extra"/>
 
-                            <field name="peso_total" readonly="1"/>
+                                <field name="peso_total" readonly="1"/>
 
-                            <field name="cobro_interno"/>
-                            <field name="hechura"/>
+                                <field name="cobro_interno"/>
+                                <field name="hechura"/>
 
-                            <field name="cobros_extras"/>
+                                <field name="cobros_extras"/>
 
-                            <field name="total_salida_taller" readonly="1"/>
+                                <field name="total_salida_taller" readonly="1"/>
 
-                            <field name="clave_firma_manual" password="True"/>
-                            <field name="firma_id" readonly="1"/>
-                            <field name="fecha_firma" readonly="1"/>
+                                <field name="clave_firma_manual" password="True"/>
+                                <field name="firma_id" readonly="1"/>
+                                <field name="fecha_firma" readonly="1"/>
 
-                        </group>
+                            </group>
 
 
                         <!-- RECEPCIÓN Y ENTREGA -->
