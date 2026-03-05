@@ -13,7 +13,7 @@ from . import reparacion_auth_code
 from . import pos_order
 from . import pos_session
 from . import pos_order_line
-from . import pos_descuento
+from . import pos_discount
 
 
 #from . import res_users
