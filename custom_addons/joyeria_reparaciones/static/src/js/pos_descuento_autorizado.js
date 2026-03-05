@@ -1,82 +1,66 @@
 /** @odoo-module **/
 
-import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
 import { patch } from "@web/core/utils/patch";
+import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
 import { useService } from "@web/core/utils/hooks";
 
 patch(PaymentScreen.prototype, {
 
     setup() {
         super.setup();
-        this.orm = useService("orm");
+        this.rpc = useService("rpc");
     },
 
-    async addNewPaymentLine(paymentMethod) {
+    async validateOrder(isForceValidate) {
 
-        await super.addNewPaymentLine(paymentMethod);
+        const order = this.currentOrder;
+        const paymentlines = order.paymentlines;
 
-        const metodo = paymentMethod.name.toLowerCase();
+        let metodoPermitido = false;
 
-        if (metodo === "efectivo" || metodo === "transferencia") {
+        paymentlines.forEach(line => {
+            const name = line.payment_method.name.toLowerCase();
+            if (name.includes("efectivo") || name.includes("transferencia")) {
+                metodoPermitido = true;
+            }
+        });
+
+        if (metodoPermitido) {
 
             const codigo = prompt("Ingrese código de autorización de descuento");
 
-            if (!codigo) {
-                return;
-            }
+            if (codigo) {
 
-            try {
-
-                const descuento = await this.orm.call(
-                    "pos.descuento.autorizado",
-                    "validar_codigo_pos",
-                    [codigo]
-                );
-
-                if (!descuento) {
-                    alert("Código inválido o expirado");
-                    return;
-                }
-
-                const order = this.pos.get_order();
-
-                let total = order.get_total_with_tax();
-
-                let nuevo_total = total;
-
-                if (descuento.tipo === "porcentaje") {
-
-                    nuevo_total = total - (total * descuento.valor / 100);
-
-                } else {
-
-                    nuevo_total = total - descuento.valor;
-
-                }
-
-                // redondear
-                nuevo_total = Math.round(nuevo_total);
-
-                const descuento_aplicado = total - nuevo_total;
-
-                order.add_product(this.pos.db.get_product_by_id(descuento.producto_descuento_id), {
-                    price: -descuento_aplicado,
-                    quantity: 1
+                const descuento = await this.rpc("/pos/validar_descuento", {
+                    codigo: codigo
                 });
 
-                alert("Descuento aplicado correctamente");
+                if (descuento) {
 
-            }
+                    let total = order.get_total_with_tax();
 
-            catch (error) {
+                    if (descuento.tipo_descuento === "porcentaje") {
+                        total = total - (total * (parseFloat(descuento.porcentaje) / 100));
+                    }
 
-                console.error(error);
-                alert("Error validando el código");
+                    if (descuento.tipo_descuento === "monto") {
+                        total = total - descuento.monto;
+                    }
+
+                    total = Math.round(total);
+
+                    order.set_total_paid(total);
+
+                } else {
+                    alert("Código inválido");
+                    return;
+                }
 
             }
 
         }
 
+        super.validateOrder(isForceValidate);
     }
 
 });

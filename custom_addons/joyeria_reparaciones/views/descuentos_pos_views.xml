@@ -1,9 +1,11 @@
 <odoo>
 
     <!-- TREE -->
+
     <record id="view_pos_discount_tree" model="ir.ui.view">
         <field name="name">joyeria.pos.discount.tree</field>
         <field name="model">joyeria.pos.discount</field>
+
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
@@ -18,12 +20,15 @@
     </record>
 
     <!-- FORM -->
+
     <record id="view_pos_discount_form" model="ir.ui.view">
         <field name="name">joyeria.pos.discount.form</field>
         <field name="model">joyeria.pos.discount</field>
+
         <field name="arch" type="xml">
-            <form string="Descuento POS">
+            <form>
                 <sheet>
+
                     <group>
                         <field name="name" readonly="1"/>
                         <field name="tipo_descuento"/>
@@ -31,15 +36,15 @@
                         <field name="monto"/>
                         <field name="activo"/>
                         <field name="usado"/>
-                        <field name="fecha_creacion" readonly="1"/>
-                        <field name="usuario_creador" readonly="1"/>
                     </group>
+
                 </sheet>
             </form>
         </field>
     </record>
 
     <!-- ACTION -->
+
     <record id="action_pos_discount" model="ir.actions.act_window">
         <field name="name">Descuentos POS</field>
         <field name="res_model">joyeria.pos.discount</field>
@@ -47,11 +52,13 @@
     </record>
 
     <!-- MENU -->
+
     <menuitem
-        id="menu_pos_discount"
+        id="menu_pos_discount_root"
         name="Descuentos POS"
         parent="point_of_sale.menu_point_root"
         action="action_pos_discount"
-        sequence="50"/>
+        sequence="90"
+        groups="base.group_system"/>
 
 </odoo>
