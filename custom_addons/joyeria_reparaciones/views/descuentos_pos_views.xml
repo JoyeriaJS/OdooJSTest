@@ -19,6 +19,7 @@
         </field>
     </record>
 
+
     <!-- FORM -->
 
     <record id="view_pos_discount_form" model="ir.ui.view">
@@ -30,12 +31,21 @@
                 <sheet>
 
                     <group>
+
                         <field name="name" readonly="1"/>
+
                         <field name="tipo_descuento"/>
+
                         <field name="porcentaje"/>
+
                         <field name="monto"/>
+
                         <field name="activo"/>
-                        <field name="usado"/>
+
+                        <field name="usado" readonly="1"/>
+
+                        <field name="fecha_creacion" readonly="1"/>
+
                     </group>
 
                 </sheet>
@@ -43,22 +53,13 @@
         </field>
     </record>
 
+
     <!-- ACTION -->
 
     <record id="action_pos_discount" model="ir.actions.act_window">
-        <field name="name">Descuentos POS</field>
+        <field name="name">Códigos de Descuento</field>
         <field name="res_model">joyeria.pos.discount</field>
         <field name="view_mode">tree,form</field>
     </record>
-
-    <!-- MENU -->
-
-    <menuitem
-        id="menu_pos_discount_root"
-        name="Descuentos POS"
-        parent="point_of_sale.menu_point_root"
-        action="action_pos_discount"
-        sequence="90"
-        groups="base.group_system"/>
 
 </odoo>

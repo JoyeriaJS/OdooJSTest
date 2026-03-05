@@ -1,16 +1,18 @@
-from odoo import models, fields, api
+from odoo import models, fields
 import random
 import string
 
+
 class PosDiscount(models.Model):
     _name = 'joyeria.pos.discount'
-    _description = 'Descuentos autorizados POS'
+    _description = 'Descuento autorizado POS'
 
-    name = fields.Char(string="Código", readonly=True)
+    name = fields.Char("Código", required=True, copy=False, default="Nuevo")
+    
     tipo_descuento = fields.Selection([
         ('porcentaje', 'Porcentaje'),
-        ('monto', 'Monto Fijo')
-    ], string="Tipo de descuento", required=True)
+        ('monto', 'Monto fijo')
+    ], string="Tipo descuento", required=True)
 
     porcentaje = fields.Selection([
         ('5', '5%'),
@@ -18,15 +20,22 @@ class PosDiscount(models.Model):
         ('15', '15%')
     ], string="Porcentaje")
 
-    monto = fields.Float(string="Monto fijo")
+    monto = fields.Float("Monto")
 
-    activo = fields.Boolean(default=True)
-    usado = fields.Boolean(default=False)
+    activo = fields.Boolean("Activo", default=True)
 
-    fecha_creacion = fields.Datetime(default=fields.Datetime.now)
+    usado = fields.Boolean("Usado", default=False)
 
-    @api.model
-    def create(self, vals):
+    fecha_creacion = fields.Datetime(
+        "Fecha creación",
+        default=fields.Datetime.now
+    )
+
+    def generar_codigo(self):
         codigo = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-        vals['name'] = codigo
+        return codigo
+
+    def create(self, vals):
+        if vals.get('name', 'Nuevo') == 'Nuevo':
+            vals['name'] = self.generar_codigo()
         return super().create(vals)
