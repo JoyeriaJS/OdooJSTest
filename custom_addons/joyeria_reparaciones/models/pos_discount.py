@@ -5,13 +5,20 @@ import string
 
 class JoyeriaPosDiscount(models.Model):
     _name = 'joyeria.pos.discount'
-    _description = 'Codigos de descuento POS'
+    _description = 'Descuentos autorizados POS'
 
-    name = fields.Char("Código", required=True, copy=False, default="Nuevo")
-    tipo = fields.Selection([
+    name = fields.Char("Nombre", required=True)
+
+    codigo = fields.Char(
+        string="Código autorización",
+        readonly=True,
+        copy=False
+    )
+
+    tipo_descuento = fields.Selection([
         ('porcentaje', 'Porcentaje'),
         ('monto', 'Monto fijo')
-    ], string="Tipo", required=True)
+    ], string="Tipo de descuento", required=True)
 
     porcentaje = fields.Selection([
         ('5', '5%'),
@@ -26,13 +33,17 @@ class JoyeriaPosDiscount(models.Model):
     usado = fields.Boolean("Usado", default=False)
 
     fecha_creacion = fields.Datetime(
-        "Fecha creación",
+        string="Fecha creación",
         default=fields.Datetime.now
     )
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', 'Nuevo') == 'Nuevo':
+    def generar_codigo(self):
+        for rec in self:
             codigo = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-            vals['name'] = codigo
+            rec.codigo = codigo
+
+    @api.model
+    def crear_codigo(self, vals):
+        codigo = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        vals['codigo'] = codigo
         return super().create(vals)
