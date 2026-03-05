@@ -66,21 +66,36 @@ patch(PaymentScreen.prototype, {
 
                 if (descuento) {
 
-                    let total = order.get_total_with_tax();
+                    const lines = order.get_orderlines();
+
+                    // ==============================
+                    // DESCUENTO POR PORCENTAJE
+                    // ==============================
 
                     if (descuento.tipo_descuento === "porcentaje") {
 
-                        total = total - (total * (parseFloat(descuento.porcentaje) / 100));
+                        const porcentaje = parseFloat(descuento.porcentaje);
+
+                        lines.forEach(line => {
+                            line.set_discount(porcentaje);
+                        });
 
                     }
+
+                    // ==============================
+                    // DESCUENTO MONTO FIJO
+                    // ==============================
 
                     if (descuento.tipo_descuento === "monto") {
 
-                        total = total - descuento.monto;
+                        const total = order.get_total_with_tax();
+                        const porcentaje = (descuento.monto / total) * 100;
+
+                        lines.forEach(line => {
+                            line.set_discount(porcentaje);
+                        });
 
                     }
-
-                    total = Math.round(total);
 
                     alert("Descuento aplicado correctamente");
 
