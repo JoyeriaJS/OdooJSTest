@@ -21,6 +21,7 @@ class JoyeriaPosDiscount(models.Model):
     ], string="Porcentaje")
 
     monto = fields.Float("Monto fijo")
+    
 
     codigo = fields.Char(
         "Código autorización",
@@ -29,6 +30,7 @@ class JoyeriaPosDiscount(models.Model):
     )
 
     activo = fields.Boolean(default=True)
+    usado = fields.Boolean("Usado", default=False)
 
     @api.model
     def create(self, vals):
