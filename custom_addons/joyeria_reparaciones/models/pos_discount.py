@@ -7,12 +7,11 @@ class JoyeriaPosDiscount(models.Model):
     _name = 'joyeria.pos.discount'
     _description = 'Codigos de descuento POS'
 
-    name = fields.Char("Nombre", required=True)
-
-    tipo_descuento = fields.Selection([
+    name = fields.Char("Código", required=True, copy=False, default="Nuevo")
+    tipo = fields.Selection([
         ('porcentaje', 'Porcentaje'),
         ('monto', 'Monto fijo')
-    ], string="Tipo de descuento", required=True)
+    ], string="Tipo", required=True)
 
     porcentaje = fields.Selection([
         ('5', '5%'),
@@ -21,19 +20,19 @@ class JoyeriaPosDiscount(models.Model):
     ], string="Porcentaje")
 
     monto = fields.Float("Monto fijo")
-    
 
-    codigo = fields.Char(
-        "Código autorización",
-        readonly=True,
-        copy=False
-    )
+    activo = fields.Boolean("Activo", default=True)
 
-    activo = fields.Boolean(default=True)
     usado = fields.Boolean("Usado", default=False)
+
+    fecha_creacion = fields.Datetime(
+        "Fecha creación",
+        default=fields.Datetime.now
+    )
 
     @api.model
     def create(self, vals):
-        if not vals.get('codigo'):
-            vals['codigo'] = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        if vals.get('name', 'Nuevo') == 'Nuevo':
+            codigo = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+            vals['name'] = codigo
         return super().create(vals)
