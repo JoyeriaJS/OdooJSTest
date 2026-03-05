@@ -3,16 +3,16 @@ import random
 import string
 
 
-class JoyeriaPosDiscount(models.Model):
-    _name = 'joyeria.pos.discount'
-    _description = 'Descuentos autorizados POS'
+class PosDiscount(models.Model):
+    _name = "joyeria.pos.discount"
+    _description = "Descuentos autorizados POS"
 
-    name = fields.Char("Nombre", required=True)
-
-    codigo = fields.Char(
-        string="Código autorización",
+    name = fields.Char(
+        string="Código",
+        required=True,
+        copy=False,
         readonly=True,
-        copy=False
+        default=lambda self: self._generate_code()
     )
 
     tipo_descuento = fields.Selection([
@@ -26,24 +26,23 @@ class JoyeriaPosDiscount(models.Model):
         ('15', '15%')
     ], string="Porcentaje")
 
-    monto = fields.Float("Monto fijo")
+    monto = fields.Float(string="Monto fijo")
 
-    activo = fields.Boolean("Activo", default=True)
+    activo = fields.Boolean(default=True)
 
-    usado = fields.Boolean("Usado", default=False)
+    usado = fields.Boolean(default=False)
 
     fecha_creacion = fields.Datetime(
         string="Fecha creación",
         default=fields.Datetime.now
     )
 
-    def generar_codigo(self):
-        for rec in self:
-            codigo = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-            rec.codigo = codigo
+    usuario_creador = fields.Many2one(
+        'res.users',
+        default=lambda self: self.env.user
+    )
 
-    @api.model
-    def crear_codigo(self, vals):
-        codigo = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-        vals['codigo'] = codigo
-        return super().create(vals)
+    # Generador automático de código
+    def _generate_code(self):
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        return code

@@ -7,7 +7,6 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
-                <field name="codigo"/>
                 <field name="tipo_descuento"/>
                 <field name="porcentaje"/>
                 <field name="monto"/>
@@ -23,29 +22,18 @@
         <field name="name">joyeria.pos.discount.form</field>
         <field name="model">joyeria.pos.discount</field>
         <field name="arch" type="xml">
-            <form>
+            <form string="Descuento POS">
                 <sheet>
-
                     <group>
-                        <field name="name"/>
-                        <field name="codigo" readonly="1"/>
+                        <field name="name" readonly="1"/>
                         <field name="tipo_descuento"/>
-                    </group>
-
-                    <group>
-                        <field name="porcentaje"
-                               attrs="{'invisible':[('tipo_descuento','!=','porcentaje')]}"/>
-
-                        <field name="monto"
-                               attrs="{'invisible':[('tipo_descuento','!=','monto')]}"/>
-                    </group>
-
-                    <group>
+                        <field name="porcentaje"/>
+                        <field name="monto"/>
                         <field name="activo"/>
                         <field name="usado"/>
                         <field name="fecha_creacion" readonly="1"/>
+                        <field name="usuario_creador" readonly="1"/>
                     </group>
-
                 </sheet>
             </form>
         </field>
@@ -53,20 +41,17 @@
 
     <!-- ACTION -->
     <record id="action_pos_discount" model="ir.actions.act_window">
-        <field name="name">Códigos de Descuento POS</field>
+        <field name="name">Descuentos POS</field>
         <field name="res_model">joyeria.pos.discount</field>
         <field name="view_mode">tree,form</field>
     </record>
 
     <!-- MENU -->
-    <menuitem id="menu_pos_discount_root"
-              name="Descuentos POS"
-              parent="point_of_sale.menu_point_root"
-              sequence="50"/>
-
-    <menuitem id="menu_pos_discount"
-              name="Códigos de descuento"
-              parent="menu_pos_discount_root"
-              action="action_pos_discount"/>
+    <menuitem
+        id="menu_pos_discount"
+        name="Descuentos POS"
+        parent="point_of_sale.menu_point_root"
+        action="action_pos_discount"
+        sequence="50"/>
 
 </odoo>
