@@ -30,7 +30,7 @@
         "views/reparacion_confirm_view.xml",
         'views/pos_order_line_views.xml',
         'views/descuentos_pos_views.xml',
-        'views/pos_menu.xml',
+        #'views/pos_menu.xml',
         
         
 
