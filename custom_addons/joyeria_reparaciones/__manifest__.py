@@ -29,6 +29,8 @@
         "views/reparacion_auth_code_view.xml",
         "views/reparacion_confirm_view.xml",
         'views/pos_order_line_views.xml',
+        'views/descuentos_pos_views.xml',
+        'views/pos_assets.xml,'
         
         
 
@@ -57,6 +59,7 @@
             'joyeria_reparaciones/static/src/js/pos_special_products.js',
             #'joyeria_reparaciones/static/src/xml/qr_vendedora.xml',
             'joyeria_reparaciones/static/src/xml/receipt_override.xml',
+            'joyeria_reparaciones/static/src/js/poa_descuento_autorizado.js',
         ],
     },
 
