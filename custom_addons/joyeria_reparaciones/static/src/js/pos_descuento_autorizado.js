@@ -14,44 +14,18 @@ patch(PaymentScreen.prototype, {
     async validateOrder(isForceValidate) {
 
         const order = this.currentOrder;
-
-        // ==============================
-        // VALIDACIÓN 50% PRECIO MÍNIMO
-        // ==============================
-
-        const lines = order.get_orderlines();
-
-        for (let line of lines) {
-
-            const precioOriginal = line.product.lst_price;
-            const precioVenta = line.get_unit_price();
-
-            if (precioVenta < (precioOriginal * 0.5)) {
-
-                alert(
-                    "No se puede vender el producto '" +
-                    line.product.display_name +
-                    "' por menos del 50% de su precio original."
-                );
-
-                return;
-            }
-        }
-
-
-        // ==============================
-        // DESCUENTO AUTORIZADO
-        // ==============================
-
         const paymentlines = order.paymentlines;
+
         let metodoPermitido = false;
 
         paymentlines.forEach(line => {
+
             const name = line.payment_method.name.toLowerCase();
 
             if (name.includes("efectivo") || name.includes("transferencia")) {
                 metodoPermitido = true;
             }
+
         });
 
         if (metodoPermitido) {
@@ -64,38 +38,36 @@ patch(PaymentScreen.prototype, {
                     codigo: codigo
                 });
 
-                if (descuento) {
-
-                    let total = order.get_total_with_tax();
-
-                    if (descuento.tipo_descuento === "porcentaje") {
-
-                        total = total - (total * (parseFloat(descuento.porcentaje) / 100));
-
-                    }
-
-                    if (descuento.tipo_descuento === "monto") {
-
-                        total = total - descuento.monto;
-
-                    }
-
-                    total = Math.round(total);
-
-                    alert("Descuento aplicado correctamente");
-
-                } else {
-
-                    alert("Código inválido o ya utilizado");
+                if (!descuento) {
+                    alert("Código inválido o ya usado");
                     return;
+                }
+
+                let porcentaje = 0;
+
+                if (descuento.tipo_descuento === "porcentaje") {
+                    porcentaje = parseFloat(descuento.porcentaje);
+                }
+
+                if (descuento.tipo_descuento === "monto") {
+
+                    const total = order.get_total_with_tax();
+
+                    porcentaje = (descuento.monto / total) * 100;
 
                 }
+
+                porcentaje = Math.round(porcentaje);
+
+                order.get_orderlines().forEach(line => {
+                    line.set_discount(porcentaje);
+                });
 
             }
 
         }
 
-        await super.validateOrder(isForceValidate);
+        await super.validateOrder(...arguments);
     }
 
 });
