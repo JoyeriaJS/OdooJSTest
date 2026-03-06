@@ -5,14 +5,18 @@ from odoo.http import request
 class PosRMAController(http.Controller):
 
     @http.route('/pos/buscar_rma', type='json', auth='user')
-    def buscar_rma(self, numero_rma):
+    def buscar_rma(self, **kwargs):
+
+        numero_rma = kwargs.get("numero_rma")
 
         if not numero_rma:
-            return {"error": "Debe ingresar un número de RMA"}
+            return {
+                "error": "Debe ingresar un número de RMA"
+            }
 
         numero_rma = numero_rma.strip().upper()
 
-        # Permitir buscar solo el número (1162)
+        # permitir escribir solo número (1162)
         if not numero_rma.startswith("RMA/"):
             numero_rma = f"RMA/{numero_rma.zfill(5)}"
 
@@ -20,13 +24,20 @@ class PosRMAController(http.Controller):
             ('name', '=', numero_rma)
         ], limit=1)
 
+        # RMA no existe
         if not reparacion:
-            return {"error": "El RMA no existe"}
+            return {
+                "error": f"El RMA {numero_rma} no existe"
+            }
 
+        # RMA sin abono
         if not reparacion.abono or reparacion.abono <= 0:
-            return {"error": "Este RMA no tiene saldo de abono"}
+            return {
+                "error": f"El RMA {numero_rma} no tiene abono registrado"
+            }
 
         return {
+            "success": True,
             "precio": reparacion.abono,
             "rma": reparacion.name
         }
