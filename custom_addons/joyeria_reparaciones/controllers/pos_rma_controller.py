@@ -16,7 +16,7 @@ class PosRMAController(http.Controller):
 
         numero_rma = numero_rma.strip().upper()
 
-        # permitir escribir solo número (1162)
+        # permitir escribir solo el número (ej: 1162)
         if not numero_rma.startswith("RMA/"):
             numero_rma = f"RMA/{numero_rma.zfill(5)}"
 
@@ -33,7 +33,7 @@ class PosRMAController(http.Controller):
         # RMA sin abono
         if not reparacion.abono or reparacion.abono <= 0:
             return {
-                "error": f"El RMA {numero_rma} no tiene abono registrado"
+                "error": f"El RMA {numero_rma} no tiene valor de abono"
             }
 
         return {
