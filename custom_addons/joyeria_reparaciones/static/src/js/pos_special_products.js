@@ -88,8 +88,10 @@ patch(Order.prototype, {
 
             const numeroRMA = rmaInput.payload;
 
-            const resultado = await rpc("/pos/buscar_rma", {
-                numero_rma: numeroRMA
+            const result = await rpc('/pos/buscar_rma', {
+                params: {
+                    numero_rma: rma
+                }
             });
 
             if (!resultado) {
@@ -163,5 +165,5 @@ patch(Orderline.prototype, {
         return line;
     },
 
-    
+
 });
