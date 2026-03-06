@@ -745,6 +745,7 @@ class Reparacion(models.Model):
 
 
 
+
     class ResPartnerRestrictWriteForRMAClients(models.Model):
         _inherit = 'res.partner'
 
