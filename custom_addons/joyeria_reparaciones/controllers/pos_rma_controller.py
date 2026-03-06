@@ -37,4 +37,3 @@ class PosRMAController(http.Controller):
             "success": True,
             "precio": reparacion.abono
         }
-    
