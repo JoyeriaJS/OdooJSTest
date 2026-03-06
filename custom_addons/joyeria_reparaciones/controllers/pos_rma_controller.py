@@ -5,50 +5,28 @@ from odoo.http import request
 class PosRMAController(http.Controller):
 
     @http.route('/pos/buscar_rma', type='json', auth='user')
-    def buscar_rma(self, rma=None):
+    def buscar_rma(self, numero_rma):
 
-        if not rma:
-            return {
-                "success": False,
-                "message": "Debe ingresar un RMA."
-            }
+        if not numero_rma:
+            return {"error": "Debe ingresar un número de RMA"}
 
-        rma = str(rma).strip().upper()
+        numero_rma = numero_rma.strip().upper()
 
-        Reparacion = request.env['joyeria.reparacion'].sudo()
+        # Permitir buscar solo el número (1162)
+        if not numero_rma.startswith("RMA/"):
+            numero_rma = f"RMA/{numero_rma.zfill(5)}"
 
-        # Buscar directamente
-        reparacion = Reparacion.search([
-            ('name', '=', rma)
+        reparacion = request.env['joyeria.reparacion'].sudo().search([
+            ('name', '=', numero_rma)
         ], limit=1)
 
-        # Si no existe, intentar con formato RMA/
-        if not reparacion and not rma.startswith("RMA/"):
-
-            numero = rma.zfill(5)
-            codigo = f"RMA/{numero}"
-
-            reparacion = Reparacion.search([
-                ('name', '=', codigo)
-            ], limit=1)
-
-        # Si aún no existe
         if not reparacion:
-            return {
-                "success": False,
-                "message": "El RMA no existe."
-            }
+            return {"error": "El RMA no existe"}
 
-        # Validar abono
         if not reparacion.abono or reparacion.abono <= 0:
-            return {
-                "success": False,
-                "message": "El RMA no tiene valor de abono."
-            }
+            return {"error": "Este RMA no tiene saldo de abono"}
 
         return {
-            "success": True,
-            "rma": reparacion.name,
-            "abono": reparacion.abono,
-            "cliente": reparacion.cliente_id.name if reparacion.cliente_id else "",
+            "precio": reparacion.abono,
+            "rma": reparacion.name
         }
