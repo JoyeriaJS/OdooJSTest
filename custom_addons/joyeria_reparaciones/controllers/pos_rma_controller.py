@@ -9,32 +9,43 @@ class PosRMAController(http.Controller):
 
         if not rma:
             return {
-                "error": "Debe ingresar un RMA."
+                "success": False,
+                "message": "Debe ingresar un RMA."
             }
 
         rma = str(rma).strip().upper()
 
-        # Permitir buscar sin escribir RMA/
-        if not rma.startswith("RMA/"):
-            rma = "RMA/" + rma.zfill(5)
+        Reparacion = request.env['joyeria.reparacion'].sudo()
 
-        reparacion = request.env['joyeria.reparacion'].sudo().search([
+        # Buscar directamente
+        reparacion = Reparacion.search([
             ('name', '=', rma)
         ], limit=1)
 
-        # ❌ RMA NO EXISTE
+        # Si no existe, intentar con formato RMA/
+        if not reparacion and not rma.startswith("RMA/"):
+
+            numero = rma.zfill(5)
+            codigo = f"RMA/{numero}"
+
+            reparacion = Reparacion.search([
+                ('name', '=', codigo)
+            ], limit=1)
+
+        # Si aún no existe
         if not reparacion:
             return {
-                "error": "not_found"
+                "success": False,
+                "message": "El RMA no existe."
             }
 
-        # ❌ RMA SIN ABONO
+        # Validar abono
         if not reparacion.abono or reparacion.abono <= 0:
             return {
-                "error": "no_abono"
+                "success": False,
+                "message": "El RMA no tiene valor de abono."
             }
 
-        # ✅ TODO OK
         return {
             "success": True,
             "rma": reparacion.name,
