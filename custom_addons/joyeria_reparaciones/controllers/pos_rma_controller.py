@@ -5,19 +5,24 @@ from odoo.http import request
 class PosRMAController(http.Controller):
 
     @http.route('/pos/buscar_rma', type='json', auth='user')
-    def buscar_rma(self, rma):
+    def buscar_rma(self, **kwargs):
+
+        rma = kwargs.get('rma')
+
+        if not rma:
+            return {"error": "RMA vacío"}
 
         reparacion = request.env['joyeria.reparacion'].sudo().search([
-            ('name', '=', rma)
+            ('referencia_reparacion', '=', rma)
         ], limit=1)
 
         if not reparacion:
-            return {
-                "success": False
-            }
+            return {"error": "RMA no encontrado"}
+
+        if not reparacion.abono:
+            return {"error": "El RMA no tiene abono"}
 
         return {
-            "success": True,
-            "abono": reparacion.abono
+            "abono": reparacion.abono,
+            "referencia": reparacion.referencia_reparacion
         }
-    
