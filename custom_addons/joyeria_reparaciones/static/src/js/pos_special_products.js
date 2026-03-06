@@ -5,7 +5,6 @@ import { Order, Orderline } from "@point_of_sale/app/store/models";
 import { TextInputPopup } from "@point_of_sale/app/utils/input_popups/text_input_popup";
 import { NumberPopup } from "@point_of_sale/app/utils/input_popups/number_popup";
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
-import { useService } from "@web/core/utils/hooks";
 
 patch(Order.prototype, {
 
@@ -75,7 +74,7 @@ patch(Order.prototype, {
 
             const rmaInput = await popup.add(TextInputPopup, {
                 title: "Ingrese número de RMA",
-                placeholder: "Ej: RMA/01160"
+                placeholder: "Ej: RMA/01160 o 1160"
             });
 
             if (!rmaInput.confirmed || !rmaInput.payload) {
@@ -88,33 +87,23 @@ patch(Order.prototype, {
 
             const numeroRMA = rmaInput.payload;
 
-            const result = await rpc('/pos/buscar_rma', {
-                params: {
-                    numero_rma: rma
-                }
+            // 🔵 CONSULTAR BACKEND
+            const resultado = await rpc('/pos/buscar_rma', {
+                numero_rma: numeroRMA
             });
 
-            if (!resultado) {
+            if (resultado.error) {
 
                 await popup.add(ErrorPopup, {
-                    title: "RMA no encontrado",
-                    body: "No existe ese RMA en reparaciones.",
+                    title: "Error",
+                    body: resultado.error,
                 });
 
                 return;
             }
 
-            if (!resultado.abono || resultado.abono === 0) {
-
-                await popup.add(ErrorPopup, {
-                    title: "RMA sin abono",
-                    body: "El RMA no tiene valor de abono.",
-                });
-
-                return;
-            }
-
-            options.price = parseFloat(resultado.abono);
+            // 🔵 USAR PRECIO DEL ABONO
+            options.price = parseFloat(resultado.precio);
 
             await super.add_product(product, options);
 
@@ -136,6 +125,7 @@ patch(Order.prototype, {
 patch(Orderline.prototype, {
 
     export_as_JSON() {
+
         const json = super.export_as_JSON(...arguments);
 
         json.gramos = this.gramos || "";
@@ -164,6 +154,5 @@ patch(Orderline.prototype, {
 
         return line;
     },
-
 
 });
