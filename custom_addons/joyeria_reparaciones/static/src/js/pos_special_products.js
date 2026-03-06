@@ -12,8 +12,12 @@ patch(Order.prototype, {
     async add_product(product, options = {}) {
 
         const popup = this.env.services.popup;
+        const rpc = this.env.services.rpc;
 
-        // 🔵 PRODUCTO NO INVENTARIADO
+        // ===================================
+        // PRODUCTO NO INVENTARIADO
+        // ===================================
+
         if (product.name === "Producto No Inventariado") {
 
             const gramos = await popup.add(NumberPopup, {
@@ -63,24 +67,58 @@ patch(Order.prototype, {
             return;
         }
 
-        // 🔴 PRODUCTO RMA
+        // ===================================
+        // PRODUCTO RMA
+        // ===================================
+
         if (product.name === "Producto RMA") {
 
-            const precio = await popup.add(NumberPopup, {
-                title: "Ingrese precio RMA",
+            const rmaInput = await popup.add(TextInputPopup, {
+                title: "Ingrese número de RMA",
+                placeholder: "Ej: RMA/01160"
             });
 
-            if (!precio.confirmed || !precio.payload) {
+            if (!rmaInput.confirmed || !rmaInput.payload) {
                 await popup.add(ErrorPopup, {
                     title: "Dato obligatorio",
-                    body: "Debe ingresar el precio.",
+                    body: "Debe ingresar el número de RMA.",
                 });
                 return;
             }
 
-            options.price = parseFloat(precio.payload);
+            const numeroRMA = rmaInput.payload;
+
+            const resultado = await rpc("/pos/buscar_rma", {
+                numero_rma: numeroRMA
+            });
+
+            if (!resultado) {
+
+                await popup.add(ErrorPopup, {
+                    title: "RMA no encontrado",
+                    body: "No existe ese RMA en reparaciones.",
+                });
+
+                return;
+            }
+
+            if (!resultado.abono || resultado.abono === 0) {
+
+                await popup.add(ErrorPopup, {
+                    title: "RMA sin abono",
+                    body: "El RMA no tiene valor de abono.",
+                });
+
+                return;
+            }
+
+            options.price = parseFloat(resultado.abono);
 
             await super.add_product(product, options);
+
+            const line = this.get_selected_orderline();
+            line.numero_rma = resultado.rma;
+
             return;
         }
 
@@ -89,27 +127,39 @@ patch(Order.prototype, {
 });
 
 
-// 🔥 EXTENDER ORDERLINE PARA GUARDAR DATOS
+// ===================================
+// EXTENDER ORDERLINE
+// ===================================
 
 patch(Orderline.prototype, {
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
+
         json.gramos = this.gramos || "";
         json.descripcion_personalizada = this.descripcion_personalizada || "";
+        json.numero_rma = this.numero_rma || "";
+
         return json;
     },
 
     init_from_JSON(json) {
+
         super.init_from_JSON(...arguments);
+
         this.gramos = json.gramos || "";
         this.descripcion_personalizada = json.descripcion_personalizada || "";
+        this.numero_rma = json.numero_rma || "";
     },
 
     export_for_printing() {
+
         const line = super.export_for_printing(...arguments);
+
         line.gramos = this.gramos || "";
         line.descripcion_personalizada = this.descripcion_personalizada || "";
+        line.numero_rma = this.numero_rma || "";
+
         return line;
     },
 
