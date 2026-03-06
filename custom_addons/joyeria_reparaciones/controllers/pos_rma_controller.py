@@ -26,3 +26,4 @@ class PosRMAController(http.Controller):
             "abono": reparacion.abono,
             "referencia": reparacion.referencia_reparacion
         }
+    
