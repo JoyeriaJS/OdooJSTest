@@ -74,7 +74,7 @@ patch(Order.prototype, {
 
             const rmaInput = await popup.add(TextInputPopup, {
                 title: "Ingrese número de RMA",
-                placeholder: "Ej: RMA/01160 o 1160"
+                placeholder: "Ej: RMA/01160, RMA-01160, 1160 o escanee QR"
             });
 
             if (!rmaInput.confirmed || !rmaInput.payload) {
@@ -85,9 +85,43 @@ patch(Order.prototype, {
                 return;
             }
 
-            const numeroRMA = rmaInput.payload;
+            let numeroRMA = rmaInput.payload.trim();
 
-            // 🔵 CONSULTAR BACKEND
+            // ===================================
+            // SOPORTE PARA QR DE ODOO (URL)
+            // ===================================
+
+            if (numeroRMA.includes("http")) {
+
+                try {
+
+                    const url = new URL(numeroRMA);
+                    const match = url.hash.match(/id=(\d+)/);
+
+                    if (match) {
+                        numeroRMA = match[1];
+                    }
+
+                } catch (e) {
+                    console.warn("QR no es URL válida");
+                }
+            }
+
+            // ===================================
+            // NORMALIZAR FORMATO RMA
+            // ===================================
+
+            numeroRMA = numeroRMA
+                .replace("RMA/", "")
+                .replace("RMA-", "")
+                .replace("rma/", "")
+                .replace("rma-", "")
+                .trim();
+
+            // ===================================
+            // CONSULTAR BACKEND
+            // ===================================
+
             const resultado = await rpc('/pos/buscar_rma', {
                 numero_rma: numeroRMA
             });
@@ -102,7 +136,8 @@ patch(Order.prototype, {
                 return;
             }
 
-            // 🔵 USAR PRECIO DEL ABONO
+            // USAR PRECIO DEL ABONO
+
             options.price = parseFloat(resultado.precio);
 
             await super.add_product(product, options);
