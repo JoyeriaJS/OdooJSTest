@@ -28,5 +28,6 @@ exec odoo \
   --db_user="${ODOO_DATABASE_USER}" \
   --db_password="${ODOO_DATABASE_PASSWORD}" \
   --database="${ODOO_DATABASE_NAME}" \
-  --addons-path="/mnt/custom_addons,/usr/lib/python3/dist-packages/odoo/addons"
+  --addons-path="/mnt/custom_addons,/usr/lib/python3/dist-packages/odoo/addons" \
+  --init=base
   
