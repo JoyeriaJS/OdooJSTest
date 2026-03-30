@@ -972,19 +972,19 @@ class Reparacion(models.Model):
 class ResPartnerRequirePhoneAlways(models.Model):
     _inherit = 'res.partner'
 
-    #@api.constrains('phone', 'mobile', 'is_company', 'active')
-    #def _check_phone_required_for_person(self):
-     #   """
-      #  Obliga a ingresar teléfono (phone o mobile) para PERSONAS activas.
-       # Se ejecuta en create/write y es independiente del contexto del popup.
-        #"""
-        #for rec in self:
-         #   # Sólo aplica a clientes/personas (no empresas) y activos
-          #  if rec.active and not rec.is_company:
-           #     if not (rec.phone and rec.phone.strip()) and not (rec.mobile and rec.mobile.strip()):
-            #        raise ValidationError(
-             #           "Debe ingresar un número de teléfono (Teléfono o Móvil) para crear/guardar el cliente."
-              #      )
+    @api.constrains('phone', 'mobile', 'is_company', 'active')
+    def _check_phone_required_for_person(self):
+        """
+        Obliga a ingresar teléfono (phone o mobile) para PERSONAS activas.
+        Se ejecuta en create/write y es independiente del contexto del popup.
+        """
+        for rec in self:
+            # Sólo aplica a clientes/personas (no empresas) y activos
+            if rec.active and not rec.is_company:
+                if not (rec.phone and rec.phone.strip()) and not (rec.mobile and rec.mobile.strip()):
+                    raise ValidationError(
+                        "Debe ingresar un número de teléfono (Teléfono o Móvil) para crear/guardar el cliente."
+                    )
 
 
 class Operacion(models.Model):
