@@ -48,7 +48,22 @@ patch(PaymentScreen.prototype, {
             const precioOriginal = line.product.lst_price || 0;
             const precioVenta = line.get_unit_price();
 
-            if (precioVenta < (precioOriginal * 0.5)) {
+            // ==============================
+            // 👇 NUEVO: EXCEPCIÓN POR LISTA DE PRECIOS
+            // ==============================
+
+            const pricelistName = (order.pricelist && order.pricelist.name || "").toLowerCase();
+
+            const esListaExcepcion =
+                pricelistName.includes("mayorista") ||
+                pricelistName.includes("preferente") ||
+                pricelistName.includes("interno");
+
+            // ==============================
+            // VALIDACIÓN ORIGINAL + EXCEPCIÓN
+            // ==============================
+
+            if (!esListaExcepcion && precioVenta < (precioOriginal * 0.5)) {
 
                 await this.popup.add(ErrorPopup, {
                     title: "Precio inválido",
