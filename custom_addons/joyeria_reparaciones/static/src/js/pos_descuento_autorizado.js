@@ -67,7 +67,7 @@ patch(PaymentScreen.prototype, {
 
                 await this.popup.add(ErrorPopup, {
                     title: "Precio inválido",
-                    body: "No se puede vender '" + line.product.display_name + "' bajo el 50%",
+                    body: "No se puede vender '" + line.product.display_name + "' PRECIO ERRÓNEO",
                 });
 
                 return;
