@@ -49,10 +49,25 @@ patch(PaymentScreen.prototype, {
             const precioVenta = line.get_unit_price();
 
             // ==============================
-            // 👇 NUEVO: EXCEPCIÓN POR LISTA DE PRECIOS
+            // 👇 FIX: evitar precio 0 SIEMPRE
             // ==============================
 
-            const pricelistName = (order.pricelist && order.pricelist.name || "").toLowerCase();
+            if (precioVenta <= 0) {
+
+                await this.popup.add(ErrorPopup, {
+                    title: "Precio inválido",
+                    body: "No se puede vender '" + line.product.display_name + "' con precio 0",
+                });
+
+                return;
+            }
+
+            // ==============================
+            // 👇 FIX: obtener pricelist correctamente
+            // ==============================
+
+            const pricelist = order.get_pricelist();
+            const pricelistName = (pricelist && pricelist.name || "").toLowerCase();
 
             const esListaExcepcion =
                 pricelistName.includes("mayorista") ||
