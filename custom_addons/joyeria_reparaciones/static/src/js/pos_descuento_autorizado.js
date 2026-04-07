@@ -49,10 +49,21 @@ patch(PaymentScreen.prototype, {
             const precioVenta = line.get_unit_price();
 
             // ==============================
-            // 👇 FIX: evitar precio 0 SIEMPRE
+            // 👇 EXCEPCIÓN POR LISTA DE PRECIOS (FIX ODOO 17)
             // ==============================
 
-            if (precioVenta <= 0) {
+            const pricelistName = (order.pricelist && order.pricelist.name || "").toLowerCase();
+
+            const esListaExcepcion =
+                pricelistName.includes("mayorista") ||
+                pricelistName.includes("preferente") ||
+                pricelistName.includes("interno");
+
+            // ==============================
+            // 🚨 NUEVO: BLOQUEAR PRECIO 0
+            // ==============================
+
+            if (!esListaExcepcion && precioVenta <= 0) {
 
                 await this.popup.add(ErrorPopup, {
                     title: "Precio inválido",
@@ -61,18 +72,6 @@ patch(PaymentScreen.prototype, {
 
                 return;
             }
-
-            // ==============================
-            // 👇 FIX: obtener pricelist correctamente
-            // ==============================
-
-            const pricelist = order.get_pricelist();
-            const pricelistName = (pricelist && pricelist.name || "").toLowerCase();
-
-            const esListaExcepcion =
-                pricelistName.includes("mayorista") ||
-                pricelistName.includes("preferente") ||
-                pricelistName.includes("interno");
 
             // ==============================
             // VALIDACIÓN ORIGINAL + EXCEPCIÓN
