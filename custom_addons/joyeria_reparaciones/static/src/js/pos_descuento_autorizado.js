@@ -48,10 +48,6 @@ patch(PaymentScreen.prototype, {
             const precioOriginal = line.product.lst_price || 0;
             const precioVenta = line.get_unit_price();
 
-            // ==============================
-            // EXCEPCIÓN POR LISTA DE PRECIOS
-            // ==============================
-
             const pricelistName = (order.pricelist && order.pricelist.name || "").toLowerCase();
 
             const esListaExcepcion =
@@ -60,30 +56,26 @@ patch(PaymentScreen.prototype, {
                 pricelistName.includes("interno");
 
             // ==============================
-            // 🚨 FIX HARD: ELIMINAR PRODUCTOS EN $0
+            // 🚨 BLOQUEO TOTAL PRECIO 0
             // ==============================
 
-            if (!esListaExcepcion && (!precioVenta || precioVenta <= 0)) {
-
-                order.removeOrderline(line);
-
+            if (precioVenta === 0) {
                 await this.popup.add(ErrorPopup, {
-                    title: "Producto eliminado",
-                    body: "No se permiten productos con precio 0",
+                    title: "Precio inválido",
+                    body: "No se puede vender '" + line.product.display_name + "' con precio 0",
                 });
-
                 return;
             }
 
             // ==============================
-            // VALIDACIÓN ORIGINAL + EXCEPCIÓN
+            // VALIDACIÓN 50%
             // ==============================
 
             if (!esListaExcepcion && precioVenta < (precioOriginal * 0.5)) {
 
                 await this.popup.add(ErrorPopup, {
                     title: "Precio inválido",
-                    body: "No se puede vender '" + line.product.display_name + "' PRECIO ERRÓNEO",
+                    body: "No se puede vender '" + line.product.display_name + "' bajo el 50%",
                 });
 
                 return;
@@ -91,7 +83,7 @@ patch(PaymentScreen.prototype, {
         }
 
         // ==============================
-        // DESCUENTO AUTORIZADO (SIEMPRE PASA, NO CORTA FLUJO)
+        // DESCUENTO AUTORIZADO
         // ==============================
 
         if (!order.descuento_aplicado) {
@@ -173,12 +165,11 @@ patch(PaymentScreen.prototype, {
                         }
                     }
                 }
-                // 👈 si cancela, NO pasa nada y sigue flujo
             }
         }
 
         // ==============================
-        // 🔐 VENDEDORA (SIEMPRE OBLIGATORIA DESPUÉS)
+        // 🔐 VENDEDORA
         // ==============================
 
         if (!order.vendedora_id) {
@@ -190,7 +181,7 @@ patch(PaymentScreen.prototype, {
             });
 
             if (!confirmed || !payload) {
-                return; // 🚫 aquí sí se bloquea todo
+                return;
             }
 
             const result = await this.orm.call(
