@@ -49,7 +49,7 @@ patch(PaymentScreen.prototype, {
             const precioVenta = line.get_unit_price();
 
             // ==============================
-            // 👇 EXCEPCIÓN POR LISTA DE PRECIOS (FIX ODOO 17)
+            // EXCEPCIÓN POR LISTA DE PRECIOS
             // ==============================
 
             const pricelistName = (order.pricelist && order.pricelist.name || "").toLowerCase();
@@ -60,14 +60,16 @@ patch(PaymentScreen.prototype, {
                 pricelistName.includes("interno");
 
             // ==============================
-            // 🚨 NUEVO: BLOQUEAR PRECIO 0
+            // 🚨 FIX HARD: ELIMINAR PRODUCTOS EN $0
             // ==============================
 
-            if (!esListaExcepcion && precioVenta <= 0) {
+            if (!esListaExcepcion && (!precioVenta || precioVenta <= 0)) {
+
+                order.removeOrderline(line);
 
                 await this.popup.add(ErrorPopup, {
-                    title: "Precio inválido",
-                    body: "No se puede vender '" + line.product.display_name + "' con precio 0",
+                    title: "Producto eliminado",
+                    body: "No se permiten productos con precio 0",
                 });
 
                 return;
