@@ -209,22 +209,6 @@ class Reparacion(models.Model):
     total_salida_taller = fields.Float("Total salida del taller", compute="_compute_total_salida", store=True)
     peso_total = fields.Float("Peso total", compute="_compute_peso_total", store=True)
 
-    tipo_trabajo = fields.Selection([
-    ('diseno_3d', 'Diseño 3D'),
-    ('vector', 'Vector'),
-    ('argollas', 'Argollas')
-    ], string="Tipo de trabajo")
-
-    subtipo = fields.Selection([
-        ('nuevo', 'Nuevo'),
-        ('existente', 'Existente/Web')
-    ], string="Subtipo")
-
-    cantidad_circones = fields.Integer("Cantidad circones")
-    lleva_brillantes = fields.Boolean("Brillantes")
-    lleva_moissanitas = fields.Boolean("Moissanitas")
-    es_vector_nuevo = fields.Boolean("Vector nuevo")
-
         # ==============================
     # CAMPOS FORMULARIO POR METAL
     # ==============================
@@ -316,85 +300,6 @@ class Reparacion(models.Model):
         #        total += r.otros_cantidad_piedras * 300
          #   r.otros_total = total
 
-
-    @api.depends(
-    'metal_utilizado',
-    'tipo_trabajo',
-    'subtipo',
-    'cantidad_circones',
-    'gramos_utilizado',
-    'lleva_brillantes',
-    'lleva_moissanitas',
-    'es_vector_nuevo'
-)
-    def _compute_costos_taller(self):
-        for rec in self:
-
-            cobro = 0
-            hechura = 0
-            extras = 0
-
-            # =========================
-            # 🟡 ORO 18K
-            # =========================
-            if rec.metal_utilizado in ['oro 18k rosado', 'oro 18k amarillo']:
-
-                if rec.tipo_trabajo == 'diseno_3d':
-
-                    if rec.subtipo == 'nuevo':
-                        cobro += 16000  # diseño
-                        cobro += 4000   # impresión
-
-                    elif rec.subtipo == 'existente':
-                        cobro += 4000   # solo impresión
-
-                    cobro += (rec.cantidad_circones or 0) * 300
-
-                    if rec.lleva_brillantes:
-                        extras += 1  # marcador, puedes mejorar luego
-
-                    if rec.lleva_moissanitas:
-                        extras += 1
-
-                elif rec.tipo_trabajo == 'vector':
-                    cobro += 4000 if rec.es_vector_nuevo else 2000
-                    hechura += 3000
-
-                elif rec.tipo_trabajo == 'argollas':
-                    cobro += 3000
-                    cobro += (rec.cantidad_circones or 0) * 300
-
-            # =========================
-            # ⚪ PLATA
-            # =========================
-            elif rec.metal_utilizado == 'plata':
-
-                if rec.tipo_trabajo == 'diseno_3d':
-
-                    if rec.subtipo == 'nuevo':
-                        cobro += 16000
-                        cobro += 2000
-
-                    elif rec.subtipo == 'existente':
-                        cobro += 2000
-
-                    cobro += (rec.cantidad_circones or 0) * 300
-                    cobro += (rec.gramos_utilizado or 0) * 2300
-
-                elif rec.tipo_trabajo == 'vector':
-                    cobro += 4000 if rec.es_vector_nuevo else 2000
-                    cobro += (rec.gramos_utilizado or 0) * 2300
-
-                elif rec.tipo_trabajo == 'argollas':
-                    cobro += (rec.gramos_utilizado or 0) * 2300
-                    cobro += (rec.cantidad_circones or 0) * 300
-
-            # =========================
-            # RESULTADO FINAL
-            # =========================
-            rec.cobro_interno = cobro
-            rec.hechura = hechura
-            rec.cobros_extras = extras
     @api.depends('precio_unitario', 'extra', 'extra2', 'extra3', 'abono', 'saldo')
     def _compute_requiere_autorizacion(self):
         for rec in self:
