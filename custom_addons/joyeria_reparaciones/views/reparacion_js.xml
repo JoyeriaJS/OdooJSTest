@@ -74,6 +74,35 @@
                                col="2">
                             <label for="metal_utilizado"/>
                             <field name="metal_utilizado"/>
+
+                            <!-- ========================= -->
+                            <!-- 🔥 CALCULADORA DINÁMICA -->
+                            <!-- ========================= -->
+
+                            <group string="Calculadora Taller"
+                                   invisible="metal_utilizado not in ['plata','oro 18k amarillo','oro 18k rosado']"
+                                   col="2">
+
+                                <field name="tipo_trabajo"/>
+                                <field name="subtipo"/>
+
+                                <field name="cantidad_circones"
+                                       invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
+
+                                <field name="es_vector_nuevo"
+                                       invisible="tipo_trabajo != 'vector'"/>
+
+                                <field name="lleva_brillantes"
+                                       invisible="tipo_trabajo != 'diseno_3d'"/>
+
+                                <field name="lleva_moissanitas"
+                                       invisible="tipo_trabajo != 'diseno_3d'"/>
+
+                                <field name="gramos_utilizado"
+                                       invisible="metal_utilizado != 'plata'"/>
+
+                            </group>
+
                             
 
                             <!-- PLATA -->
