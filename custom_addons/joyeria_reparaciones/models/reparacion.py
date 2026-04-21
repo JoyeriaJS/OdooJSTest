@@ -80,10 +80,11 @@ class Reparacion(models.Model):
         ('local 329', 'Paseo Estado 344, Local 329, Santiago Centro, Metro Plaza de Armas (Galería Pasaje Matte)'),
         ('local 325', 'Paseo Estado 344, Local 325, Santiago Centro, Metro Plaza de Armas (Galería Pasaje Matte)'),
         ('local 383 online', 'Paseo Estado 344, Local 383 Online, Santiago Centro, Metro Plaza de Armas (Galería Pasaje Matte)'),
-        ('local 921', 'Paseo Estado 344, Local 921, Santiago Centro, Metro Plaza de Armas (Galería Pasaje Matte)'),
+        ('local 921', 'Huérfanos 921 (Galería Matte), Santiago Centro, Metro Plaza de Armas'),
         ('local 584', 'Monjitas 873, Local 584, Santiago Centro, Metro Plaza de Armas'),
         ('local maipu', 'Jumbo, Av. Los Pajaritos 3302 (Local Maipú), Metro Santiago Bueras')
     ], string='Dirección de entrega', required=True)
+
     vencimiento_garantia = fields.Date(string='Vencimiento de la garantía',compute='_compute_vencimiento_garantia',store=True)
     fecha_entrega = fields.Date(string='Fecha de entrega', tracking=True)
     responsable_id = fields.Many2one('res.users', string="Responsable", default=False, tracking=True)
@@ -177,9 +178,7 @@ class Reparacion(models.Model):
         ('confirmado', 'Confirmado'),
         ('cancelado', 'Cancelado')
     ], string='Estado', default='presupuesto', tracking=True, required=True, store=True, readonly=False)
-    descripcion_extra_1 = fields.Char()
-    descripcion_extra_2 = fields.Char()
-    descripcion_extra_3 = fields.Char()
+
 
     clave_autenticacion_manual = fields.Char(string='QR de quien recibe', required=True)
 
@@ -204,44 +203,9 @@ class Reparacion(models.Model):
 
     cobro_interno = fields.Float("Cobro interno")
     hechura = fields.Float("Hechura")
-    hechura2 = fields.Float("Hechura")
     cobros_extras = fields.Float("Cobros extras")
     total_salida_taller = fields.Float("Total salida del taller", compute="_compute_total_salida", store=True)
     peso_total = fields.Float("Peso total", compute="_compute_peso_total", store=True)
-
-        # ==============================
-    # CAMPOS FORMULARIO POR METAL
-    # ==============================
-
-    # PLATA
-    #plata_diseno = fields.Boolean(string="Diseño")
-    #plata_casting = fields.Boolean(string="Casting")
-    #plata_piedras = fields.Boolean(string="Piedras")
-    #plata_cantidad_piedras = fields.Integer(string="Cantidad piedras")
-    #plata_total = fields.Float(string="Total Plata", compute="_compute_total_plata", store=True)
-
-
-    # ORO AMARILLO
-    #oro_amarillo_diseno = fields.Boolean(string="Diseño")
-    #oro_amarillo_casting = fields.Boolean(string="Casting")
-    #oro_amarillo_piedras = fields.Boolean(string="Piedras")
-    #oro_amarillo_cantidad_piedras = fields.Integer(string="Cantidad piedras")
-    #oro_amarillo_total = fields.Float(string="Total Oro Amarillo", compute="_compute_total_oro_amarillo", store=True)
-
-
-    # ORO ROSADO
-    #oro_rosado_diseno = fields.Boolean(string="Diseño")
-    #oro_rosado_casting = fields.Boolean(string="Casting")
-    #oro_rosado_piedras = fields.Boolean(string="Piedras")
-    #oro_rosado_cantidad_piedras = fields.Integer(string="Cantidad piedras")
-    #oro_rosado_total = fields.Float(string="Total Oro Rosado", compute="_compute_total_oro_rosado", store=True)
-
-
-    # OTROS METALES
-    #otros_casting = fields.Boolean(string="Casting")
-    #otros_piedras = fields.Boolean(string="Piedras")
-    #otros_cantidad_piedras = fields.Integer(string="Cantidad piedras")
-    #otros_total = fields.Float(string="Total Otros", compute="_compute_total_otros", store=True)
 
 
     #firma_salida_id = fields.Many2one('joyeria.vendedora', string="Firma salida del taller", readonly=True)
@@ -249,56 +213,6 @@ class Reparacion(models.Model):
     firma_id = fields.Many2one('joyeria.vendedora', string='Retirado por', readonly=True, tracking=True)
     fecha_firma = fields.Datetime(string='Fecha de firma', readonly=True)
     clave_firma_manual = fields.Char(string='QR de quien retira')
-
-
-    #@api.depends('plata_diseno','plata_casting','plata_piedras','plata_cantidad_piedras')
-    #def _compute_total_plata(self):
-     #   for r in self:
-      #      total = 0
-       #     if r.plata_diseno:
-        #        total += 4000
-         #   if r.plata_casting:
-          #      total += 4000
-           # if r.plata_piedras:
-            #    total += r.plata_cantidad_piedras * 300
-            #r.plata_total = total
-
-
-    #@api.depends('oro_amarillo_diseno','oro_amarillo_casting','oro_amarillo_piedras','oro_amarillo_cantidad_piedras')
-    #def _compute_total_oro_amarillo(self):
-    #    for r in self:
-    #        total = 0
-     #       if r.oro_amarillo_diseno:
-      #          total += 4000
-       #     if r.oro_amarillo_casting:
-        #        total += 4000
-         #   if r.oro_amarillo_piedras:
-          #      total += r.oro_amarillo_cantidad_piedras * 300
-           # r.oro_amarillo_total = total
-
-
-   #@api.depends('oro_rosado_diseno','oro_rosado_casting','oro_rosado_piedras','oro_rosado_cantidad_piedras')
-    #def _compute_total_oro_rosado(self):
-     #   for r in self:
-      #      total = 0
-       #     if r.oro_rosado_diseno:
-        #        total += 4000
-         #   if r.oro_rosado_casting:
-          #      total += 4000
-           # if r.oro_rosado_piedras:
-            #    total += r.oro_rosado_cantidad_piedras * 300
-            #r.oro_rosado_total = total
-
-
-    #@api.depends('otros_casting','otros_piedras','otros_cantidad_piedras')
-    #def _compute_total_otros(self):
-     #   for r in self:
-     #      total = 0
-      #      if r.otros_casting:
-       #         total += 4000
-       #     if r.otros_piedras:
-        #        total += r.otros_cantidad_piedras * 300
-         #   r.otros_total = total
 
     @api.depends('precio_unitario', 'extra', 'extra2', 'extra3', 'abono', 'saldo')
     def _compute_requiere_autorizacion(self):
@@ -404,6 +318,7 @@ class Reparacion(models.Model):
                 }
 
 
+
     @api.onchange('express')
     def _onchange_express(self):
         if self.express:
@@ -484,7 +399,6 @@ class Reparacion(models.Model):
             self.cobro_interno = 0.0
             self.hechura = 0.0
             self.cobros_extras = 0.0
-            self.hechura2 = 0.0
 
     
     #@api.model
@@ -539,23 +453,10 @@ class Reparacion(models.Model):
             if not self.env.user.has_group('joyeria_reparaciones.grupo_gestion_estado_reparacion'):
                 rec.estado = rec.estado  # No cambia el valor, pero evita la edición
 
-    @api.depends('cantidad', 'precio_unitario', 'extra', 'extra2', 'extra3', 'hechura2', 'tipo_cliente')
+    @api.depends('cantidad', 'precio_unitario', 'extra', 'extra2', 'extra3')
     def _compute_subtotal(self):
         for rec in self:
-
-            # Determinar precio base según tipo de cliente
-            if rec.tipo_cliente in ['cliente mayorista', 'cliente preferente']:
-                precio_base = rec.hechura2 or 0.0
-            else:
-                precio_base = rec.precio_unitario or 0.0
-
-            # Calcular subtotal correctamente
-            rec.subtotal = (
-                (rec.cantidad or 0.0) * precio_base
-                + (rec.extra or 0.0)
-                + (rec.extra2 or 0.0)
-                + (rec.extra3 or 0.0)
-            )
+            rec.subtotal = rec.cantidad * rec.precio_unitario + rec.extra + rec.extra2 + rec.extra3
 
     @api.depends('subtotal', 'abono')
     def _compute_saldo(self):
@@ -576,7 +477,7 @@ class Reparacion(models.Model):
          #       raise ValidationError("Debe ingresar un valor para el peso si selecciona tipo 'Especial'.")
         #return super().write(vals)
 
-    @api.depends('cobro_interno', 'hechura', 'cobros_extras') #'otros_total' #'oro_rosado_total', 'oro_amarillo_total', 'plata_total')
+    @api.depends('cobro_interno', 'hechura', 'cobros_extras')
     def _compute_total_salida(self):
         for rec in self:
             rec.total_salida_taller = (rec.cobro_interno or 0) + (rec.hechura or 0) + (rec.cobros_extras or 0)
@@ -629,6 +530,7 @@ class Reparacion(models.Model):
                 self.vendedora_id = vendedora.id
 
 # ###create funcional(se modifica)######
+    # ###create funcional (corregido sin alterar lógica)######
     @api.model
     def create(self, vals):
         ahora = datetime.now(CHILE_TZ).strftime('%d/%m/%Y %H:%M:%S')
@@ -636,18 +538,6 @@ class Reparacion(models.Model):
 
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
         is_import = bool(self.env.context.get('import_file') or self.env.context.get('from_import'))
-
-        # ============================================================
-        # 🆕 CLIENTE ESPECIAL → USAR HECHURA
-        # ============================================================
-        tipo_cliente = vals.get("tipo_cliente")
-
-        if tipo_cliente in ["cliente mayorista", "cliente preferente"]:
-            precio = vals.get("precio_unitario", 0) or 0
-
-            if precio > 0:
-                vals["hechura2"] = precio
-                vals["precio_unitario"] = 0
 
         # ============================================================
         # 🔐 VALIDACIÓN DE AUTORIZACIÓN PARA RMA SIN COSTO
@@ -678,13 +568,20 @@ class Reparacion(models.Model):
             _logger = logging.getLogger(__name__)
             _logger.warning("===== DEBUG AUTORIZACIÓN CREA =====")
             _logger.warning("VALS codigo_ingresado = %s", vals.get("codigo_ingresado"))
+            _logger.warning("CÓDIGOS EN BD:")
+            for c in self.env["joyeria.reparacion.authcode"].search([]):
+                _logger.warning("ID %s | '%s' | used=%s", c.id, repr(c.codigo), c.used)
             _logger.warning("====================================")
 
-            codigo_ing = vals.get("codigo_ingresado") or self._context.get("codigo_ingresado") or ""
+            codigo_ing = vals.get("codigo_ingresado")
+            if not codigo_ing:
+                codigo_ing = self._context.get("codigo_ingresado") or ""
             codigo_ing = str(codigo_ing).strip().upper()
 
             if not codigo_ing:
                 raise ValidationError("❌ Debes ingresar un código de autorización para reparaciones sin costo.")
+
+            codigo_ing_norm = codigo_ing.strip().upper()
 
             codes = self.env["joyeria.reparacion.authcode"].search([
                 ('used', '=', False),
@@ -692,7 +589,7 @@ class Reparacion(models.Model):
             ])
 
             code = next(
-                (c for c in codes if (c.codigo or "").strip().upper() == codigo_ing),
+                (c for c in codes if (c.codigo or "").strip().upper() == codigo_ing_norm),
                 False
             )
 
@@ -708,7 +605,7 @@ class Reparacion(models.Model):
             vals["codigo_autorizacion_id"] = code.id
 
         # ============================================================
-        # ⚙️ RESTO DE TU LÓGICA (NO TOCADA)
+        # ⚙️ LÓGICA EXISTENTE — NO TOCAR
         # ============================================================
 
         if (not is_admin) and (not is_import) and vals.get('peso') == 'especial' and not vals.get('peso_valor'):
@@ -719,6 +616,7 @@ class Reparacion(models.Model):
             peso_tipo = vals.get('peso')
             peso_valor = vals.get('peso_valor')
 
+            # ✅ AHORA ESTÁ DENTRO DEL BLOQUE CORRECTO
             if peso_tipo == 'estandar':
                 if peso_valor not in (0, False, None):
                     raise ValidationError(
@@ -770,11 +668,22 @@ class Reparacion(models.Model):
         if hasattr(record, '_generar_codigo_qr'):
             record._generar_codigo_qr()
 
+        peso_str = str(record.peso_valor) if record.peso_valor not in (False, 0, 0.0) else "No especificado"
+        resumen = (
+            "📌 Resumen generado automáticamente\n"
+            f"🗓️ Vencimiento de la garantía: {record.vencimiento_garantia or 'No definida'}\n"
+            f"📄 Estado: {record.estado or 'No definido'}\n"
+            f"🔩 Metal Reparación: {record.metal or 'No definido'}\n"
+            f"⚖️ Peso del Producto: {peso_str}\n"
+            f"📝 Solicitud del Cliente: {record.solicitud_cliente or 'No especificada'}\n"
+            f"🕒 Registrado el: {ahora}"
+        )
+        mensajes.append(resumen)
+
         for msg in mensajes:
             record.message_post(body=msg)
 
         return record
-
 
 
 
@@ -846,20 +755,6 @@ class Reparacion(models.Model):
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
 
         # ============================================================
-        # 🆕 CLIENTE ESPECIAL → HECHURA + BLOQUEO PRECIO
-        # ============================================================
-        for rec in self:
-            tipo = vals.get("tipo_cliente", rec.tipo_cliente)
-
-            if tipo in ["cliente mayorista", "cliente preferente"]:
-
-                precio = vals.get("precio_unitario", rec.precio_unitario) or 0
-
-                if precio > 0:
-                    vals["hechura2"] = precio
-                    vals["precio_unitario"] = 0
-
-        # ============================================================
         # 🔧 VALIDACIONES EXISTENTES (NO TOCAR)
         # ============================================================
         if not is_admin:
@@ -868,10 +763,11 @@ class Reparacion(models.Model):
                     raise ValidationError("No se permite cambiar el tipo de peso una vez creado el registro.")
 
         # ============================================================
-        # 📲 QR (NO TOCADO)
+        # 📲 PROCESAR QR — NO SE TOCA
         # ============================================================
         for rec in self:
 
+            # Recepción por QR
             if vals.get('clave_autenticacion_manual'):
                 clave = vals['clave_autenticacion_manual'].strip().upper()
                 vendedora = rec.env['joyeria.vendedora'].search([
@@ -883,6 +779,7 @@ class Reparacion(models.Model):
                 if vendedora:
                     vals['vendedora_id'] = vendedora.id
 
+            # Firma por QR
             if vals.get('clave_firma_manual'):
                 clave = vals['clave_firma_manual'].strip().upper()
                 vendedora_firma = rec.env['joyeria.vendedora'].search([
@@ -897,6 +794,9 @@ class Reparacion(models.Model):
                     ahora_utc_naive = ahora_chile.astimezone(pytz.UTC).replace(tzinfo=None)
                     vals['fecha_firma'] = ahora_utc_naive
 
+        # ============================================================
+        # ✔ GUARDAR CAMBIOS
+        # ============================================================
         return super().write(vals)
 
 
@@ -1072,21 +972,3 @@ class Vendedora(models.Model):
     def imprimir_etiqueta_vendedora(self):
         return self.env.ref('joyeria_reparaciones.action_report_etiqueta_vendedora').report_action(self)
 
-    @api.model
-    def validar_vendedora_pos(self, codigo):
-        codigo = (codigo or "").strip()
-
-        vendedora = self.search([
-            '|', '|',
-            ('codigo_qr', '=', codigo),
-            ('clave_qr', '=', codigo),
-            ('clave_autenticacion', '=', codigo),
-        ], limit=1)
-
-        if not vendedora:
-            return False
-
-        return {
-            'id': vendedora.id,
-            'name': vendedora.name,
-        }
