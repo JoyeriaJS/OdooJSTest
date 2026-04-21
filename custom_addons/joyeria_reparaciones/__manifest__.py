@@ -1,5 +1,5 @@
 {
-    'name': 'Reparaciones de JoyeríaPrueba',
+    'name': 'Reparaciones de Joyería',
     'version': '1.0',
     'summary': 'Gestión de órdenes de reparación de joyas',
     'author': 'DR',
@@ -26,7 +26,6 @@
         #'views/wizard_reporte_responsables.xml',
         #'views/res_users_inherit.xml',
         'views/reparacion_confirm_view.xml',
-        "views/reparacion_auth_code_view.xml",
 
         'report/report_salida_taller_xlsx.xml',
         'report/report_sales_by_store_xlsx.xml',
