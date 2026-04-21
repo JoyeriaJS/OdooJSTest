@@ -6,9 +6,9 @@
     'category': 'Operations',
     'depends': ['base', 'product', 'sale', 'contacts','point_of_sale', 'report_xlsx','mail'],
     'data': [
+        'views/reparacion_js.xml',
         'security/joyeria_security.xml',
         'security/ir.model.access.csv',
-        'views/reparacion_js.xml',
         'data/ir_sequence_data.xml',
         'data/joyeria_data.xml',
         'report/report.xml',  # ← este es el que importa
