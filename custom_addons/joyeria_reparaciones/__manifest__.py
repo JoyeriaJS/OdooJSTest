@@ -34,7 +34,6 @@
         #'views/pos_menu.xml',
         
         
-        
 
         'report/report_salida_taller_xlsx.xml',
         'report/report_sales_by_store_xlsx.xml',
@@ -61,7 +60,7 @@
             'joyeria_reparaciones/static/src/js/pos_descuento_autorizado.js',
             'joyeria_reparaciones/static/src/js/pos_special_products.js',
             #'joyeria_reparaciones/static/src/xml/qr_vendedora.xml',
-            #'joyeria_reparaciones/static/src/xml/receipt_override.xml',
+            'joyeria_reparaciones/static/src/xml/receipt_override.xml',
             
 
             
