@@ -1,14 +1,18 @@
 FROM odoo:17.0
 
-USER root
+ARG LOCALE=en_US.UTF-8
+ENV LANGUAGE=${LOCALE}
+ENV LC_ALL=${LOCALE}
+ENV LANG=${LOCALE}
 
-RUN apt-get update && apt-get install -y netcat-openbsd
+USER 0
 
-COPY ./entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN apt-get -y update && apt-get install -y --no-install-recommends locales netcat-openbsd \
+    && locale-gen ${LOCALE}
 
+WORKDIR /app
+
+COPY --chmod=755 entrypoint.sh ./
 COPY ./custom_addons /mnt/custom_addons
 
-USER odoo
-
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "entrypoint.sh"]
