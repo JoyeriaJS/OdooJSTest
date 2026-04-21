@@ -47,8 +47,32 @@ patch(PaymentScreen.prototype, {
 
             const precioOriginal = line.product.lst_price || 0;
             const precioVenta = line.get_unit_price();
+            const subtotal = line.get_price_with_tax();
 
-            if (precioVenta < (precioOriginal * 0.5)) {
+            const pricelistName = (order.pricelist && order.pricelist.name || "").toLowerCase();
+
+            const esListaExcepcion =
+                pricelistName.includes("mayorista") ||
+                pricelistName.includes("preferente") ||
+                pricelistName.includes("interno");
+
+            // ==============================
+            // 🚨 BLOQUEO REAL PRECIO 0 (FIX BUG ⌫)
+            // ==============================
+
+            if (precioVenta <= 0 || subtotal <= 0) {
+                await this.popup.add(ErrorPopup, {
+                    title: "Precio inválido",
+                    body: "No se puede vender '" + line.product.display_name + "' con precio 0 o inválido",
+                });
+                return;
+            }
+
+            // ==============================
+            // VALIDACIÓN 50%
+            // ==============================
+
+            if (!esListaExcepcion && precioVenta < (precioOriginal * 0.5)) {
 
                 await this.popup.add(ErrorPopup, {
                     title: "Precio inválido",
@@ -60,7 +84,7 @@ patch(PaymentScreen.prototype, {
         }
 
         // ==============================
-        // DESCUENTO AUTORIZADO (SIEMPRE PASA, NO CORTA FLUJO)
+        // DESCUENTO AUTORIZADO
         // ==============================
 
         if (!order.descuento_aplicado) {
@@ -142,12 +166,11 @@ patch(PaymentScreen.prototype, {
                         }
                     }
                 }
-                // 👈 si cancela, NO pasa nada y sigue flujo
             }
         }
 
         // ==============================
-        // 🔐 VENDEDORA (SIEMPRE OBLIGATORIA DESPUÉS)
+        // 🔐 VENDEDORA
         // ==============================
 
         if (!order.vendedora_id) {
@@ -159,7 +182,7 @@ patch(PaymentScreen.prototype, {
             });
 
             if (!confirmed || !payload) {
-                return; // 🚫 aquí sí se bloquea todo
+                return;
             }
 
             const result = await this.orm.call(
@@ -179,10 +202,6 @@ patch(PaymentScreen.prototype, {
             order.vendedora_id = result.id;
             order.vendedora_name = result.name;
         }
-
-        // ==============================
-        // VALIDAR ORDEN FINAL
-        // ==============================
 
         return await super.validateOrder(isForceValidate);
     }
