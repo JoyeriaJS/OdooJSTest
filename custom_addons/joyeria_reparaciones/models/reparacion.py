@@ -369,6 +369,9 @@ class Reparacion(models.Model):
             # =========================
             elif rec.metal_utilizado == 'plata':
 
+                # =========================
+                # 🔹 DISEÑO / IMPRESIÓN → COBRO INTERNO
+                # =========================
                 if rec.tipo_trabajo == 'diseno_3d':
 
                     if rec.subtipo == 'nuevo':
@@ -378,23 +381,35 @@ class Reparacion(models.Model):
                     elif rec.subtipo == 'existente':
                         cobro += 2000
 
-                    cobro += (rec.cantidad_circones or 0) * 300
-                    cobro += (rec.gramos_utilizado or 0) * 2300
-
                 elif rec.tipo_trabajo == 'vector':
                     cobro += 4000 if rec.es_vector_nuevo else 2000
-                    cobro += (rec.gramos_utilizado or 0) * 2300
 
                 elif rec.tipo_trabajo == 'argollas':
-                    cobro += (rec.gramos_utilizado or 0) * 2300
-                    cobro += (rec.cantidad_circones or 0) * 300
+                    cobro += 3000
 
-            # =========================
-            # RESULTADO FINAL
-            # =========================
-            rec.cobro_interno = cobro
-            rec.hechura = hechura
-            rec.cobros_extras = extras
+                # =========================
+                # 🔨 HECHURA → GRAMOS
+                # =========================
+                hechura += (rec.gramos_utilizado or 0) * 2300
+
+                # =========================
+                # 💎 EXTRAS → PIEDRAS
+                # =========================
+                extras += (rec.cantidad_circones or 0) * 300
+
+                # (opcional futuro)
+                if rec.lleva_brillantes:
+                    extras += 0  # aquí luego metes lógica real
+
+                if rec.lleva_moissanitas:
+                    extras += 0
+
+                        # =========================
+                        # RESULTADO FINAL
+                        # =========================
+                    rec.cobro_interno = cobro
+                    rec.hechura = hechura
+                    rec.cobros_extras = extras
     @api.depends('precio_unitario', 'extra', 'extra2', 'extra3', 'abono', 'saldo')
     def _compute_requiere_autorizacion(self):
         for rec in self:
