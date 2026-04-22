@@ -226,8 +226,8 @@ class Reparacion(models.Model):
     lleva_moissanitas = fields.Boolean("Moissanitas")
     cantidad_moissanitas = fields.Integer("Cantidad moissanitas")
     es_vector_nuevo = fields.Boolean("Vector nuevo")
-    #ORO BLANCO
     rodinado = fields.Boolean("Rodinado")
+
 
         # ==============================
     # CAMPOS FORMULARIO POR METAL
@@ -426,7 +426,7 @@ class Reparacion(models.Model):
                 # ✨ RODINADO
                 # =========================
                 if rec.rodinado:
-                    extras += 20000
+                    extras += 10000
 
             # =========================
             # RESULTADO FINAL
