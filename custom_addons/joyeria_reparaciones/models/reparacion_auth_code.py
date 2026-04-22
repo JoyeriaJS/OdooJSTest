@@ -13,6 +13,18 @@ class ReparacionAuthCode(models.Model):
     codigo = fields.Char(string="Código", readonly=True)
     used = fields.Boolean(string="Usado", default=False)
 
+    reparacion_id = fields.Many2one(
+        "joyeria.reparacion",
+        string="RMA",
+        readonly=True
+    )
+
+    reparacion_name = fields.Char(
+        string="N° RMA",
+        related="reparacion_id.name",
+        store=True
+    )
+
     fecha_creacion = fields.Datetime(
         string="Fecha creación",
         default=lambda self: fields.Datetime.now(),
