@@ -202,10 +202,10 @@ class Reparacion(models.Model):
 
     metales_extra = fields.Float("Metales extra(gr)")
 
-    cobro_interno = fields.Float("Cobro interno")
-    hechura = fields.Float("Hechura")
+    cobro_interno = fields.Float("Cobro interno", compute="_compute_costos_taller", store=True)
+    hechura = fields.Float("Hechura", compute="_compute_costos_taller", store=True)
     hechura2 = fields.Float("Hechura")
-    cobros_extras = fields.Float("Cobros extras")
+    cobros_extras = fields.Floatcobros_extras = fields.Float("Cobros extras", compute="_compute_costos_taller", store=True)
     total_salida_taller = fields.Float("Total salida del taller", compute="_compute_total_salida", store=True)
     peso_total = fields.Float("Peso total", compute="_compute_peso_total", store=True)
 
@@ -671,7 +671,15 @@ class Reparacion(models.Model):
          #       raise ValidationError("Debe ingresar un valor para el peso si selecciona tipo 'Especial'.")
         #return super().write(vals)
 
-    @api.depends('cobro_interno', 'hechura', 'cobros_extras') #'otros_total' #'oro_rosado_total', 'oro_amarillo_total', 'plata_total')
+    @api.depends('cobro_interno', 'hechura', 'cobros_extras',
+                 'metal_utilizado',
+    'tipo_trabajo',
+    'subtipo',
+    'cantidad_circones',
+    'gramos_utilizado',
+    'lleva_brillantes',
+    'lleva_moissanitas',
+    'es_vector_nuevo') #'otros_total' #'oro_rosado_total', 'oro_amarillo_total', 'plata_total')
     def _compute_total_salida(self):
         for rec in self:
             rec.total_salida_taller = (rec.cobro_interno or 0) + (rec.hechura or 0) + (rec.cobros_extras or 0)
