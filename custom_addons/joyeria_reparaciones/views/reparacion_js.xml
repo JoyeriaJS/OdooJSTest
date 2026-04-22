@@ -95,8 +95,14 @@
                                 <field name="lleva_brillantes"
                                        invisible="tipo_trabajo != 'diseno_3d'"/>
 
+                                <field name="cantidad_brillantes"
+                                       invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
+
                                 <field name="lleva_moissanitas"
                                        invisible="tipo_trabajo != 'diseno_3d'"/>
+                                       
+                                <field name="cantidad_moissanitas"
+                                       invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
 
                             </group>
 

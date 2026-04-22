@@ -222,7 +222,9 @@ class Reparacion(models.Model):
 
     cantidad_circones = fields.Integer("Cantidad circones")
     lleva_brillantes = fields.Boolean("Brillantes")
+    cantidad_brillantes = fields.Integer("Cantidad brillantes")
     lleva_moissanitas = fields.Boolean("Moissanitas")
+    cantidad_moissanitas = fields.Integer("Cantidad moissanitas")
     es_vector_nuevo = fields.Boolean("Vector nuevo")
 
         # ==============================
