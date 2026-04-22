@@ -1,0 +1,10 @@
+<!-- wizard_set_precio_oros_action.xml -->
+<odoo>
+    <record id="action_open_precio_oros_wizard" model="ir.actions.act_window">
+        <field name="name">Configurar precios oro</field>
+        <field name="res_model">wizard.set.precio.oros</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>
