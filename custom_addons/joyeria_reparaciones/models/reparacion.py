@@ -773,13 +773,20 @@ class Reparacion(models.Model):
             _logger = logging.getLogger(__name__)
             _logger.warning("===== DEBUG AUTORIZACIÓN CREA =====")
             _logger.warning("VALS codigo_ingresado = %s", vals.get("codigo_ingresado"))
+            _logger.warning("CÓDIGOS EN BD:")
+            for c in self.env["joyeria.reparacion.authcode"].search([]):
+                _logger.warning("ID %s | '%s' | used=%s", c.id, repr(c.codigo), c.used)
             _logger.warning("====================================")
 
-            codigo_ing = vals.get("codigo_ingresado") or self._context.get("codigo_ingresado") or ""
+            codigo_ing = vals.get("codigo_ingresado")
+            if not codigo_ing:
+                codigo_ing = self._context.get("codigo_ingresado") or ""
             codigo_ing = str(codigo_ing).strip().upper()
 
             if not codigo_ing:
                 raise ValidationError("❌ Debes ingresar un código de autorización para reparaciones sin costo.")
+
+            codigo_ing_norm = codigo_ing.strip().upper()
 
             codes = self.env["joyeria.reparacion.authcode"].search([
                 ('used', '=', False),
@@ -787,7 +794,7 @@ class Reparacion(models.Model):
             ])
 
             code = next(
-                (c for c in codes if (c.codigo or "").strip().upper() == codigo_ing),
+                (c for c in codes if (c.codigo or "").strip().upper() == codigo_ing_norm),
                 False
             )
 
@@ -797,8 +804,7 @@ class Reparacion(models.Model):
             code.write({
                 'used': True,
                 'usado_por_id': self.env.uid,
-                'fecha_uso': datetime.now(),
-                'reparacion_id': record.id  # 🔥 AQUÍ está la magia
+                'fecha_uso': datetime.now()
             })
 
             vals["codigo_autorizacion_id"] = code.id
