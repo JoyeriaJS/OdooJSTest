@@ -4,13 +4,14 @@
     'summary': 'Gestión de órdenes de reparación de joyas',
     'author': 'DR',
     'category': 'Operations',
-    'depends': ['base', 'product', 'sale', 'contacts','point_of_sale', 'report_xlsx','mail'],
+    'depends': ['base', 'product', 'sale', 'contacts','point_of_sale', #'report_xlsx'
+                'mail'],
     'data': [
         'security/joyeria_security.xml',
         'security/ir.model.access.csv',
         'views/reparacion_js.xml',
-        'data/ir_sequence_data.xml',
-        'data/joyeria_data.xml',
+        #'data/ir_sequence_data.xml',
+        #'data/joyeria_data.xml',
         #'report/report.xml',  # ← este es el que importa
         #'report/report_qrcode_template.xml',
         #'report/reporte_responsable_report.xml',
