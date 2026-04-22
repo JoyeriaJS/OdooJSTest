@@ -10,11 +10,11 @@
         'security/joyeria_security.xml',
         'security/ir.model.access.csv',
         'views/reparacion_js.xml',
-        'data/ir_sequence_data.xml',
-        'data/joyeria_data.xml',
-        'report/report.xml',  # ← este es el que importa
-        'report/report_qrcode_template.xml',
-        'report/reporte_responsable_report.xml',
+        #'data/ir_sequence_data.xml',
+        #'data/joyeria_data.xml',
+        #'report/report.xml',  # ← este es el que importa
+        #'report/report_qrcode_template.xml',
+        #'report/reporte_responsable_report.xml',
         #'static/src/reparacion_form.js',
         'report/reporte_reparaciones_responsable.xml',
         #'views/vendedora_qr_views.xml',
