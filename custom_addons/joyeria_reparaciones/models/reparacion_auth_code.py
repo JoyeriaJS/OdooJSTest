@@ -22,20 +22,6 @@ class ReparacionAuthCode(models.Model):
     usado_por_id = fields.Many2one("res.users", string="Usado por", readonly=True)
     fecha_uso = fields.Datetime("Fecha de uso", readonly=True)
 
-    # 🔥 NUEVO → RELACIÓN CON RMA
-    reparacion_id = fields.Many2one(
-        "joyeria.reparacion",
-        string="RMA asociado",
-        readonly=True
-    )
-
-    # 🔥 NUEVO → MOSTRAR NÚMERO RMA
-    reparacion_name = fields.Char(
-        string="N° RMA",
-        related="reparacion_id.name",
-        store=True
-    )
-
     tiempo_restante = fields.Char(
         string="Tiempo restante",
         compute="_compute_tiempo_restante"
@@ -73,7 +59,7 @@ class ReparacionAuthCode(models.Model):
                 fecha_ini = pytz.UTC.localize(fecha_ini)
 
             ahora = datetime.now(pytz.UTC)
-            expira = fecha_ini + timedelta(hours=1)
+            expira = fecha_ini + timedelta(hours=1)  # ✔ EXPIRA EN 1 HORA
 
             diff = expira - ahora
 
@@ -102,12 +88,16 @@ class ReparacionAuthCode(models.Model):
             ahora = datetime.now(pytz.UTC)
             expira = fecha_ini + timedelta(hours=1)
 
-            code.expired = ahora >= expira
+            if ahora >= expira:
+                code.expired = True
+            else:
+                code.expired = False
 
     # ============================
     # VERIFICAR EXPIRACIÓN MANUAL
     # ============================
     def check_expired(self):
+        """Forzar revisión de expiración antes de validar un RMA."""
         for code in self:
             fecha_ini = code.fecha_creacion
             if fecha_ini.tzinfo is None:
