@@ -226,6 +226,8 @@ class Reparacion(models.Model):
     lleva_moissanitas = fields.Boolean("Moissanitas")
     cantidad_moissanitas = fields.Integer("Cantidad moissanitas")
     es_vector_nuevo = fields.Boolean("Vector nuevo")
+    #ORO BLANCO
+    rodinado = fields.Boolean("Rodinado")
 
         # ==============================
     # CAMPOS FORMULARIO POR METAL
@@ -327,7 +329,8 @@ class Reparacion(models.Model):
     'gramos_utilizado',
     'lleva_brillantes',
     'lleva_moissanitas',
-    'es_vector_nuevo'
+    'es_vector_nuevo',
+    'rodinado'
 )
     def _compute_costos_taller(self):
         for rec in self:
@@ -350,7 +353,7 @@ class Reparacion(models.Model):
                     elif rec.subtipo == 'existente':
                         cobro += 4000
 
-                    cobro += (rec.cantidad_circones or 0) * 300
+                    extras += (rec.cantidad_circones or 0) * 300
 
                     if rec.lleva_brillantes:
                         extras += 0  # puedes ajustar luego
@@ -364,7 +367,7 @@ class Reparacion(models.Model):
 
                 elif rec.tipo_trabajo == 'argollas':
                     cobro += 3000
-                    cobro += (rec.cantidad_circones or 0) * 300
+                    extras += (rec.cantidad_circones or 0) * 300
 
             # =========================
             # ⚪ PLATA
@@ -390,6 +393,40 @@ class Reparacion(models.Model):
                 elif rec.tipo_trabajo == 'argollas':
                     hechura += (rec.gramos_utilizado or 0) * 2300
                     extras += (rec.cantidad_circones or 0) * 300
+
+            # =========================
+            # ⚪ ORO 18K BLANCO
+            # =========================
+            elif rec.metal_utilizado == 'oro 18k blanco':
+
+                if rec.tipo_trabajo == 'diseno_3d':
+
+                    if rec.subtipo == 'nuevo':
+                        cobro += 16000
+                        cobro += 2000
+
+                    elif rec.subtipo == 'existente':
+                        cobro += 2000
+
+                    # 💎 piedras
+                    extras += (rec.cantidad_circones or 0) * 300
+
+                    # ⚖️ gramos → HECHURA
+                    hechura += (rec.gramos_utilizado or 0) * 101000
+
+                elif rec.tipo_trabajo == 'vector':
+                    cobro += 4000 if rec.es_vector_nuevo else 2000
+                    hechura += (rec.gramos_utilizado or 0) * 101000
+
+                elif rec.tipo_trabajo == 'argollas':
+                    hechura += (rec.gramos_utilizado or 0) * 101000
+                    extras += (rec.cantidad_circones or 0) * 300
+
+                # =========================
+                # ✨ RODINADO
+                # =========================
+                if rec.rodinado:
+                    extras += 20000
 
             # =========================
             # RESULTADO FINAL
