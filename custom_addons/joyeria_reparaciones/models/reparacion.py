@@ -404,12 +404,6 @@ class Reparacion(models.Model):
                 if rec.lleva_moissanitas:
                     extras += 0
 
-                        # =========================
-                        # RESULTADO FINAL
-                        # =========================
-                    rec.cobro_interno = cobro
-                    rec.hechura = hechura
-                    rec.cobros_extras = extras
     @api.depends('precio_unitario', 'extra', 'extra2', 'extra3', 'abono', 'saldo')
     def _compute_requiere_autorizacion(self):
         for rec in self:
