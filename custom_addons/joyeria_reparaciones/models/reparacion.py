@@ -732,6 +732,8 @@ class Reparacion(models.Model):
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
         is_import = bool(self.env.context.get('import_file') or self.env.context.get('from_import'))
 
+        code = False  # 🔥 guardar código temporalmente
+
         # ============================================================
         # 🆕 CLIENTE ESPECIAL → USAR HECHURA
         # ============================================================
@@ -770,14 +772,6 @@ class Reparacion(models.Model):
 
             self.env["joyeria.reparacion.authcode"].search([]).check_expired()
 
-            _logger = logging.getLogger(__name__)
-            _logger.warning("===== DEBUG AUTORIZACIÓN CREA =====")
-            _logger.warning("VALS codigo_ingresado = %s", vals.get("codigo_ingresado"))
-            _logger.warning("CÓDIGOS EN BD:")
-            for c in self.env["joyeria.reparacion.authcode"].search([]):
-                _logger.warning("ID %s | '%s' | used=%s", c.id, repr(c.codigo), c.used)
-            _logger.warning("====================================")
-
             codigo_ing = vals.get("codigo_ingresado")
             if not codigo_ing:
                 codigo_ing = self._context.get("codigo_ingresado") or ""
@@ -801,17 +795,10 @@ class Reparacion(models.Model):
             if not code:
                 raise ValidationError("❌ El código ingresado no existe o ya fue utilizado.")
 
-            code.write({
-                'used': True,
-                'usado_por_id': self.env.uid,
-                'fecha_uso': datetime.now(),
-                'reparacion_id': record.id  # 🔥 AQUÍ está la magia
-            })
-
             vals["codigo_autorizacion_id"] = code.id
 
         # ============================================================
-        # ⚙️ RESTO DE TU LÓGICA (NO TOCADA)
+        # ⚙️ RESTO DE TU LÓGICA
         # ============================================================
 
         if (not is_admin) and (not is_import) and vals.get('peso') == 'especial' and not vals.get('peso_valor'):
@@ -869,6 +856,15 @@ class Reparacion(models.Model):
             raise ValidationError("❌ Clave inválida: No se encontró ninguna vendedora con esa clave (quien retira).")
 
         record = super().create(vals)
+
+        # 🔥 SOLO AQUÍ se marca usado y se relaciona al RMA
+        if code:
+            code.write({
+                'used': True,
+                'usado_por_id': self.env.uid,
+                'fecha_uso': datetime.now(),
+                'reparacion_id': record.id
+            })
 
         if hasattr(record, '_generar_codigo_qr'):
             record._generar_codigo_qr()
