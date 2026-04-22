@@ -72,81 +72,42 @@
                         <group string="Datos de salida del taller"
                                groups="base.group_system"
                                col="2">
+
                             <label for="metal_utilizado"/>
                             <field name="metal_utilizado"/>
-                            
 
-                            <!-- PLATA -->
-
-                            <!--<group string="Configuración Plata"
-                                   invisible="metal_utilizado != 'plata'"
+                            <!-- 🔥 CALCULADORA DINÁMICA -->
+                            <group string="Configuración de cálculo"
+                                   invisible="not metal_utilizado"
                                    col="2">
 
-                                <field name="plata_diseno"/>
-                                <field name="plata_casting"/>
+                                <field name="tipo_trabajo"/>
 
-                                <field name="plata_piedras"/>
-                                <field name="plata_cantidad_piedras"/>
+                                <field name="subtipo"
+                                       invisible="tipo_trabajo != 'diseno_3d'"/>
 
-                                <field name="plata_total" readonly="1"/>
+                                <field name="es_vector_nuevo"
+                                       invisible="tipo_trabajo != 'vector'"/>
 
-                            </group>
-                            -->
-                            
+                                <field name="cantidad_circones"
+                                       invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
 
+                                <field name="lleva_brillantes"
+                                       invisible="tipo_trabajo != 'diseno_3d'"/>
 
-                            <!-- ORO AMARILLO -->
-                            <!-- -->
-
-                            <!--<group string="Configuración Oro Amarillo"
-                                   invisible="metal_utilizado != 'oro 18k amarillo'"
-                                   col="2">
-
-                                <field name="oro_amarillo_diseno"/>
-                                <field name="oro_amarillo_casting"/>
-
-                                <field name="oro_amarillo_piedras"/>
-                                <field name="oro_amarillo_cantidad_piedras"/>
-
-                                <field name="oro_amarillo_total" readonly="1"/>
+                                <field name="lleva_moissanitas"
+                                       invisible="tipo_trabajo != 'diseno_3d'"/>
 
                             </group>
-                            -->
 
+                            <!-- 🔥 RESUMEN AUTOMÁTICO -->
+                            <group string="Resumen automático" col="2">
 
-                            <!-- ORO ROSADO -->
-
-                            <!--<group string="Configuración Oro Rosado"
-                                   invisible="metal_utilizado != 'oro 18k rosado'"
-                                   col="2">
-
-                                <field name="oro_rosado_diseno"/>
-                                <field name="oro_rosado_casting"/>
-
-                                <field name="oro_rosado_piedras"/>
-                                <field name="oro_rosado_cantidad_piedras"/>
-
-                                <field name="oro_rosado_total" readonly="1"/>
+                                <field name="cobro_interno" readonly="1"/>
+                                <field name="hechura" readonly="1"/>
+                                <field name="cobros_extras" readonly="1"/>
 
                             </group>
-                            -->
-
-
-                            <!-- OTROS METALES -->
-
-                            <!--<group string="Configuración Otros Metales"
-                                   invisible="metal_utilizado in ['plata','oro 18k amarillo','oro 18k rosado']"
-                                   col="2">
-
-                                <field name="otros_casting"/>
-                                <field name="otros_piedras"/>
-
-                                <field name="otros_cantidad_piedras"/>
-                                <field name="otros_total" readonly="1"/>
-
-                            </group>
-                            -->
-
 
                             <separator string="Cálculos Internos"/>
                             
@@ -171,7 +132,7 @@
                                 <field name="fecha_firma" readonly="1"/>
 
                             </group>
-                            </group>
+                        </group>
 
 
                         <!-- RECEPCIÓN Y ENTREGA -->
@@ -200,31 +161,30 @@
 
                         <group string="Datos Financieros" col="2">
 
-                            <!-- PRECIO NORMAL -->
                             <field name="precio_unitario"
                                 invisible="tipo_cliente in ['cliente mayorista','cliente preferente']"/>
 
-                            <!-- HECHURA SOLO CLIENTES ESPECIALES -->
                             <field name="hechura2"
                                 invisible="tipo_cliente not in ['cliente mayorista','cliente preferente']"/>
 
-                            <!-- EXTRAS -->
                             <field name="extra"/>
-                            <!-- 🔥 DESCRIPCIONES SOLO CLIENTES ESPECIALES -->
+
                             <field name="descripcion_extra_1"
                                 placeholder="Descripción 1"
                                 invisible="tipo_cliente not in ['cliente mayorista','cliente preferente','cliente normal']"/>
+
                             <field name="extra2"/>
+
                             <field name="descripcion_extra_2"
                                 placeholder="Descripción 2"
                                 invisible="tipo_cliente not in ['cliente mayorista','cliente preferente','cliente normal']"/>
+
                             <field name="extra3"/>
                             
                             <field name="descripcion_extra_3"
                                 placeholder="Descripción 3"
                                 invisible="tipo_cliente not in ['cliente mayorista','cliente preferente','cliente normal']"/>
 
-                            <!-- TOTALES -->
                             <field name="subtotal" readonly="1"/>
                             <field name="abono"/>
                             <field name="saldo" readonly="1"/>
@@ -232,15 +192,15 @@
                         </group>
 
                     </group>
-                     <!-- AUTORIZACIÓN PARA RMA SIN COSTO -->
-                        <group string="Autorización (solo si es sin costo)"
-                            visibility_condition="requiere_autorizacion == True">
 
-                            <field name="codigo_ingresado"
-                                force_save="1"
-                                placeholder="Ingresa el código entregado por administración"/>
-                        </group>
+                    <!-- AUTORIZACIÓN -->
+                    <group string="Autorización (solo si es sin costo)"
+                        visibility_condition="requiere_autorizacion == True">
 
+                        <field name="codigo_ingresado"
+                            force_save="1"
+                            placeholder="Ingresa el código entregado por administración"/>
+                    </group>
 
                     <!-- NOTAS -->
 
@@ -250,7 +210,6 @@
                         <field name="comentarios"/>
 
                     </group>
-
 
                     <!-- OPERACIONES -->
 
@@ -275,7 +234,6 @@
                         </page>
 
                     </notebook>
-
 
                     <!-- CHATTER -->
 

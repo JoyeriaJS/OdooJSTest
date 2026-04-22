@@ -342,19 +342,19 @@ class Reparacion(models.Model):
                 if rec.tipo_trabajo == 'diseno_3d':
 
                     if rec.subtipo == 'nuevo':
-                        cobro += 16000  # diseño
-                        cobro += 4000   # impresión
+                        cobro += 16000
+                        cobro += 4000
 
                     elif rec.subtipo == 'existente':
-                        cobro += 4000   # solo impresión
+                        cobro += 4000
 
                     cobro += (rec.cantidad_circones or 0) * 300
 
                     if rec.lleva_brillantes:
-                        extras += 1  # marcador, puedes mejorar luego
+                        extras += 0  # puedes ajustar luego
 
                     if rec.lleva_moissanitas:
-                        extras += 1
+                        extras += 0
 
                 elif rec.tipo_trabajo == 'vector':
                     cobro += 4000 if rec.es_vector_nuevo else 2000
