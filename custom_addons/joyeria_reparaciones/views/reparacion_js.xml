@@ -103,7 +103,8 @@
 
                                 <field name="cantidad_moissanitas"
                                        invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
-
+                                <field name="rodinado"
+                                        invisible="metal_utilizado != 'oro 18k blanco'"/>
                             </group>
 
                             <!-- 🔥 RESUMEN AUTOMÁTICO -->
@@ -121,8 +122,6 @@
 
                                 <field name="gramos_utilizado"/>
                                 <field name="metales_extra"/>
-                                <field name="rodinado"
-                                    invisible="metal_utilizado != 'oro 18k blanco'"/>
 
                                 <field name="peso_total" readonly="1"
                                 style="background-color:#fff8b3; color:#665c00; font-weight:bold;"/>
