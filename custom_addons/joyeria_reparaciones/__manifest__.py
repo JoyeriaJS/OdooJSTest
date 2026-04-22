@@ -33,7 +33,7 @@
         'security/joyeria_security.xml',
 
         # 🔹 REPORTES (al final siempre)
-        'report/report.xml',
+        #'report/report.xml',
         'report/report_qrcode_template.xml',
         'report/reporte_responsable_report.xml',
         'report/reporte_reparaciones_responsable.xml',
