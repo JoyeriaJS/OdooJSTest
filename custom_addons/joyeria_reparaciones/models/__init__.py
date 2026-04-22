@@ -2,7 +2,7 @@ from . import reparacion
 from . import joyeria_producto
 
 # 🔥 AGREGA ESTOS (faltaban)
-from . import reparacion_auth_code
+#from . import reparacion_auth_code
 from . import reparacion_code
 from . import pos_discount
 from . import pos_order
@@ -10,8 +10,8 @@ from . import pos_order_line
 from . import pos_session
 
 # wizards
-from . import wizard_reporte_responsables
-from . import reporte_salida_taller_wizard
+#from . import wizard_reporte_responsables
+#from . import reporte_salida_taller_wizard
 from . import report_salida_taller_xlsx
 
 # reports

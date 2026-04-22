@@ -26,9 +26,7 @@
         'views/trabajadores_views.xml',
         'views/reparacion_confirm_view.xml',
 
-        # 🔹 WIZARDS
-        'wizard/wizard_set_precio_oros_view.xml',
-        'wizard/wizard_set_precio_oros_action.xml',
+     
 
         # 🔹 SECURITY (DESPUÉS de que el modelo existe)
         'security/ir.model.access.csv',
