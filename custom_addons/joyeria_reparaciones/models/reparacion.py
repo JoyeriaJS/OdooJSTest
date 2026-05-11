@@ -538,6 +538,19 @@ class Reparacion(models.Model):
                 }
 
 
+
+    @api.onchange('servicio')
+    def _onchange_servicio_tipo_peso(self):
+        for rec in self:
+
+            # 🔧 Si el servicio es reparación
+            if rec.servicio == 'reparacion':
+                rec.peso = 'especial'
+
+            # 🏭 Si vuelve a fabricación
+            elif rec.servicio == 'fabricacion':
+                rec.peso = 'estandar'
+
     @api.onchange('express')
     def _onchange_express(self):
         if self.express:
