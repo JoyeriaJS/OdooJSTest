@@ -26,15 +26,25 @@ patch(Order.prototype, {
                     line.product.name === "Producto No Inventariado"
             );
 
-        // 👇 AJUSTA ESTOS CAMPOS SEGÚN TU IMPLEMENTACIÓN
-        const esPrecioMayorista =
-            product.lst_price === product.precio_mayorista;
+        // PRECIO REAL QUE SE ESTÁ USANDO
+        const precioAplicado =
+            options.price !== undefined
+                ? options.price
+                : product.get_price(
+                    this.pricelist,
+                    1
+                );
 
-        const esPrecioPreferente =
-            product.lst_price === product.precio_preferente;
+        // PRECIO NORMAL
+        const precioNormal = product.lst_price;
+
+        // SI EL PRECIO ES MENOR AL NORMAL
+        // ENTONCES ES MAYORISTA/PREFERENTE
+        const usaPrecioEspecial =
+            precioAplicado < precioNormal;
 
         if (
-            (esPrecioMayorista || esPrecioPreferente) &&
+            usaPrecioEspecial &&
             product.name !== "Producto No Inventariado" &&
             !tieneProductoNoInventariado
         ) {
@@ -42,7 +52,7 @@ patch(Order.prototype, {
             await popup.add(ErrorPopup, {
                 title: "Producto requerido",
                 body:
-                    'Para vender con precio Mayorista o Preferente debes agregar primero un "Producto No Inventariado".',
+                    'Para usar precio Mayorista o Preferente debes agregar un "Producto No Inventariado".',
             });
 
             return;
