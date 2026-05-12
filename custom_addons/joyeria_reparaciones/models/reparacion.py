@@ -729,7 +729,7 @@ class Reparacion(models.Model):
         #return super().write(vals)
 
     @api.depends('cobro_interno', 'hechura', 'cobros_extras',
-                 'metal_utilizado','valor_extra','valor_brillante','valor moissanita',
+                 'metal_utilizado','valor_extra','valor_brillante','valor_moissanita',
     'tipo_trabajo',
     'subtipo',
     'cantidad_circones',
