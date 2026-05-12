@@ -198,6 +198,8 @@ class Reparacion(models.Model):
     ], string='Metal utilizado')
 
     valor_extra = fields.Float("Valor Extra")
+    valor_brillante = fields.Float("Valor Brillante")
+    valor_moissanita = fields.Float("Valor Moissanita")
     
     gramos_utilizado = fields.Float("Gramos utilizados(gr)")
 
@@ -727,7 +729,7 @@ class Reparacion(models.Model):
         #return super().write(vals)
 
     @api.depends('cobro_interno', 'hechura', 'cobros_extras',
-                 'metal_utilizado','valor_extra',
+                 'metal_utilizado','valor_extra','valor_brillante','valor moissanita',
     'tipo_trabajo',
     'subtipo',
     'cantidad_circones',
@@ -737,7 +739,7 @@ class Reparacion(models.Model):
     'es_vector_nuevo') #'otros_total' #'oro_rosado_total', 'oro_amarillo_total', 'plata_total')
     def _compute_total_salida(self):
         for rec in self:
-            rec.total_salida_taller = (rec.cobro_interno or 0) + (rec.hechura or 0) + (rec.cobros_extras or 0) + (rec.valor_extra or 0)
+            rec.total_salida_taller = (rec.cobro_interno or 0) + (rec.hechura or 0) + (rec.cobros_extras or 0) + (rec.valor_extra or 0) + (rec.valor_brillante or 0) + (rec.valor_moissanita)
 
     @api.onchange('clave_firma_manual')
     def _onchange_clave_firma_manual(self):
