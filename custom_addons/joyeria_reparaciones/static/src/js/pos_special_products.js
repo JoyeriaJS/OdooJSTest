@@ -13,6 +13,41 @@ patch(Order.prototype, {
         const rpc = this.env.services.rpc;
         const pos = this.pos || this.env.pos;
 
+                // ===================================
+        // VALIDAR MAYORISTA / PREFERENTE
+        // REQUIERE PRODUCTO NO INVENTARIADO
+        // ===================================
+
+        const tieneProductoNoInventariado = this
+            .get_orderlines()
+            .some(
+                (line) =>
+                    line.product &&
+                    line.product.name === "Producto No Inventariado"
+            );
+
+        // 👇 AJUSTA ESTOS CAMPOS SEGÚN TU IMPLEMENTACIÓN
+        const esPrecioMayorista =
+            product.lst_price === product.precio_mayorista;
+
+        const esPrecioPreferente =
+            product.lst_price === product.precio_preferente;
+
+        if (
+            (esPrecioMayorista || esPrecioPreferente) &&
+            product.name !== "Producto No Inventariado" &&
+            !tieneProductoNoInventariado
+        ) {
+
+            await popup.add(ErrorPopup, {
+                title: "Producto requerido",
+                body:
+                    'Para vender con precio Mayorista o Preferente debes agregar primero un "Producto No Inventariado".',
+            });
+
+            return;
+        }
+
         // ===================================
         // BLOQUEAR PRODUCTOS AUXILIARES
         // ===================================
