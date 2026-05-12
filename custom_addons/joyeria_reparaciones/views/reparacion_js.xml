@@ -92,9 +92,6 @@
                                 <field name="cantidad_circones"
                                        invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
 
-                                <field name="valor_brillante"
-                                       invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
-
                                 <field name="lleva_brillantes"
                                        invisible="tipo_trabajo != 'diseno_3d'"/>
                                        
