@@ -748,6 +748,8 @@ class Reparacion(models.Model):
                  'metal_utilizado','valor_extra',
     'tipo_trabajo',
     'subtipo',
+    'valor_brillante',
+    'valor_moissanita',
     'cantidad_circones',
     'gramos_utilizado',
     'lleva_brillantes',
