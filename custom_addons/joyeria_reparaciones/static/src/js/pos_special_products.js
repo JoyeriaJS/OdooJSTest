@@ -265,31 +265,37 @@ if (product.name === "Producto RMA") {
         lineSubtotal.saldo_rma = saldo;
     }
 
-    // ===================================
-    // LÍNEA ABONO
-    // SOLO VISUAL - NO DESCUENTA
-    // ===================================
-    await super.add_product(productoAbono, {
-        price: 0,
-        quantity: 1,
-        merge: false,
-    });
+   // ===================================
+        // LÍNEA ABONO
+        // SOLO VISUAL
+        // ===================================
+        await super.add_product(productoAbono, {
+            price: 0,
+            quantity: 1,
+            merge: false,
+        });
 
-    const lineAbono = this.get_selected_orderline();
+        const lineAbono = this.get_selected_orderline();
 
-    if (lineAbono) {
-        lineAbono.numero_rma = resultado.rma;
-        lineAbono.es_linea_rma_aux = true;
-        lineAbono.tipo_linea_rma = "abono";
+        if (lineAbono) {
 
-        // 🔥 SOLO VISUAL
-        lineAbono.abono_visual = abono;
-        lineAbono.saldo_visual = saldo;
+            lineAbono.numero_rma = resultado.rma;
+            lineAbono.es_linea_rma_aux = true;
+            lineAbono.tipo_linea_rma = "abono";
 
-        // 🔥 IMPORTANTE
-        lineAbono.precio_bloqueado = 0;
-        lineAbono.set_unit_price(0);
-    }
+            // 🔥 VALORES VISUALES
+            lineAbono.abono_visual = abono;
+            lineAbono.saldo_visual = saldo;
+
+            // 🔥 NO SUMA AL TOTAL
+            lineAbono.precio_bloqueado = 0;
+            lineAbono.set_unit_price(0);
+
+            // 🔥 CAMBIAR NOMBRE VISUAL
+            lineAbono.set_full_product_name(
+                `ABONO PREVIO: $${abono.toLocaleString("es-CL")}`
+            );
+        }
 
     // ===================================
     // LÍNEA PRINCIPAL RMA
