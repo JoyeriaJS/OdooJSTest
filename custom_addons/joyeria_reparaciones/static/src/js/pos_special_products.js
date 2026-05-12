@@ -262,54 +262,62 @@ patch(Order.prototype, {
             }
 
             // ===================================
-            // LÍNEA SUBTOTAL
-            // ESTA ES LA QUE COBRA
+            // CASO 1:
+            // NO TIENE ABONO
+            // MOSTRAR SOLO PRODUCTO ABONO
             // ===================================
-            await super.add_product(productoSubtotal, {
-                price: totalACobrar,
-                quantity: 1,
-                merge: false,
-                permitir_linea_rma_aux: true,
-            });
+            if (abono <= 0) {
 
-            const lineSubtotal = this.get_selected_orderline();
+                await super.add_product(productoAbono, {
+                    price: saldo,
+                    quantity: 1,
+                    merge: false,
+                    permitir_linea_rma_aux: true,
+                });
 
-            if (lineSubtotal) {
-                lineSubtotal.numero_rma = resultado.rma;
-                lineSubtotal.es_linea_rma_aux = true;
-                lineSubtotal.tipo_linea_rma = "subtotal";
-                lineSubtotal.precio_bloqueado = totalACobrar;
+                const lineAbono = this.get_selected_orderline();
 
-                lineSubtotal.subtotal_rma = subtotal;
-                lineSubtotal.abono_rma = abono;
-                lineSubtotal.saldo_rma = saldo;
-            }
+                if (lineAbono) {
 
-            // ===================================
-            // LÍNEA ABONO
-            // SOLO VISUAL
-            // ===================================
-            await super.add_product(productoAbono, {
-                price: 0,
-                quantity: 1,
-                merge: false,
-                permitir_linea_rma_aux: true,
-            });
+                    lineAbono.numero_rma = resultado.rma;
+                    lineAbono.es_linea_rma_aux = true;
+                    lineAbono.tipo_linea_rma = "abono";
 
-            const lineAbono = this.get_selected_orderline();
+                    lineAbono.precio_bloqueado = saldo;
 
-            if (lineAbono) {
-                lineAbono.numero_rma = resultado.rma;
-                lineAbono.es_linea_rma_aux = true;
-                lineAbono.tipo_linea_rma = "abono";
+                    lineAbono.subtotal_rma = subtotal;
+                    lineAbono.abono_rma = abono;
+                    lineAbono.saldo_rma = saldo;
+                }
 
-                // SOLO VISUAL
-                lineAbono.abono_visual = abono;
+            } else {
 
-                // NO COBRA
-                lineAbono.precio_bloqueado = 0;
+                // ===================================
+                // CASO 2:
+                // YA TIENE ABONO
+                // MOSTRAR SOLO PRODUCTO SUBTOTAL
+                // ===================================
+                await super.add_product(productoSubtotal, {
+                    price: subtotal,
+                    quantity: 1,
+                    merge: false,
+                    permitir_linea_rma_aux: true,
+                });
 
-                lineAbono.set_unit_price(0);
+                const lineSubtotal = this.get_selected_orderline();
+
+                if (lineSubtotal) {
+
+                    lineSubtotal.numero_rma = resultado.rma;
+                    lineSubtotal.es_linea_rma_aux = true;
+                    lineSubtotal.tipo_linea_rma = "subtotal";
+
+                    lineSubtotal.precio_bloqueado = subtotal;
+
+                    lineSubtotal.subtotal_rma = subtotal;
+                    lineSubtotal.abono_rma = abono;
+                    lineSubtotal.saldo_rma = saldo;
+                }
             }
 
             // ===================================
