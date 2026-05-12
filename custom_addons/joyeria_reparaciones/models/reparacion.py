@@ -334,13 +334,10 @@ class Reparacion(models.Model):
     'gramos_utilizado',
     'lleva_brillantes',
     'lleva_moissanitas',
-    'valor_brillante',
-    'valor_moissanita',
     'es_vector_nuevo',
     'rodinado'
 )
     def _compute_costos_taller(self):
-
         for rec in self:
 
             cobro = 0
@@ -364,10 +361,10 @@ class Reparacion(models.Model):
                     extras += (rec.cantidad_circones or 0) * 300
 
                     if rec.lleva_brillantes:
-                        extras += (rec.valor_brillante or 0)
+                        extras += 0  # puedes ajustar luego
 
                     if rec.lleva_moissanitas:
-                        extras += (rec.valor_moissanita or 0)
+                        extras += 0
 
                 elif rec.tipo_trabajo == 'vector':
                     cobro += 4000 if rec.es_vector_nuevo else 2000
@@ -392,13 +389,6 @@ class Reparacion(models.Model):
                         cobro += 2000
 
                     extras += (rec.cantidad_circones or 0) * 300
-
-                    if rec.lleva_brillantes:
-                        extras += (rec.valor_brillante or 0)
-
-                    if rec.lleva_moissanitas:
-                        extras += (rec.valor_moissanita or 0)
-
                     hechura += (rec.gramos_utilizado or 0) * 2300
 
                 elif rec.tipo_trabajo == 'vector':
@@ -425,12 +415,6 @@ class Reparacion(models.Model):
 
                     # 💎 piedras
                     extras += (rec.cantidad_circones or 0) * 300
-
-                    if rec.lleva_brillantes:
-                        extras += (rec.valor_brillante or 0)
-
-                    if rec.lleva_moissanitas:
-                        extras += (rec.valor_moissanita or 0)
 
                     # ⚖️ gramos → HECHURA
                     hechura += (rec.gramos_utilizado or 0) * 101000
@@ -745,11 +729,9 @@ class Reparacion(models.Model):
         #return super().write(vals)
 
     @api.depends('cobro_interno', 'hechura', 'cobros_extras',
-                 'metal_utilizado','valor_extra',
+                 'metal_utilizado','valor_extra','valor_brillante','valor_moissanita',
     'tipo_trabajo',
     'subtipo',
-    'valor_brillante',
-    'valor_moissanita',
     'cantidad_circones',
     'gramos_utilizado',
     'lleva_brillantes',
@@ -757,7 +739,7 @@ class Reparacion(models.Model):
     'es_vector_nuevo') #'otros_total' #'oro_rosado_total', 'oro_amarillo_total', 'plata_total')
     def _compute_total_salida(self):
         for rec in self:
-            rec.total_salida_taller = (rec.cobro_interno or 0) + (rec.hechura or 0) + (rec.cobros_extras or 0) + (rec.valor_extra or 0) 
+            rec.total_salida_taller = (rec.cobro_interno or 0) + (rec.hechura or 0) + (rec.cobros_extras or 0) + (rec.valor_extra or 0) + (rec.valor_brillante or 0) + (rec.valor_moissanita)
 
     @api.onchange('clave_firma_manual')
     def _onchange_clave_firma_manual(self):

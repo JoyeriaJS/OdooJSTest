@@ -105,8 +105,6 @@
                                 <field name="lleva_moissanitas"
                                        invisible="tipo_trabajo != 'diseno_3d'"/>
 
-                                <field name="valor_moissanita"
-                                       invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
 
                                 <field name="cantidad_moissanitas"
                                        invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
@@ -121,6 +119,8 @@
                                 <field name="hechura" readonly="1"/>
                                 <field name="cobros_extras" readonly="1"/>
                                 <field name="valor_extra" />
+                                <field name="valor_brillante"/>
+                                <field name="valor_moissanita"/>
 
                             </group>
 
