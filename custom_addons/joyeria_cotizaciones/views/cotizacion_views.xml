@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- TREE -->
+
+    <record id="view_joyeria_cotizacion_tree"
+            model="ir.ui.view">
+
+        <field name="name">
+            joyeria.cotizacion.tree
+        </field>
+
+        <field name="model">
+            joyeria.cotizacion
+        </field>
+
+        <field name="arch"
+               type="xml">
+
+            <tree>
+
+                <field name="name"/>
+
+                <field name="partner_id"/>
+
+                <field name="fecha"/>
+
+                <field name="fecha_vencimiento"/>
+
+                <field name="total"/>
+
+                <field name="estado"/>
+
+            </tree>
+
+        </field>
+
+    </record>
+
+
+    <!-- FORM -->
+
+    <record id="view_joyeria_cotizacion_form"
+            model="ir.ui.view">
+
+        <field name="name">
+            joyeria.cotizacion.form
+        </field>
+
+        <field name="model">
+            joyeria.cotizacion
+        </field>
+
+        <field name="arch"
+               type="xml">
+
+            <form string="Cotización">
+
+                <header>
+
+                    <button
+                        name="action_borrador"
+                        type="object"
+                        string="Borrador"
+                        class="btn-secondary"/>
+
+                    <button
+                        name="action_enviada"
+                        type="object"
+                        string="Enviada"
+                        class="btn-primary"/>
+
+                    <button
+                        name="action_aceptada"
+                        type="object"
+                        string="Aceptada"
+                        class="btn-success"/>
+
+                    <button
+                        name="action_rechazada"
+                        type="object"
+                        string="Rechazada"
+                        class="btn-danger"/>
+
+                    <field name="estado"
+                           widget="statusbar"/>
+
+                </header>
+
+                <sheet>
+
+                    <group>
+
+                        <group>
+
+                            <field name="name"
+                                   readonly="1"/>
+
+                            <field name="partner_id"/>
+
+                            <field name="email"/>
+
+                            <field name="telefono"/>
+
+                        </group>
+
+                        <group>
+
+                            <field name="direccion"/>
+
+                            <field name="fecha"/>
+
+                            <field name="fecha_vencimiento"/>
+
+                        </group>
+
+                    </group>
+
+                    <notebook>
+
+                        <page string="Productos">
+
+                            <field name="line_ids">
+
+                                <tree editable="bottom">
+
+                                    <field name="descripcion"/>
+
+                                    <field name="cantidad"/>
+
+                                    <field name="precio_unitario"/>
+
+                                    <field name="subtotal"
+                                           readonly="1"/>
+
+                                </tree>
+
+                            </field>
+
+                        </page>
+
+                    </notebook>
+
+                    <group>
+
+                        <group/>
+
+                        <group>
+
+                            <field name="total"
+                                   readonly="1"/>
+
+                        </group>
+
+                    </group>
+
+                    <group string="Código QR">
+
+                        <field name="qr_code"
+                               widget="image"
+                               readonly="1"/>
+
+                    </group>
+
+                </sheet>
+
+                <chatter/>
+
+            </form>
+
+        </field>
+
+    </record>
+
+
+    <!-- SEARCH -->
+
+    <record id="view_joyeria_cotizacion_search"
+            model="ir.ui.view">
+
+        <field name="name">
+            joyeria.cotizacion.search
+        </field>
+
+        <field name="model">
+            joyeria.cotizacion
+        </field>
+
+        <field name="arch"
+               type="xml">
+
+            <search>
+
+                <field name="name"/>
+
+                <field name="partner_id"/>
+
+                <field name="estado"/>
+
+                <filter
+                    string="Aceptadas"
+                    name="aceptadas"
+                    domain="[('estado','=','aceptada')]"/>
+
+                <filter
+                    string="Rechazadas"
+                    name="rechazadas"
+                    domain="[('estado','=','rechazada')]"/>
+
+            </search>
+
+        </field>
+
+    </record>
+
+
+    <!-- ACTION -->
+
+    <record id="action_joyeria_cotizacion"
+            model="ir.actions.act_window">
+
+        <field name="name">
+            Cotizaciones
+        </field>
+
+        <field name="res_model">
+            joyeria.cotizacion
+        </field>
+
+        <field name="view_mode">
+            tree,form
+        </field>
+
+    </record>
+
+
+    <!-- MENÚ PRINCIPAL -->
+
+    <menuitem
+        id="menu_joyeria_cotizaciones_root"
+        name="Cotizaciones"
+        sequence="10"/>
+
+
+    <!-- MENÚ HIJO -->
+
+    <menuitem
+        id="menu_joyeria_cotizaciones"
+        name="Cotizaciones"
+        parent="menu_joyeria_cotizaciones_root"
+        action="action_joyeria_cotizacion"
+        sequence="1"/>
+
+</odoo>

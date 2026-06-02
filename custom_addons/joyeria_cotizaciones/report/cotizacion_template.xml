@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_cotizacion_template">
+
+        <t t-call="web.html_container">
+
+            <t t-foreach="docs"
+               t-as="o">
+
+                <t t-call="web.external_layout">
+
+                    <div class="page">
+
+                        <h2>
+                            Cotización
+                        </h2>
+
+                        <br/>
+
+                        <table style="width:100%;">
+
+                            <tr>
+                                <td>
+                                    <strong>
+                                        Número:
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <span t-field="o.name"/>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <strong>
+                                        Fecha:
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <span t-field="o.fecha"/>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <strong>
+                                        Cliente:
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <span t-field="o.partner_id"/>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <strong>
+                                        Correo:
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <span t-field="o.email"/>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <strong>
+                                        Teléfono:
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <span t-field="o.telefono"/>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <strong>
+                                        Dirección:
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <span t-field="o.direccion"/>
+                                </td>
+                            </tr>
+
+                        </table>
+
+                        <br/>
+                        <br/>
+
+                        <table class="table table-sm"
+                               style="width:100%; border-collapse:collapse;">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th style="border:1px solid black;">
+                                        Descripción
+                                    </th>
+
+                                    <th style="border:1px solid black;">
+                                        Cantidad
+                                    </th>
+
+                                    <th style="border:1px solid black;">
+                                        Precio Unitario
+                                    </th>
+
+                                    <th style="border:1px solid black;">
+                                        Subtotal
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                <tr t-foreach="o.line_ids"
+                                    t-as="line">
+
+                                    <td style="border:1px solid black;">
+                                        <span t-field="line.descripcion"/>
+                                    </td>
+
+                                    <td style="border:1px solid black;">
+                                        <span t-field="line.cantidad"/>
+                                    </td>
+
+                                    <td style="border:1px solid black;">
+                                        <span t-field="line.precio_unitario"/>
+                                    </td>
+
+                                    <td style="border:1px solid black;">
+                                        <span t-field="line.subtotal"/>
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                        <br/>
+
+                        <div style="text-align:right;">
+
+                            <h3>
+
+                                Total:
+                                $
+
+                                <span t-field="o.total"/>
+
+                            </h3>
+
+                        </div>
+
+                        <br/>
+                        <br/>
+
+                        <div style="text-align:center;">
+
+                            <strong>
+                                Código QR
+                            </strong>
+
+                            <br/>
+
+                            <img
+                                t-if="o.qr_code"
+                                t-att-src="'data:image/png;base64,%s' % o.qr_code.decode('utf-8')"
+                                style="width:180px;height:180px;"
+                            />
+
+                            <br/>
+
+                            <strong>
+                                <span t-field="o.name"/>
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </t>
+
+            </t>
+
+        </t>
+
+    </template>
+
+</odoo>
