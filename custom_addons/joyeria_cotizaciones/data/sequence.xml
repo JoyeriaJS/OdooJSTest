@@ -1,29 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="seq_joyeria_cotizacion"
-            model="ir.sequence">
-
-        <field name="name">
-            Secuencia Cotización
-        </field>
-
-        <field name="code">
-            joyeria.cotizacion
-        </field>
-
-        <field name="prefix">
-            COT/
-        </field>
-
-        <field name="padding">
-            5
-        </field>
-
-        <field name="number_increment">
-            1
-        </field>
-
+    <record id="seq_joyeria_cotizacion" model="ir.sequence">
+        <field name="name">Secuencia Cotización</field>
+        <field name="code">joyeria.cotizacion</field>
+        <field name="prefix">COT/</field>
+        <field name="padding">5</field>
+        <field name="number_increment">1</field>
     </record>
 
 </odoo>
