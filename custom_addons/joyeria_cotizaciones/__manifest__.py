@@ -12,10 +12,10 @@
     ],
     "data": [
         "security/ir.model.access.csv",
-        "views/cotizacion_views.xml",
+        #"views/cotizacion_views.xml",
         "data/sequence.xml",
-        "report/cotizacion_report.xml",
-        "report/cotizacion_template.xml",
+        #"report/cotizacion_report.xml",
+        #"report/cotizacion_template.xml",
     ],
     "installable": True,
     "application": True,
