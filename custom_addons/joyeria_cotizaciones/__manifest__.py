@@ -12,8 +12,8 @@
     ],
     "data": [
         "security/ir.model.access.csv",
-        "data/sequence.xml",
         "views/cotizacion_views.xml",
+        "data/sequence.xml",
         "report/cotizacion_report.xml",
         "report/cotizacion_template.xml",
     ],
