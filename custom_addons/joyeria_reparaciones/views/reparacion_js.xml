@@ -111,9 +111,9 @@
                                 <field name="cobro_interno" readonly="1"/>
                                 <field name="hechura" readonly="1"/>
                                 <field name="cobros_extras" readonly="1"/>
-                                <field name="valor_extra" />
                                 <field name="valor_brillante"/>
                                 <field name="valor_moissanita"/>
+                                <field name="valor_extra" />
 
                             </group>
 
