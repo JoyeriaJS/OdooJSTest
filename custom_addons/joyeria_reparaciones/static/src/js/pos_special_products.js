@@ -62,12 +62,10 @@ patch(Order.prototype, {
         // BLOQUEAR PRODUCTOS AUXILIARES
         // ===================================
         if (
-            (
-                product.name === "Producto SUBTOTAL" ||
-                product.name === "Producto ABONO"
-            ) &&
+            product.name === "Producto SUBTOTAL" &&
             !options.permitir_linea_rma_aux
-        ) {
+        )
+        {
             await popup.add(ErrorPopup, {
                 title: "Acción no permitida",
                 body: `No se puede vender "${product.name}" por separado.`,
@@ -214,6 +212,90 @@ patch(Order.prototype, {
 
             return;
         }
+
+        // ===================================
+// PRODUCTO ABONO
+// ===================================
+if (product.name === "Producto ABONO") {
+
+    const rmaInput = await popup.add(TextInputPopup, {
+        title: "Ingrese número de RMA",
+        placeholder: "Ej: RMA/01160",
+    });
+
+    if (!rmaInput.confirmed || !rmaInput.payload) {
+
+        await popup.add(ErrorPopup, {
+            title: "Dato obligatorio",
+            body: "Debe ingresar el número de RMA.",
+        });
+
+        return;
+    }
+
+    let numeroRMA = rmaInput.payload.trim();
+
+    numeroRMA = numeroRMA
+        .replace("RMA/", "")
+        .replace("RMA-", "")
+        .replace("rma/", "")
+        .replace("rma-", "")
+        .trim();
+
+    const resultado = await rpc("/pos/buscar_rma", {
+        numero_rma: numeroRMA,
+    });
+
+    if (resultado.error) {
+
+        await popup.add(ErrorPopup, {
+            title: "Error",
+            body: resultado.error,
+        });
+
+        return;
+    }
+
+    const abono = parseFloat(resultado.abono || 0);
+
+    if (abono <= 0) {
+
+        await popup.add(ErrorPopup, {
+            title: "Sin abono",
+            body: "Este RMA no tiene abono registrado.",
+        });
+
+        return;
+    }
+
+    await super.add_product(product, {
+        price: abono,
+        quantity: 1,
+        merge: false,
+        permitir_linea_rma_aux: true,
+    });
+
+    const line = this.get_selected_orderline();
+
+    if (line) {
+
+        line.numero_rma = resultado.rma;
+
+        line.es_linea_rma_aux = true;
+
+        line.tipo_linea_rma = "abono";
+
+        line.precio_bloqueado = abono;
+
+        line.subtotal_rma = parseFloat(resultado.subtotal || 0);
+
+        line.abono_rma = abono;
+
+        line.saldo_rma = parseFloat(resultado.saldo || 0);
+    }
+
+    return;
+}
 
         // ===================================
         // PRODUCTO RMA
