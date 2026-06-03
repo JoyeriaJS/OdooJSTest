@@ -69,53 +69,102 @@
 
                         <!-- SALIDA DEL TALLER -->
 
-                        <group string="Datos de salida del taller"
-                               groups="base.group_system"
-                               col="2">
+                       <!-- SALIDA DEL TALLER -->
 
-                            <label for="metal_utilizado"/>
+                        <group string="Calculadora Taller"
+                            groups="base.group_system"
+                            col="4">
+
+                            <!-- CABECERA -->
+
+                            <separator string="1. Tipo de Trabajo" colspan="4"/>
+
+                            <field name="tipo_trabajo"/>
+
+                            <field name="subtipo"
+                                invisible="tipo_trabajo != 'diseno_3d'"/>
+
+                            <field name="es_vector_nuevo"
+                                invisible="tipo_trabajo != 'vector'"/>
+
                             <field name="metal_utilizado"/>
 
-                            <!-- 🔥 CALCULADORA DINÁMICA -->
-                            <group string="Configuración de cálculo"
-                                   invisible="not metal_utilizado"
-                                   col="2">
+                            <!-- METAL -->
 
-                                <field name="tipo_trabajo"/>
+                            <separator string="2. Metal" colspan="4"/>
 
-                                <field name="subtipo"
-                                       invisible="tipo_trabajo != 'diseno_3d'"/>
+                            <field name="gramos_utilizado"/>
 
-                                <field name="es_vector_nuevo"
-                                       invisible="tipo_trabajo != 'vector'"/>
+                            <label string="x"/>
 
-                                <field name="cantidad_circones"
-                                       invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
+                            <field name="peso_valor"/>
 
-                                       
+                            <field name="peso_total"
+                                readonly="1"
+                                style="background-color:#fff8b3;
+                                        color:#665c00;
+                                        font-weight:bold;"/>
 
-                                <field name="cantidad_brillantes"
-                                       invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
+                            <!-- DISEÑO -->
 
+                            <separator string="3. Diseño / Hechura" colspan="4"/>
 
+                            <field name="hechura"
+                                readonly="1"/>
 
-                                <field name="cantidad_moissanitas"
-                                       invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
-                                <field name="rodinado"
-                                        invisible="metal_utilizado != 'oro 18k blanco'"/>
-                            </group>
+                            <field name="cobro_interno"
+                                readonly="1"/>
 
-                            <!-- 🔥 RESUMEN AUTOMÁTICO -->
-                            <group string="Resumen automático" col="2">
+                            <field name="cobros_extras"
+                                readonly="1"/>
 
-                                <field name="cobro_interno" readonly="1"/>
-                                <field name="hechura" readonly="1"/>
-                                <field name="cobros_extras" readonly="1"/>
-                                <field name="valor_brillante"/>
-                                <field name="valor_moissanita"/>
-                                <field name="valor_extra" />
+                            <field name="valor_extra"/>
 
-                            </group>
+                            <!-- PIEDRAS -->
+
+                            <separator string="4. Piedras" colspan="4"/>
+
+                            <field name="cantidad_circones"
+                                invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
+
+                            <field name="cantidad_brillantes"
+                                invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
+
+                            <field name="valor_brillante"/>
+
+                            <field name="cantidad_moissanitas"
+                                invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
+
+                            <field name="valor_moissanita"/>
+
+                            <field name="rodinado"
+                                invisible="metal_utilizado != 'oro 18k blanco'"/>
+
+                            <!-- TOTAL -->
+
+                            <separator string="Resultado Final" colspan="4"/>
+
+                            <field name="metales_extra"/>
+
+                            <field name="total_salida_taller"
+                                readonly="1"
+                                style="
+                                    background-color:#fff8b3;
+                                    color:#665c00;
+                                    font-size:18px;
+                                    font-weight:bold;
+                                "/>
+
+                            <field name="clave_firma_manual"
+                                password="True"/>
+
+                            <field name="firma_id"
+                                readonly="1"/>
+
+                            <field name="fecha_firma"
+                                readonly="1"/>
+
+                        </group>
 
                             <separator string="Cálculos Internos"/>
                             

@@ -206,7 +206,7 @@ class Reparacion(models.Model):
 
     metales_extra = fields.Float("Metales extra(gr)")
 
-    cobro_interno = fields.Float("Hechira", compute="_compute_costos_taller", store=True)
+    cobro_interno = fields.Float("Hechura", compute="_compute_costos_taller", store=True)
     hechura = fields.Float("Metal", compute="_compute_costos_taller", store=True)
     hechura2 = fields.Float("Hechura")
     cobros_extras = fields.Floatcobros_extras = fields.Float("Cobros extras", compute="_compute_costos_taller", store=True)
