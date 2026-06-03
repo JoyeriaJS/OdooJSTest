@@ -95,7 +95,9 @@
 
                             <field name="gramos_utilizado"/>
 
-                            <label string="x"/>
+                            <div class="o_form_label">
+                                        x
+                                    </div>
 
                             <field name="peso_valor"/>
 
