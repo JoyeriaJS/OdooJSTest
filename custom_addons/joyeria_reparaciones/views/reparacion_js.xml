@@ -16,8 +16,6 @@
 
                     <group col="2">
 
-                        <!-- INFORMACIÓN GENERAL -->
-
                         <group string="Información General" col="2">
 
                             <field name="name" readonly="1"/>
@@ -34,12 +32,10 @@
                             <field name="qr"
                                    widget="image"
                                    class="oe_avatar"
-                                   readonly="1"/>
+                                   readonly="1"
+                                   nolabel="1"/>
 
                         </group>
-
-
-                        <!-- PRODUCTO Y SERVICIO -->
 
                         <group string="Producto y Servicio" col="2">
 
@@ -62,40 +58,30 @@
 
                             <field name="peso_valor"/>
 
+                            <newline/>
                             <field name="solicitud_cliente" colspan="2"/>
 
                         </group>
 
-
-                        <!-- SALIDA DEL TALLER -->
-
-                      <!-- SALIDA DEL TALLER -->
-
                         <group string="Calculadora Taller"
-                            groups="base.group_system"
-                            col="2">
-
-                            <!-- FABRICACION -->
+                               groups="base.group_system"
+                               col="2">
 
                             <group string="Fabricación"
-                                invisible="servicio != 'fabricacion'">
+                                   invisible="servicio != 'fabricacion'">
 
                                 <field name="metal_utilizado"/>
 
                                 <separator string="Diseño"/>
-
                                 <field name="tipo_diseno"/>
 
                                 <separator string="Vector"/>
-
                                 <field name="tipo_vector"/>
 
                                 <separator string="Argollas"/>
-
                                 <field name="cantidad"/>
 
                                 <separator string="Circones"/>
-
                                 <field name="cantidad_circones"/>
 
                                 <separator string="Brillantes"/>
@@ -120,16 +106,12 @@
                                 </group>
 
                                 <separator string="Otro"/>
-
                                 <field name="otro_taller"/>
 
                             </group>
 
-
-                            <!-- REPARACION -->
-
                             <group string="Reparación"
-                                invisible="servicio != 'reparacion'">
+                                   invisible="servicio != 'reparacion'">
 
                                 <field name="metal_utilizado"/>
 
@@ -169,46 +151,37 @@
                                 </group>
 
                                 <separator string="Otro"/>
-
                                 <field name="otro_reparacion"/>
 
                             </group>
 
                         </group>
 
-
                         <group string="Resumen Taller"
-                            groups="base.group_system"
-                            col="4">
+                               groups="base.group_system"
+                               col="2">
 
-                            <field name="hechura"
-                                readonly="1"/>
+                            <field name="hechura" readonly="1"/>
+                            <field name="cobro_interno" readonly="1"/>
 
-                            <field name="cobro_interno"
-                                readonly="1"/>
-
-                            <field name="cobros_extras"
-                                readonly="1"/>
-
+                            <field name="cobros_extras" readonly="1"/>
                             <field name="total_salida_taller"
-                                readonly="1"
-                                style="background-color:#fff8b3;
-                                        color:#665c00;
-                                        font-size:22px;
-                                        font-weight:bold;"/>
+                                   readonly="1"
+                                   style="background-color:#fff8b3;
+                                          color:#665c00;
+                                          font-size:22px;
+                                          font-weight:bold;"/>
 
                             <field name="clave_firma_manual"
-                                password="True"/>
+                                   password="True"/>
 
                             <field name="firma_id"
-                                readonly="1"/>
+                                   readonly="1"/>
 
                             <field name="fecha_firma"
-                                readonly="1"/>
+                                   readonly="1"/>
 
                         </group>
-
-                        <!-- RECEPCIÓN Y ENTREGA -->
 
                         <group string="Recepción y Entrega" col="2">
 
@@ -221,6 +194,8 @@
 
                             <field name="local_tienda"/>
 
+                            <newline/>
+
                             <field name="fecha_recepcion" readonly="1"/>
                             <field name="fecha_entrega"/>
 
@@ -229,53 +204,50 @@
 
                         </group>
 
-
-                        <!-- FINANZAS -->
-
                         <group string="Datos Financieros" col="2">
 
                             <field name="precio_unitario"
-                                invisible="tipo_cliente in ['cliente mayorista','cliente preferente']"/>
+                                   invisible="tipo_cliente in ['cliente mayorista','cliente preferente']"/>
 
                             <field name="hechura2"
-                                invisible="tipo_cliente not in ['cliente mayorista','cliente preferente']"/>
+                                   invisible="tipo_cliente not in ['cliente mayorista','cliente preferente']"/>
 
                             <field name="extra"/>
 
                             <field name="descripcion_extra_1"
-                                placeholder="Descripción 1"
-                                invisible="tipo_cliente not in ['cliente mayorista','cliente preferente','cliente normal']"/>
+                                   placeholder="Descripción 1"
+                                   invisible="tipo_cliente not in ['cliente mayorista','cliente preferente','cliente normal']"/>
 
                             <field name="extra2"/>
 
                             <field name="descripcion_extra_2"
-                                placeholder="Descripción 2"
-                                invisible="tipo_cliente not in ['cliente mayorista','cliente preferente','cliente normal']"/>
+                                   placeholder="Descripción 2"
+                                   invisible="tipo_cliente not in ['cliente mayorista','cliente preferente','cliente normal']"/>
 
                             <field name="extra3"/>
-                            
+
                             <field name="descripcion_extra_3"
-                                placeholder="Descripción 3"
-                                invisible="tipo_cliente not in ['cliente mayorista','cliente preferente','cliente normal']"/>
+                                   placeholder="Descripción 3"
+                                   invisible="tipo_cliente not in ['cliente mayorista','cliente preferente','cliente normal']"/>
 
                             <field name="subtotal" readonly="1"/>
                             <field name="abono"/>
+
+                            <newline/>
                             <field name="saldo" readonly="1"/>
 
                         </group>
 
                     </group>
 
-                    <!-- AUTORIZACIÓN -->
                     <group string="Autorización (solo si es sin costo)"
-                        visibility_condition="requiere_autorizacion == True">
+                           visibility_condition="requiere_autorizacion == True">
 
                         <field name="codigo_ingresado"
-                            force_save="1"
-                            placeholder="Ingresa el código entregado por administración"/>
-                    </group>
+                               force_save="1"
+                               placeholder="Ingresa el código entregado por administración"/>
 
-                    <!-- NOTAS -->
+                    </group>
 
                     <group string="Notas y Comentarios">
 
@@ -283,8 +255,6 @@
                         <field name="comentarios"/>
 
                     </group>
-
-                    <!-- OPERACIONES -->
 
                     <notebook>
 
@@ -307,8 +277,6 @@
                         </page>
 
                     </notebook>
-
-                    <!-- CHATTER -->
 
                     <div class="oe_chatter">
 
