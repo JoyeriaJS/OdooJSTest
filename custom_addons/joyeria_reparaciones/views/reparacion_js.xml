@@ -73,84 +73,129 @@
 
                         <group string="Calculadora Taller"
                             groups="base.group_system"
+                            col="2">
+
+                            <!-- FABRICACION -->
+
+                            <group string="Fabricación"
+                                invisible="servicio != 'fabricacion'">
+
+                                <field name="metal_utilizado"/>
+
+                                <separator string="Diseño"/>
+
+                                <field name="tipo_diseno"/>
+
+                                <separator string="Vector"/>
+
+                                <field name="tipo_vector"/>
+
+                                <separator string="Argollas"/>
+
+                                <field name="cantidad"/>
+
+                                <separator string="Circones"/>
+
+                                <field name="cantidad_circones"/>
+
+                                <separator string="Brillantes"/>
+
+                                <group col="2">
+                                    <field name="cantidad_brillantes_manual"/>
+                                    <field name="valor_brillante_unitario"/>
+                                </group>
+
+                                <separator string="Moissanita"/>
+
+                                <group col="2">
+                                    <field name="cantidad_moissanita_manual"/>
+                                    <field name="valor_moissanita_unitario"/>
+                                </group>
+
+                                <separator string="Rodinado"/>
+
+                                <group col="2">
+                                    <field name="rodinado_cantidad"/>
+                                    <field name="rodinado_valor"/>
+                                </group>
+
+                                <separator string="Otro"/>
+
+                                <field name="otro_taller"/>
+
+                            </group>
+
+
+                            <!-- REPARACION -->
+
+                            <group string="Reparación"
+                                invisible="servicio != 'reparacion'">
+
+                                <field name="metal_utilizado"/>
+
+                                <separator string="Soldadura"/>
+
+                                <group col="2">
+                                    <field name="soldadura_cantidad"/>
+                                    <field name="soldadura_valor"/>
+                                </group>
+
+                                <separator string="Piedras"/>
+
+                                <group col="2">
+                                    <field name="piedras_cantidad"/>
+                                    <field name="piedras_valor"/>
+                                </group>
+
+                                <separator string="Brillantes"/>
+
+                                <group col="2">
+                                    <field name="cantidad_brillantes_manual"/>
+                                    <field name="valor_brillante_unitario"/>
+                                </group>
+
+                                <separator string="Moissanita"/>
+
+                                <group col="2">
+                                    <field name="cantidad_moissanita_manual"/>
+                                    <field name="valor_moissanita_unitario"/>
+                                </group>
+
+                                <separator string="Rodinado / Baño"/>
+
+                                <group col="2">
+                                    <field name="rodinado_bano_cantidad"/>
+                                    <field name="rodinado_bano_valor"/>
+                                </group>
+
+                                <separator string="Otro"/>
+
+                                <field name="otro_reparacion"/>
+
+                            </group>
+
+                        </group>
+
+
+                        <group string="Resumen Taller"
+                            groups="base.group_system"
                             col="4">
 
-                            <!-- CABECERA -->
+                            <field name="hechura"
+                                readonly="1"/>
 
-                            <separator string="1. Tipo de Trabajo" colspan="4"/>
+                            <field name="cobro_interno"
+                                readonly="1"/>
 
-                            <field name="tipo_trabajo"/>
-
-                            <field name="subtipo"
-                                invisible="tipo_trabajo != 'diseno_3d'"/>
-
-                            <field name="es_vector_nuevo"
-                                invisible="tipo_trabajo != 'vector'"/>
-
-                            <field name="metal_utilizado"/>
-
-                            <!-- METAL -->
-
-                            <separator string="2. Metal" colspan="4"/>
-
-                            <field name="gramos_utilizado"/>
-
-                            <div class="o_form_label">
-                                        x
-                                    </div>
-
-                            <field name="peso_valor"/>
-
-                            <field name="peso_total"
-                                readonly="1"
-                                style="background-color:#fff8b3;
-                                    color:#665c00;
-                                    font-weight:bold;"/>
-
-                            <!-- DISEÑO -->
-
-                            <separator string="3. Diseño / Hechura" colspan="4"/>
-
-                            <field name="hechura" readonly="1"/>
-
-                            <field name="cobro_interno" readonly="1"/>
-
-                            <field name="cobros_extras" readonly="1"/>
-
-                            <field name="valor_extra"/>
-
-                            <!-- PIEDRAS -->
-
-                            <separator string="4. Piedras" colspan="4"/>
-
-                            <field name="cantidad_circones"
-                                invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
-
-                            <field name="cantidad_brillantes"
-                                invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
-
-                            <field name="valor_brillante"/>
-
-                            <field name="cantidad_moissanitas"
-                                invisible="tipo_trabajo not in ['diseno_3d','argollas']"/>
-
-                            <field name="valor_moissanita"/>
-
-                            <field name="rodinado"
-                                invisible="metal_utilizado != 'oro 18k blanco'"/>
-
-                            <!-- TOTAL -->
-
-                            <separator string="Resultado Final" colspan="4"/>
-
-                            <field name="metales_extra"/>
+                            <field name="cobros_extras"
+                                readonly="1"/>
 
                             <field name="total_salida_taller"
                                 readonly="1"
                                 style="background-color:#fff8b3;
-                                    color:#665c00;
-                                    font-size:18px;
-                                    font-weight:bold;"/>
+                                        color:#665c00;
+                                        font-size:22px;
+                                        font-weight:bold;"/>
 
                             <field name="clave_firma_manual"
                                 password="True"/>

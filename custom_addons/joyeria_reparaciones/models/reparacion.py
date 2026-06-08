@@ -202,9 +202,33 @@ class Reparacion(models.Model):
     valor_moissanita = fields.Float("Valor Moissanita")
     
     gramos_utilizado = fields.Float("Gramos utilizados(gr)")
+    rodinado_cantidad = fields.Float()
+    rodinado_valor = fields.Float()
+    tipo_diseno = fields.Selection([
+    ('nuevo','Nuevo'),
+    ('antiguo','Antiguo')
+    ])
+    tipo_vector = fields.Selection([
+        ('nuevo','Nuevo'),
+        ('antiguo','Antiguo')
+    ])
 
-
+    cantidad_brillantes_manual = fields.Float()
+    valor_brillante_unitario = fields.Float()
+    cantidad_moissanita_manual = fields.Float()
+    valor_moissanita_unitario = fields.Float()
     metales_extra = fields.Float("Metales extra(gr)")
+    rodinado_cantidad = fields.Float()
+    rodinado_valor = fields.Float()
+    otro_taller = fields.Float()
+    #reparacion
+    soldadura_cantidad = fields.Float()
+    soldadura_valor = fields.Float()
+    piedras_cantidad = fields.Float()
+    piedras_valor = fields.Float()
+    rodinado_bano_cantidad = fields.Float()
+    rodinado_bano_valor = fields.Float()
+    otro_reparacion = fields.Float()
 
     cobro_interno = fields.Float("Hechura", compute="_compute_costos_taller", store=True)
     hechura = fields.Float("Metal", compute="_compute_costos_taller", store=True)
@@ -326,116 +350,162 @@ class Reparacion(models.Model):
 
 
     @api.depends(
-    'metal_utilizado',
+        'servicio',
+        'metal_utilizado',
+        'gramos_utilizado',
 
-    'tipo_trabajo',
-    'subtipo',
-    'cantidad_circones',
-    'gramos_utilizado',
-    'lleva_brillantes',
-    'lleva_moissanitas',
-    'es_vector_nuevo',
-    'rodinado'
-)
+        # FABRICACION
+        'tipo_diseno',
+        'tipo_vector',
+        'cantidad',
+        'cantidad_circones',
+
+        'cantidad_brillantes_manual',
+        'valor_brillante_unitario',
+
+        'cantidad_moissanita_manual',
+        'valor_moissanita_unitario',
+
+        'rodinado_cantidad',
+        'rodinado_valor',
+
+        'otro_taller',
+
+        # REPARACION
+        'soldadura_cantidad',
+        'soldadura_valor',
+
+        'piedras_cantidad',
+        'piedras_valor',
+
+        'rodinado_bano_cantidad',
+        'rodinado_bano_valor',
+
+        'otro_reparacion'
+    )
     def _compute_costos_taller(self):
+
         for rec in self:
 
             cobro = 0
             hechura = 0
             extras = 0
 
-            # =========================
-            # 🟡 ORO 18K
-            # =========================
-            if rec.metal_utilizado in ['oro 18k rosado', 'oro 18k amarillo']:
+            # ====================================================
+            # FABRICACION
+            # ====================================================
+            if rec.servicio == 'fabricacion':
 
-                if rec.tipo_trabajo == 'diseno_3d':
-
-                    if rec.subtipo == 'nuevo':
-                        cobro += 16000
-                        cobro += 4000
-
-                    elif rec.subtipo == 'existente':
-                        cobro += 4000
-
-                    extras += (rec.cantidad_circones or 0) * 300
-
-                    if rec.lleva_brillantes:
-                        extras += 0  # puedes ajustar luego
-
-                    if rec.lleva_moissanitas:
-                        extras += 0
-
-                elif rec.tipo_trabajo == 'vector':
-                    cobro += 4000 if rec.es_vector_nuevo else 2000
-                    hechura += 3000
-
-                elif rec.tipo_trabajo == 'argollas':
-                    cobro += 3000
-                    extras += (rec.cantidad_circones or 0) * 300
-
-            # =========================
-            # ⚪ PLATA
-            # =========================
-            elif rec.metal_utilizado == 'plata':
-
-                if rec.tipo_trabajo == 'diseno_3d':
-
-                    if rec.subtipo == 'nuevo':
-                        cobro += 16000
-                        cobro += 2000
-
-                    elif rec.subtipo == 'existente':
-                        cobro += 2000
-
-                    extras += (rec.cantidad_circones or 0) * 300
+                # --------------------------------
+                # METAL
+                # --------------------------------
+                if rec.metal_utilizado == 'plata':
                     hechura += (rec.gramos_utilizado or 0) * 2300
 
-                elif rec.tipo_trabajo == 'vector':
-                    cobro += 4000 if rec.es_vector_nuevo else 2000
-                    hechura += (rec.gramos_utilizado or 0) * 2300
-
-                elif rec.tipo_trabajo == 'argollas':
-                    hechura += (rec.gramos_utilizado or 0) * 2300
-                    extras += (rec.cantidad_circones or 0) * 300
-
-            # =========================
-            # ⚪ ORO 18K BLANCO
-            # =========================
-            elif rec.metal_utilizado == 'oro 18k blanco':
-
-                if rec.tipo_trabajo == 'diseno_3d':
-
-                    if rec.subtipo == 'nuevo':
-                        cobro += 16000
-                        cobro += 2000
-
-                    elif rec.subtipo == 'existente':
-                        cobro += 2000
-
-                    # 💎 piedras
-                    extras += (rec.cantidad_circones or 0) * 300
-
-                    # ⚖️ gramos → HECHURA
+                elif rec.metal_utilizado == 'oro 18k blanco':
                     hechura += (rec.gramos_utilizado or 0) * 101000
 
-                elif rec.tipo_trabajo == 'vector':
-                    cobro += 4000 if rec.es_vector_nuevo else 2000
-                    hechura += (rec.gramos_utilizado or 0) * 101000
+                # si después quieren precio para rosado o amarillo
+                # aquí lo agregamos
 
-                elif rec.tipo_trabajo == 'argollas':
-                    hechura += (rec.gramos_utilizado or 0) * 101000
-                    extras += (rec.cantidad_circones or 0) * 300
+                # --------------------------------
+                # DISEÑO
+                # --------------------------------
+                if rec.tipo_diseno == 'nuevo':
+                    cobro += 16000
 
-                # =========================
-                # ✨ RODINADO
-                # =========================
-                if rec.rodinado:
-                    extras += 10000
+                elif rec.tipo_diseno == 'antiguo':
+                    cobro += 4000
 
-            # =========================
-            # RESULTADO FINAL
-            # =========================
+                # --------------------------------
+                # VECTOR
+                # --------------------------------
+                if rec.tipo_vector == 'nuevo':
+                    cobro += 4000
+
+                elif rec.tipo_vector == 'antiguo':
+                    cobro += 2000
+
+                # --------------------------------
+                # ARGOLLAS
+                # 0.5 = una argolla = 3000
+                # 1.0 = par = 6000
+                # --------------------------------
+                if rec.cantidad:
+                    extras += (rec.cantidad or 0) * 6000
+
+                # --------------------------------
+                # CIRCONES
+                # --------------------------------
+                extras += (rec.cantidad_circones or 0) * 300
+
+                # --------------------------------
+                # BRILLANTES
+                # --------------------------------
+                extras += (
+                    (rec.cantidad_brillantes_manual or 0)
+                    * (rec.valor_brillante_unitario or 0)
+                )
+
+                # --------------------------------
+                # MOISSANITAS
+                # --------------------------------
+                extras += (
+                    (rec.cantidad_moissanita_manual or 0)
+                    * (rec.valor_moissanita_unitario or 0)
+                )
+
+                # --------------------------------
+                # RODINADO
+                # --------------------------------
+                extras += (
+                    (rec.rodinado_cantidad or 0)
+                    * (rec.rodinado_valor or 0)
+                )
+
+                # --------------------------------
+                # OTRO
+                # --------------------------------
+                extras += rec.otro_taller or 0
+
+            # ====================================================
+            # REPARACION
+            # ====================================================
+            elif rec.servicio == 'reparacion':
+
+                # SOLDADURA
+                extras += (
+                    (rec.soldadura_cantidad or 0)
+                    * (rec.soldadura_valor or 0)
+                )
+
+                # PIEDRAS
+                extras += (
+                    (rec.piedras_cantidad or 0)
+                    * (rec.piedras_valor or 0)
+                )
+
+                # BRILLANTES
+                extras += (
+                    (rec.cantidad_brillantes_manual or 0)
+                    * (rec.valor_brillante_unitario or 0)
+                )
+
+                # MOISSANITAS
+                extras += (
+                    (rec.cantidad_moissanita_manual or 0)
+                    * (rec.valor_moissanita_unitario or 0)
+                )
+
+                # RODINADO / BAÑO
+                extras += (
+                    (rec.rodinado_bano_cantidad or 0)
+                    * (rec.rodinado_bano_valor or 0)
+                )
+
+                # OTRO
+                extras += rec.otro_reparacion or 0
+
             rec.cobro_interno = cobro
             rec.hechura = hechura
             rec.cobros_extras = extras
