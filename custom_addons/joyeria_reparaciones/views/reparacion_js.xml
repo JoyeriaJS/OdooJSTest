@@ -122,10 +122,12 @@
 
                             <field name="metal_utilizado"/>
                             <group>
-                            <field name="gramos_utilizado">
+                            <field name="gramos_utilizado"
+                                    string="Gramos"/>
                             </group>
                             <group>
-                            <field name="valor_metal">
+                            <field name="valor_metal"
+                                    string="Valor"/>
                             </group>
 
                             <separator string="SOLDADURA"/>
