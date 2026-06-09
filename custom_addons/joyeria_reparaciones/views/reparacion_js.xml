@@ -154,14 +154,17 @@
                             <separator string="Brillantes"/>
 
                             <group col="2">
-                                    
-                                    <group>
-                                <field name="cantidad_brillantes_manual"
-                                            string="Cantidad"/>
-                                     </group>
-                                     <group>
-                                <field name="valor_brillante_unitario"
-                                            string="Valor"/>
+
+                                <group>
+                                    <field name="cantidad_brillantes_manual"
+                                        string="Cantidad"/>
+                                </group>
+
+                                <group>
+                                    <field name="valor_brillante_unitario"
+                                        string="Valor"/>
+                                </group>
+
                             </group>
 
                             <separator string="Moissanita"/>
@@ -180,14 +183,17 @@
                             <separator string="Rodinado / Baño"/>
 
                             <group col="2">
-                            <group>
-                                <field name="rodinado_bano_cantidad"
-                                            string="Cantidad"/>
-                                        </group>
-                                        <group>
-                                <field name="rodinado_bano_valor"
-                                            string="Valor"/>
-                                            <group>
+
+                                <group>
+                                    <field name="rodinado_bano_cantidad"
+                                        string="Cantidad"/>
+                                </group>
+
+                                <group>
+                                    <field name="rodinado_bano_valor"
+                                        string="Valor"/>
+                                </group>
+
                             </group>
 
                             <separator string="OTRO"/>
