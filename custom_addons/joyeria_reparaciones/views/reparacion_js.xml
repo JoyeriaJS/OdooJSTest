@@ -119,7 +119,7 @@
 
                             <field name="metal_utilizado"/>
 
-                            <group col="4">
+                            <group col="2">
 
                                 <field name="soldadura_cantidad"/>
 
@@ -128,8 +128,6 @@
 
                                 <field name="soldadura_valor"/>
 
-                                <div class="o_form_label">
-                                </div>
 
                             </group>
 
