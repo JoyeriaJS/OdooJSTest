@@ -118,21 +118,66 @@
                             invisible="servicio != 'reparacion'">
 
                             <field name="metal_utilizado"/>
+                            
+                            <separator string="Soldadura"/>
 
-                            <field name="soldadura_cantidad"/>
-                            <field name="soldadura_valor"/>
+                            <group col="4">
 
-                            <field name="piedras_cantidad"/>
-                            <field name="piedras_valor"/>
+                                <label string="Cantidad"/>
+                                <field name="soldadura_cantidad" nolabel="1"/>
 
-                            <field name="cantidad_brillantes_manual"/>
-                            <field name="valor_brillante_unitario"/>
+                                <label string="Valor"/>
+                                <field name="soldadura_valor" nolabel="1"/>
 
-                            <field name="cantidad_moissanita_manual"/>
-                            <field name="valor_moissanita_unitario"/>
+                            </group>
 
-                            <field name="rodinado_bano_cantidad"/>
-                            <field name="rodinado_bano_valor"/>
+                            <separator string="Piedras"/>
+
+                            <group col="4">
+
+                                <label string="Cantidad"/>
+                                <field name="piedras_cantidad" nolabel="1"/>
+
+                                <label string="Valor"/>
+                                <field name="piedras_valor" nolabel="1"/>
+
+                            </group>
+
+                            <separator string="Brillantes"/>
+
+                            <group col="4">
+
+                                <label string="Cantidad"/>
+                                <field name="cantidad_brillantes_manual" nolabel="1"/>
+
+                                <label string="Valor"/>
+                                <field name="valor_brillante_unitario" nolabel="1"/>
+
+                            </group>
+
+                            <separator string="Moissanita"/>
+
+                            <group col="4">
+
+                                <label string="Cantidad"/>
+                                <field name="cantidad_moissanita_manual" nolabel="1"/>
+
+                                <label string="Valor"/>
+                                <field name="valor_moissanita_unitario" nolabel="1"/>
+
+                            </group>
+
+                            <separator string="Rodinado / Baño"/>
+
+                            <group col="4">
+
+                                <label string="Cantidad"/>
+                                <field name="rodinado_bano_cantidad" nolabel="1"/>
+
+                                <label string="Valor"/>
+                                <field name="rodinado_bano_valor" nolabel="1"/>
+
+                            </group>
 
                             <field name="otro_reparacion"/>
 
