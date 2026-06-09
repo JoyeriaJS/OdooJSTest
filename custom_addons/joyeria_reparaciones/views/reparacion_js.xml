@@ -20,7 +20,8 @@
 
                         <group string="Información General" col="2">
 
-                            <field name="name" readonly="1"/>
+                            <field name="name" readonly="1"
+                                   nolabel="1"/>
                             <field name="cliente_id"/>
 
                             <field name="tipo_cliente"/>
@@ -62,6 +63,7 @@
 
                             <field name="peso_valor"/>
 
+                            <newline/>
                             <field name="solicitud_cliente" colspan="2"/>
 
                         </group>
@@ -179,7 +181,7 @@
 
                         <group string="Resumen Taller"
                             groups="base.group_system"
-                            col="4">
+                            col="2">
 
                             <field name="hechura"
                                 readonly="1"/>
@@ -221,6 +223,7 @@
 
                             <field name="local_tienda"/>
 
+                            <newline/>
                             <field name="fecha_recepcion" readonly="1"/>
                             <field name="fecha_entrega"/>
 
@@ -260,6 +263,7 @@
 
                             <field name="subtotal" readonly="1"/>
                             <field name="abono"/>
+                            <newline/>
                             <field name="saldo" readonly="1"/>
 
                         </group>
