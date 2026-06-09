@@ -119,21 +119,21 @@
 
                             <field name="metal_utilizado"/>
 
-                            <group col="4">
+                            <separator string="SOLDADURA"/>
 
-                            <div class="o_form_label">
-                                Cantidad
-                            </div>
+                            <group col="2">
 
-                            <field name="soldadura_cantidad" nolabel="1"/>
+                                <group>
+                                    <field name="soldadura_cantidad"
+                                        string="Cantidad"/>
+                                </group>
 
-                            <div class="o_form_label">
-                                Valor
-                            </div>
+                                <group>
+                                    <field name="soldadura_valor"
+                                        string="Valor"/>
+                                </group>
 
-                            <field name="soldadura_valor" nolabel="1"/>
-
-                        </group>
+                            </group>
 
                             <separator string="Piedras"/>
 
