@@ -400,7 +400,7 @@ class Reparacion(models.Model):
             if rec.servicio == 'fabricacion':
 
                 #Metal
-                extras += (
+                hechura += (
                     (rec.gramos_utilizado or 0)
                     * (rec.valor_metal or 0)
 
