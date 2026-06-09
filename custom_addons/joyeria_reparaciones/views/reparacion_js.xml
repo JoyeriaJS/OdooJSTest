@@ -154,29 +154,38 @@
                             <separator string="Brillantes"/>
 
                             <group col="2">
-                                <field name="cantidad_brillantes_manual"/>
-                                <field name="valor_brillante_unitario"/>
+                                <field name="cantidad_brillantes_manual"
+                                            string="Cantidad"/>
+                                <field name="valor_brillante_unitario"
+                                            string="Valor"/>
                             </group>
 
                             <separator string="Moissanita"/>
 
                             <group col="2">
-                                <field name="cantidad_moissanita_manual"/>
-                                <field name="valor_moissanita_unitario"/>
+                                <field name="cantidad_moissanita_manual"
+                                            string="Cantidad"/>
+                                <field name="valor_moissanita_unitario"
+                                            string="Valor"/>
                             </group>
 
                             <separator string="Rodinado / Baño"/>
 
                             <group col="2">
-                                <field name="rodinado_bano_cantidad"/>
-                                <field name="rodinado_bano_valor"/>
+                                <field name="rodinado_bano_cantidad"
+                                            string="Cantidad"/>
+                                <field name="rodinado_bano_valor"
+                                            string="Valor"/>
                             </group>
 
-                            <separator string="Otro"/>
+                            <separator string="OTRO"/>
 
-                            <field name="otro_reparacion"/>
+                            <group col="2">
 
-                        </group>
+                                <field name="otro_reparacion"
+                                    colspan="2"/>
+
+                            </group>
 
 
                     <!-- RESUMEN -->
