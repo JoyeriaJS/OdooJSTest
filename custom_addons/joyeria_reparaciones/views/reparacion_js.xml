@@ -119,19 +119,15 @@
 
                             <field name="metal_utilizado"/>
 
-                            <group col="4">
+                            <separator string="SOLDADURA"/>
 
-                                <field name="soldadura_cantidad"/>
+                            <group col="2">
 
-                                <div class="o_form_label">
-                                    x
-                                </div>
+                                <field name="soldadura_cantidad"
+                                    string="Cantidad"/>
 
-                                <field name="soldadura_valor"/>
-
-                                <div class="o_form_label">
-                                    $
-                                </div>
+                                <field name="soldadura_valor"
+                                    string="Valor"/>
 
                             </group>
 
