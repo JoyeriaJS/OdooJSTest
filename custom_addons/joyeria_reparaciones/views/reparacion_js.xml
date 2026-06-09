@@ -154,8 +154,12 @@
                             <separator string="Brillantes"/>
 
                             <group col="2">
+                                    
+                                    <group>
                                 <field name="cantidad_brillantes_manual"
                                             string="Cantidad"/>
+                                     </group>
+                                     <group>
                                 <field name="valor_brillante_unitario"
                                             string="Valor"/>
                             </group>
@@ -163,19 +167,27 @@
                             <separator string="Moissanita"/>
 
                             <group col="2">
+                                <group>
                                 <field name="cantidad_moissanita_manual"
                                             string="Cantidad"/>
+                                            </group>
+                                            <group>
                                 <field name="valor_moissanita_unitario"
                                             string="Valor"/>
+                                            </group>
                             </group>
 
                             <separator string="Rodinado / Baño"/>
 
                             <group col="2">
+                            <group>
                                 <field name="rodinado_bano_cantidad"
                                             string="Cantidad"/>
+                                        </group>
+                                        <group>
                                 <field name="rodinado_bano_valor"
                                             string="Valor"/>
+                                            <group>
                             </group>
 
                             <separator string="OTRO"/>
