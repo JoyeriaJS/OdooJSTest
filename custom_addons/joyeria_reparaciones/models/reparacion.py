@@ -200,6 +200,7 @@ class Reparacion(models.Model):
     valor_extra = fields.Float("Valor Extra")
     valor_brillante = fields.Float("Valor Brillante")
     valor_moissanita = fields.Float("Valor Moissanita")
+    valor_metal = fields.Float("Valor Metal")
     
     gramos_utilizado = fields.Float("Gramos utilizados(gr)")
     rodinado_cantidad = fields.Float()
@@ -354,6 +355,7 @@ class Reparacion(models.Model):
         'metal_utilizado',
         'gramos_utilizado',
 
+
         # FABRICACION
         'tipo_diseno',
         'tipo_vector',
@@ -372,6 +374,7 @@ class Reparacion(models.Model):
         'otro_taller',
 
         # REPARACION
+        'valor_metal'
         'soldadura_cantidad',
         'soldadura_valor',
 
@@ -399,11 +402,11 @@ class Reparacion(models.Model):
                 # --------------------------------
                 # METAL
                 # --------------------------------
-                if rec.metal_utilizado == 'plata':
-                    hechura += (rec.gramos_utilizado or 0) * 2300
+                #if rec.metal_utilizado == 'plata':
+                    #hechura += (rec.gramos_utilizado or 0) * 2300
 
-                elif rec.metal_utilizado == 'oro 18k blanco':
-                    hechura += (rec.gramos_utilizado or 0) * 101000
+                #elif rec.metal_utilizado == 'oro 18k blanco':
+                    #hechura += (rec.gramos_utilizado or 0) * 101000
 
                 # si después quieren precio para rosado o amarillo
                 # aquí lo agregamos
@@ -472,6 +475,13 @@ class Reparacion(models.Model):
             # REPARACION
             # ====================================================
             elif rec.servicio == 'reparacion':
+
+                #Metal
+                extras += (
+                    (rec.gramos_utilizado or 0)
+                    * (rec.valor_metal or 0)
+
+                )
 
                 # SOLDADURA
                 extras += (

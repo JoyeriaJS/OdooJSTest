@@ -116,8 +116,17 @@
                          <group string="Reparación"
                             col="2"
                             invisible="servicio != 'reparacion'">
+                            <separator string="METAL"/>
+
+                            <group col="2">
 
                             <field name="metal_utilizado"/>
+                            <group>
+                            <field name="gramos_utilizado">
+                            </group>
+                            <group>
+                            <field name="valor_metal">
+                            </group>
 
                             <separator string="SOLDADURA"/>
 
