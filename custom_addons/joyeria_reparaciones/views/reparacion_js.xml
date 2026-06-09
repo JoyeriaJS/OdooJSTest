@@ -123,13 +123,11 @@
 
                                 <field name="soldadura_cantidad"/>
 
-                                <div class="o_form_label">
-                                </div>
+
 
                                 <field name="soldadura_valor"/>
 
-                                <div class="o_form_label">
-                                </div>
+
 
                             </group>
 
