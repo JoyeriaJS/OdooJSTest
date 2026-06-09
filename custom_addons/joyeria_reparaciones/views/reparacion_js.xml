@@ -87,7 +87,20 @@
                             col="2"
                             invisible="servicio != 'fabricacion'">
 
+                            <separator string="METAL"/>
+
+                            <group col="2">
+
                             <field name="metal_utilizado"/>
+                            <group>
+                            <field name="gramos_utilizado"
+                                    string="Gramos"/>
+                            </group>
+                            <group>
+                            <field name="valor_metal"
+                                    string="Valor"/>
+                            </group>
+                         </group>
 
                             <field name="tipo_diseno"/>
 
@@ -116,19 +129,9 @@
                          <group string="Reparación"
                             col="2"
                             invisible="servicio != 'reparacion'">
-                            <separator string="METAL"/>
-
-                            <group col="2">
 
                             <field name="metal_utilizado"/>
-                            <group>
-                            <field name="gramos_utilizado"
-                                    string="Gramos"/>
-                            </group>
-                            <group>
-                            <field name="valor_metal"
-                                    string="Valor"/>
-                            </group>
+                            
 
                             <separator string="SOLDADURA"/>
 

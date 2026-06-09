@@ -399,6 +399,13 @@ class Reparacion(models.Model):
             # ====================================================
             if rec.servicio == 'fabricacion':
 
+                #Metal
+                extras += (
+                    (rec.gramos_utilizado or 0)
+                    * (rec.valor_metal or 0)
+
+                )
+
                 # --------------------------------
                 # METAL
                 # --------------------------------
@@ -476,12 +483,6 @@ class Reparacion(models.Model):
             # ====================================================
             elif rec.servicio == 'reparacion':
 
-                #Metal
-                extras += (
-                    (rec.gramos_utilizado or 0)
-                    * (rec.valor_metal or 0)
-
-                )
 
                 # SOLDADURA
                 extras += (
