@@ -267,29 +267,26 @@
                             readonly="1"/>
 
                     </group>
-                    </group>
+                </group>
+
+                                        </group>
 
                     <!-- AUTORIZACIÓN -->
-                                        <!-- ======================================
-                            AUTORIZACIÓN
-                    ====================================== -->
 
                     <group string="Autorización (solo si es sin costo)"
-                        visibility_condition="requiere_autorizacion == True">
+                           invisible="not requiere_autorizacion">
 
                         <field name="codigo_ingresado"
-                            force_save="1"
-                            placeholder="Ingresa el código entregado por administración"/>
+                               force_save="1"
+                               placeholder="Ingresa el código entregado por administración"/>
 
                     </group>
 
 
-                    <!-- ======================================
-                            NOTAS
-                    ====================================== -->
+                    <!-- NOTAS -->
 
                     <group string="Notas y Comentarios"
-                        col="2">
+                           col="2">
 
                         <field name="notas"/>
 
@@ -298,9 +295,7 @@
                     </group>
 
 
-                    <!-- ======================================
-                            OPERACIONES
-                    ====================================== -->
+                    <!-- OPERACIONES -->
 
                     <notebook>
 
@@ -311,13 +306,9 @@
                                 <tree editable="bottom">
 
                                     <field name="producto_id"/>
-
                                     <field name="descripcion"/>
-
                                     <field name="cantidad"/>
-
                                     <field name="unidad_medida"/>
-
                                     <field name="precio_unitario"/>
 
                                 </tree>
@@ -329,28 +320,25 @@
                     </notebook>
 
 
-                    <!-- ======================================
-                            CHATTER
-                    ====================================== -->
+                    <!-- CHATTER -->
 
                     <div class="oe_chatter">
 
                         <field name="message_follower_ids"
-                            widget="mail_followers"/>
+                               widget="mail_followers"/>
 
                         <field name="message_ids"
-                            widget="mail_thread"/>
+                               widget="mail_thread"/>
 
                     </div>
 
-                                    </sheet>
+                </sheet>
 
-                                </form>
+            </form>
 
-                            </field>
+        </field>
 
-                        </record>
-
+    </record>
 
 
     <!-- ======================================
