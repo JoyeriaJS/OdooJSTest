@@ -269,16 +269,19 @@
                     </group>
                 </group>
 
-                                        </group>
+                     </group>
 
                     <!-- AUTORIZACIÓN -->
 
+                    <field name="requiere_autorizacion"
+                        invisible="1"/>
+
                     <group string="Autorización (solo si es sin costo)"
-                           invisible="not requiere_autorizacion">
+                        invisible="not requiere_autorizacion">
 
                         <field name="codigo_ingresado"
-                               force_save="1"
-                               placeholder="Ingresa el código entregado por administración"/>
+                            force_save="1"
+                            placeholder="Ingresa el código entregado por administración"/>
 
                     </group>
 
