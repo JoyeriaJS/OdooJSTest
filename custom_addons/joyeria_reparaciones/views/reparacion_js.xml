@@ -101,25 +101,83 @@
                                     string="Valor"/>
                             </group>
                          </group>
+                            <separator string="DISEÑO"/>
 
-                            <field name="tipo_diseno"/>
+                        <group col="2">
+                            <group>
+                                <field name="tipo_diseno" string="Diseño"/>
+                            </group>
 
-                            <field name="tipo_vector"/>
+                            <group>
+                                <field name="tipo_vector" string="Vector"/>
+                            </group>
+                        </group>
 
-                            <field name="cantidad"/>
+                        <separator string="ARGOLLAS"/>
 
-                            <field name="cantidad_circones"/>
+                        <group col="2">
+                            <group>
+                                <field name="cantidad" string="Cantidad"/>
+                            </group>
 
-                            <field name="cantidad_brillantes_manual"/>
-                            <field name="valor_brillante_unitario"/>
+                            <group/>
+                        </group>
 
-                            <field name="cantidad_moissanita_manual"/>
-                            <field name="valor_moissanita_unitario"/>
+                        <separator string="CIRCONES"/>
 
-                            <field name="rodinado_cantidad"/>
-                            <field name="rodinado_valor"/>
+                        <group col="2">
+                            <group>
+                                <field name="cantidad_circones" string="Cantidad"/>
+                            </group>
 
-                            <field name="otro_taller"/>
+                            <group/>
+                        </group>
+
+                        <separator string="BRILLANTES"/>
+
+                        <group col="2">
+                            <group>
+                                <field name="cantidad_brillantes_manual"
+                                    string="Cantidad"/>
+                            </group>
+
+                            <group>
+                                <field name="valor_brillante_unitario"
+                                    string="Valor"/>
+                            </group>
+                        </group>
+
+                        <separator string="MOISSANITA"/>
+
+                        <group col="2">
+                            <group>
+                                <field name="cantidad_moissanita_manual"
+                                    string="Cantidad"/>
+                            </group>
+
+                            <group>
+                                <field name="valor_moissanita_unitario"
+                                    string="Valor"/>
+                            </group>
+                        </group>
+
+                        <separator string="RODINADO"/>
+
+                        <group col="2">
+                            <group>
+                                <field name="rodinado_cantidad"
+                                    string="Cantidad"/>
+                            </group>
+
+                            <group>
+                                <field name="rodinado_valor"
+                                    string="Valor"/>
+                            </group>
+                        </group>
+
+                        <separator string="OTRO"/>
+
+                        <field name="otro_taller"/>
 
                         </group>
 
