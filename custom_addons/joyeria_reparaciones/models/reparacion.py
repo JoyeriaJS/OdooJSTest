@@ -374,7 +374,7 @@ class Reparacion(models.Model):
         'otro_taller',
 
         # REPARACION
-        'valor_metal'
+        'valor_metal',
         'soldadura_cantidad',
         'soldadura_valor',
 
