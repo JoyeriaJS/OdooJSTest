@@ -135,12 +135,21 @@
 
                             </group>
 
-                            <separator string="Piedras"/>
+                            <separator string="PIEDRAS"/>
 
-                            <group col="2">
-                                <field name="piedras_cantidad"/>
-                                <field name="piedras_valor"/>
-                            </group>
+                                <group col="2">
+
+                                    <group>
+                                        <field name="piedras_cantidad"
+                                            string="Cantidad"/>
+                                    </group>
+
+                                    <group>
+                                        <field name="piedras_valor"
+                                            string="Valor"/>
+                                    </group>
+
+                                </group>
 
                             <separator string="Brillantes"/>
 
