@@ -28,10 +28,10 @@ class PosRMAController(http.Controller):
         abono = reparacion.abono or 0
         saldo = subtotal - abono
 
-        if saldo <= 0:
-            return {
-                "error": f"El RMA {numero_rma} no tiene saldo pendiente"
-            }
+        #if saldo <= 0:
+            #return {
+             #   "error": f"El RMA {numero_rma} no tiene saldo pendiente"
+            #}
 
         return {
             "success": True,
@@ -39,6 +39,7 @@ class PosRMAController(http.Controller):
 
             # 🔥 ESTO ES LO QUE TE FALTABA
             "subtotal": subtotal,
+            "abono": abono,
             "saldo": saldo,
 
             # 🔥 precio del POS
