@@ -235,7 +235,7 @@ class Reparacion(models.Model):
     hechura = fields.Float("Metal", compute="_compute_costos_taller", store=True)
     hechura2 = fields.Float("Hechura")
     cobros_extras = fields.Floatcobros_extras = fields.Float("Cobros extras", compute="_compute_costos_taller", store=True)
-    total_salida_taller = fields.Float("Total salida del taller", compute="_compute_total_salida", store=True)
+    total_salida_taller = fields.Float("Total Hechura", compute="_compute_total_salida", store=True)
     peso_total = fields.Float("Peso total", compute="_compute_peso_total", store=True)
 
     tipo_trabajo = fields.Selection([
