@@ -39,7 +39,6 @@ class PosRMAController(http.Controller):
 
             # 🔥 ESTO ES LO QUE TE FALTABA
             "subtotal": subtotal,
-            "abono": abono,
             "saldo": saldo,
 
             # 🔥 precio del POS
