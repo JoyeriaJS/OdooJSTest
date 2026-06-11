@@ -316,32 +316,32 @@
                         <!-- RECEPCIÓN Y ENTREGA -->
 
                        <!-- ======================================
-        RECEPCIÓN
-====================================== -->
+                                RECEPCIÓN
+                        ====================================== -->
 
-<group string="Recepción y Entrega"
-       col="2">
+                        <group string="Recepción y Entrega"
+                            col="2">
 
-    <field name="vendedora_id"
-           readonly="1"
-           options="{'no_open': True, 'no_create': True}"/>
+                            <field name="vendedora_id"
+                                readonly="1"
+                                options="{'no_open': True, 'no_create': True}"/>
 
-    <field name="clave_autenticacion_manual"
-           password="True"/>
+                            <field name="clave_autenticacion_manual"
+                                password="True"/>
 
-    <field name="local_tienda"/>
+                            <field name="local_tienda"/>
 
-    <field name="fecha_recepcion"
-           readonly="1"/>
+                            <field name="fecha_recepcion"
+                                readonly="1"/>
 
-    <field name="fecha_entrega"/>
+                            <field name="fecha_entrega"/>
 
-    <field name="estado"
-           groups="base.group_system"/>
+                            <field name="estado"
+                                groups="base.group_system"/>
 
-    <field name="express"/>
+                            <field name="express"/>
 
-                    </group>
+                                            </group>
 
 
                     <!-- ======================================
