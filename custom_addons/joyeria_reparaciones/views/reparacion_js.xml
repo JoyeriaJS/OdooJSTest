@@ -306,7 +306,7 @@
                             password="True"/>
 
                         <field name="firma_id"
-                            readonly="1"/>
+                                readonly="1"/>
 
                         <field name="fecha_firma"
                             readonly="1"/>
