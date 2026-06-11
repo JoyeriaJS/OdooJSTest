@@ -71,323 +71,297 @@
         </group>
 
 
-                        <!-- SALIDA DEL TALLER -->
-
                       <!-- ======================================
-                            CALCULADORA TALLER
-                    ====================================== -->
-
-                    <group string="Calculadora Taller"
-                        groups="base.group_system"
-                        colspan="2">
-
-                        <!-- FABRICACION -->
+        CALCULADORA TALLER
+====================================== -->
 
-                        <group string="Fabricación"
-                            col="2"
-                            invisible="servicio != 'fabricacion'">
+<group string="Calculadora Taller"
+       groups="base.group_system"
+       col="2">
 
-                            <separator string="METAL"/>
+    <!-- FABRICACION -->
 
-                            <group col="2">
+    <group string="Fabricación"
+           col="2"
+           invisible="servicio != 'fabricacion'">
 
-                            <field name="metal_utilizado"/>
-                            <group>
-                            <field name="gramos_utilizado"
-                                    string="Gramos"/>
-                            </group>
-                            <group>
-                            <field name="valor_metal"
-                                    string="Valor"/>
-                            </group>
-                         </group>
-                            <separator string="DISEÑO"/>
+        <separator string="METAL"/>
 
-                        <group col="2">
-                            <group>
-                                <field name="tipo_diseno" string="Diseño"/>
-                            </group>
+        <group col="2">
 
-                            <group>
-                                <field name="tipo_vector" string="Vector"/>
-                            </group>
-                        </group>
+            <field name="metal_utilizado"/>
 
-                        <separator string="CANTIDAD PRODUCTO"/>
+            <group>
+                <field name="gramos_utilizado"
+                       string="Gramos"/>
+            </group>
 
-                        <group col="2">
-                            <group>
-                                <field name="cantidad" string="Cantidad"/>
-                            </group>
+            <group>
+                <field name="valor_metal"
+                       string="Valor"/>
+            </group>
 
-                            <group/>
-                        </group>
+        </group>
 
-                        <separator string="CIRCONES"/>
+        <separator string="DISEÑO"/>
 
-                        <group col="2">
-                            <group>
-                                <field name="cantidad_circones" string="Cantidad"/>
-                            </group>
+        <group col="2">
 
-                            <group/>
-                        </group>
+            <group>
+                <field name="tipo_diseno"/>
+            </group>
 
-                        <separator string="BRILLANTES"/>
+            <group>
+                <field name="tipo_vector"/>
+            </group>
 
-                        <group col="2">
-                            <group>
-                                <field name="cantidad_brillantes_manual"
-                                    string="Cantidad"/>
-                            </group>
+        </group>
 
-                            <group>
-                                <field name="valor_brillante_unitario"
-                                    string="Valor"/>
-                            </group>
-                        </group>
+        <separator string="CANTIDAD PRODUCTO"/>
 
-                        <separator string="MOISSANITA"/>
+        <field name="cantidad"/>
 
-                        <group col="2">
-                            <group>
-                                <field name="cantidad_moissanita_manual"
-                                    string="Cantidad"/>
-                            </group>
+        <separator string="CIRCONES"/>
 
-                            <group>
-                                <field name="valor_moissanita_unitario"
-                                    string="Valor"/>
-                            </group>
-                        </group>
+        <field name="cantidad_circones"/>
 
-                        <separator string="RODINADO"/>
+        <separator string="BRILLANTES"/>
 
-                        <group col="2">
-                            <group>
-                                <field name="rodinado_cantidad"
-                                    string="Cantidad"/>
-                            </group>
+        <group col="2">
 
-                            <group>
-                                <field name="rodinado_valor"
-                                    string="Valor"/>
-                            </group>
-                        </group>
+            <group>
+                <field name="cantidad_brillantes_manual"/>
+            </group>
 
-                        <separator string="OTRO"/>
+            <group>
+                <field name="valor_brillante_unitario"/>
+            </group>
 
-                        <field name="otro_taller"/>
+        </group>
 
-                        </group>
+        <separator string="MOISSANITA"/>
 
+        <group col="2">
 
-                        <!-- REPARACION -->
+            <group>
+                <field name="cantidad_moissanita_manual"/>
+            </group>
 
-                         <group string="Reparación"
-                            col="2"
-                            invisible="servicio != 'reparacion'">
+            <group>
+                <field name="valor_moissanita_unitario"/>
+            </group>
 
-                            <field name="metal_utilizado"/>
-                            
+        </group>
 
-                            <separator string="SOLDADURA"/>
+        <separator string="RODINADO"/>
 
-                            <group col="2">
+        <group col="2">
 
-                                <group>
-                                    <field name="soldadura_cantidad"
-                                        string="Cantidad"/>
-                                </group>
+            <group>
+                <field name="rodinado_cantidad"/>
+            </group>
 
-                                <group>
-                                    <field name="soldadura_valor"
-                                        string="Valor"/>
-                                </group>
+            <group>
+                <field name="rodinado_valor"/>
+            </group>
 
-                            </group>
+        </group>
 
-                            <separator string="CIRCONES"/>
+        <separator string="OTRO"/>
 
-                                <group col="2">
+        <field name="otro_taller"/>
 
-                                    <group>
-                                        <field name="piedras_cantidad"
-                                            string="Cantidad"/>
-                                    </group>
+    </group>
 
-                                    <group>
-                                        <field name="piedras_valor"
-                                            string="Valor"/>
-                                    </group>
+    <!-- REPARACION -->
 
-                                </group>
+    <group string="Reparación"
+           col="2"
+           invisible="servicio != 'reparacion'">
 
-                            <separator string="Brillantes"/>
+        <field name="metal_utilizado"/>
 
-                            <group col="2">
+        <separator string="SOLDADURA"/>
 
-                                <group>
-                                    <field name="cantidad_brillantes_manual"
-                                        string="Cantidad"/>
-                                </group>
+        <group col="2">
 
-                                <group>
-                                    <field name="valor_brillante_unitario"
-                                        string="Valor"/>
-                                </group>
+            <group>
+                <field name="soldadura_cantidad"/>
+            </group>
 
-                            </group>
+            <group>
+                <field name="soldadura_valor"/>
+            </group>
 
-                            <separator string="Moissanita"/>
+        </group>
 
-                            <group col="2">
-                                <group>
-                                <field name="cantidad_moissanita_manual"
-                                            string="Cantidad"/>
-                                            </group>
-                                            <group>
-                                <field name="valor_moissanita_unitario"
-                                            string="Valor"/>
-                                            </group>
-                            </group>
+        <separator string="CIRCONES"/>
 
-                            <separator string="Rodinado / Baño"/>
+        <group col="2">
 
-                            <group col="2">
+            <group>
+                <field name="piedras_cantidad"/>
+            </group>
 
-                                <group>
-                                    <field name="rodinado_bano_cantidad"
-                                        string="Cantidad"/>
-                                </group>
+            <group>
+                <field name="piedras_valor"/>
+            </group>
 
-                                <group>
-                                    <field name="rodinado_bano_valor"
-                                        string="Valor"/>
-                                </group>
+        </group>
 
-                            </group>
+        <separator string="BRILLANTES"/>
 
-                            <separator string="OTRO"/>
+        <group col="2">
 
-                            <group col="2">
+            <group>
+                <field name="cantidad_brillantes_manual"/>
+            </group>
 
-                                <field name="otro_reparacion"
-                                    colspan="2"/>
+            <group>
+                <field name="valor_brillante_unitario"/>
+            </group>
 
-                            </group>
-                        </group>
+        </group>
 
-                    <!-- RESUMEN -->
+        <separator string="MOISSANITA"/>
 
-                    <group string="Resumen Taller"
-                        groups="base.group_system"
-                        col="2">
+        <group col="2">
 
-                        <field name="hechura"
-                            readonly="1"/>
+            <group>
+                <field name="cantidad_moissanita_manual"/>
+            </group>
 
-                        <field name="cobro_interno"
-                            readonly="1"/>
+            <group>
+                <field name="valor_moissanita_unitario"/>
+            </group>
 
-                        <field name="cobros_extras"
-                            readonly="1"/>
+        </group>
 
-                        <field name="total_salida_taller"
-                            readonly="1"
-                            style="
-                                    background-color:#fff8b3;
-                                    color:#665c00;
-                                    font-size:22px;
-                                    font-weight:bold;
-                            "/>
+        <separator string="RODINADO / BAÑO"/>
 
-                        <field name="clave_firma_manual"
-                            password="True"/>
+        <group col="2">
 
-                        <field name="firma_id"
-                                readonly="1"/>
+            <group>
+                <field name="rodinado_bano_cantidad"/>
+            </group>
 
-                        <field name="fecha_firma"
-                            readonly="1"/>
+            <group>
+                <field name="rodinado_bano_valor"/>
+            </group>
 
-                    </group>
-                </group>
-                        <!-- RECEPCIÓN Y ENTREGA -->
+        </group>
 
-                       <!-- ======================================
-                                RECEPCIÓN
-                        ====================================== -->
+        <separator string="OTRO"/>
 
-                        <group string="Recepción y Entrega"
-                            col="2">
+        <field name="otro_reparacion"/>
 
-                            <field name="vendedora_id"
-                                readonly="1"
-                                options="{'no_open': True, 'no_create': True}"/>
+    </group>
 
-                            <field name="clave_autenticacion_manual"
-                                password="True"/>
+    <!-- RESUMEN -->
 
-                            <field name="local_tienda"/>
+    <group string="Resumen Taller"
+           col="2">
 
-                            <field name="fecha_recepcion"
-                                readonly="1"/>
+        <field name="hechura"
+               readonly="1"/>
 
-                            <field name="fecha_entrega"/>
+        <field name="cobro_interno"
+               readonly="1"/>
 
-                            <field name="estado"
-                                groups="base.group_system"/>
+        <field name="cobros_extras"
+               readonly="1"/>
 
-                            <field name="express"/>
+        <field name="total_salida_taller"
+               readonly="1"
+               style="background-color:#fff8b3;
+                      color:#665c00;
+                      font-size:22px;
+                      font-weight:bold;"/>
 
-                                            </group>
+        <field name="clave_firma_manual"
+               password="True"/>
 
+        <field name="firma_id"
+               readonly="1"/>
 
-                    <!-- ======================================
-                            FINANZAS
-                    ====================================== -->
+        <field name="fecha_firma"
+               readonly="1"/>
 
-                    <group string="Datos Financieros"
-                        col="2">
+    </group>
 
-                        <field name="precio_unitario"
-                            invisible="tipo_cliente in ['cliente mayorista','cliente preferente']"/>
+</group>
 
-                        <field name="hechura2"
-                            invisible="tipo_cliente not in ['cliente mayorista','cliente preferente']"/>
+<!-- RECEPCION FUERA DEL GROUP ADMIN -->
 
-                        <field name="extra"/>
+<group string="Recepción y Entrega"
+       col="2">
+                    
+                      <!-- RECEPCIÓN Y ENTREGA -->
 
-                        <field name="descripcion_extra_1"
-                            placeholder="Descripción 1"
-                            invisible="tipo_cliente not in ['cliente mayorista','cliente preferente','cliente normal']"/>
+<group string="Recepción y Entrega"
+       col="2">
 
-                        <field name="extra2"/>
+    <field name="vendedora_id"
+           readonly="1"
+           options="{'no_open': True, 'no_create': True}"/>
 
-                        <field name="descripcion_extra_2"
-                            placeholder="Descripción 2"
-                            invisible="tipo_cliente not in ['cliente mayorista','cliente preferente','cliente normal']"/>
+    <field name="clave_autenticacion_manual"
+           password="True"/>
 
-                        <field name="extra3"/>
+    <field name="local_tienda"/>
 
-                        <field name="descripcion_extra_3"
-                            placeholder="Descripción 3"
-                            invisible="tipo_cliente not in ['cliente mayorista','cliente preferente','cliente normal']"/>
+    <field name="fecha_recepcion"
+           readonly="1"/>
 
-                        <field name="subtotal"
-                            readonly="1"/>
+    <field name="fecha_entrega"/>
 
-                        <field name="abono"/>
+    <field name="estado"
+           groups="base.group_system"/>
 
-                        <field name="saldo"
-                            readonly="1"/>
+    <field name="express"/>
 
-                    </group>
-                </group>
+</group>
 
-                     </group>
 
+<!-- FINANZAS -->
+
+<group string="Datos Financieros"
+       col="2">
+
+    <field name="precio_unitario"
+        invisible="tipo_cliente in ['cliente mayorista','cliente preferente']"/>
+
+    <field name="hechura2"
+        invisible="tipo_cliente not in ['cliente mayorista','cliente preferente']"/>
+
+    <field name="extra"/>
+
+    <field name="descripcion_extra_1"
+        placeholder="Descripción 1"/>
+
+    <field name="extra2"/>
+
+    <field name="descripcion_extra_2"
+        placeholder="Descripción 2"/>
+
+    <field name="extra3"/>
+
+    <field name="descripcion_extra_3"
+        placeholder="Descripción 3"/>
+
+    <field name="subtotal"
+           readonly="1"/>
+
+    <field name="abono"/>
+
+    <field name="saldo"
+           readonly="1"/>
+
+</group>
+
+</group>
+
+<!-- AUTORIZACIÓN -->
                     <!-- AUTORIZACIÓN -->
 
                     <field name="requiere_autorizacion"
