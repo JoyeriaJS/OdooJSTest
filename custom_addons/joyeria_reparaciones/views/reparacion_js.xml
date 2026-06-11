@@ -291,10 +291,6 @@
 
 </group>
 
-<!-- RECEPCION FUERA DEL GROUP ADMIN -->
-
-<group string="Recepción y Entrega"
-       col="2">
                     
                       <!-- RECEPCIÓN Y ENTREGA -->
 
