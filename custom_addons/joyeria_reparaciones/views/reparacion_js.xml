@@ -391,10 +391,13 @@
 
                     <group string="Notas y Comentarios"
                            col="2">
-
+                    <group string="Notas del Vendedor">
+                        <field name="nombre_nota_vendedor"/>
                         <field name="notas"/>
-
+                    </group>
+                    <group string="Notas de Administración" groups="base.group_system">
                         <field name="comentarios"/>
+                    </group>
 
                     </group>
 

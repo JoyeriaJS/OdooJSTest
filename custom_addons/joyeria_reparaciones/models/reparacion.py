@@ -164,8 +164,9 @@ class Reparacion(models.Model):
 
     express = fields.Boolean(string='Express', tracking=True)
     qr = fields.Binary(string='Código QR', attachment=True)
-    notas = fields.Text(string='Notas')
-    comentarios = fields.Text(string="Comentarios")
+    nombre_nota_vendedor = fields.Char(string="Nombre Vendedor")
+    notas = fields.Text(string='Nota Vendedor')
+    comentarios = fields.Text(string="Nota Administrador", groups="base.group_system")
 
     lineas_operacion_ids = fields.One2many(
         'joyeria.operacion', 'reparacion_id', string='Operaciones')
@@ -349,6 +350,15 @@ class Reparacion(models.Model):
         #        total += r.otros_cantidad_piedras * 300
          #   r.otros_total = total
 
+
+
+    @api.constrains('nombre_nota_vendedor', 'notas')
+    def _check_nombre_nota(self):
+        for rec in self:
+            if rec.notas and not rec.nombre_nota_vendedor:
+                raise ValidationError(
+                    "Debe indicar el nombre del vendedor antes de escribir una nota."
+                )
 
     @api.depends(
         'servicio',
