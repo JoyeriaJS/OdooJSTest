@@ -249,7 +249,7 @@ class Reparacion(models.Model):
         ('existente', 'Existente/Web')
     ], string="Subtipo")
 
-    cantidad_circones = fields.Integer("Cantidad circones")
+    cantidad_circones = fields.Float("Cantidad circones")
     lleva_brillantes = fields.Boolean("Brillantes")
     cantidad_brillantes = fields.Integer("Cantidad brillantes")
     lleva_moissanitas = fields.Boolean("Moissanitas")
