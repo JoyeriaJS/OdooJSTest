@@ -1126,9 +1126,8 @@ class Reparacion(models.Model):
                     raise ValidationError("No se permite cambiar el tipo de peso una vez creado el registro.")
                 
                 # Solo administración puede modificar comentarios
-        if 'comentarios' in vals and vals['comentarios'] != rec.comentarios:
-            raise ValidationError(
-                "Solo un administrador puede modificar la Nota Administrador."
+                if 'comentarios' in vals and vals['comentarios'] != rec.comentarios:
+                    raise ValidationError("Solo un administrador puede modificar la Nota Administrador."
             )
 
         # ============================================================
