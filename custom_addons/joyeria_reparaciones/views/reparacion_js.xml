@@ -112,22 +112,16 @@
                             </group>
                         </group>
 
-                        <separator string="CANTIDAD PRODUCTO"/>
-
-                        <group col="2">
-                            <group>
-                                <field name="cantidad" string="Cantidad"/>
-                            </group>
-
-                            <group/>
-                        </group>
-
                         <separator string="CIRCONES"/>
 
                         <group col="2">
                             <group>
                                 <field name="cantidad_circones" string="Cantidad"/>
                             </group>
+                            <group>
+                                <field name="piedras_valor"
+                                    string="Valor"/>
+                                    </group>
 
                             <group/>
                         </group>

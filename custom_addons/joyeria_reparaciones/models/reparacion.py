@@ -447,7 +447,10 @@ class Reparacion(models.Model):
                 # --------------------------------
                 # CIRCONES
                 # --------------------------------
-                extras += (rec.cantidad_circones or 0) * 300
+                extras += (
+                    (rec.cantidad_circones or 0) * 
+                    (rec.piedras_valor or 0)
+                )
 
                 # --------------------------------
                 # BRILLANTES
