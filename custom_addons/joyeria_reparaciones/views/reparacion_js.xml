@@ -395,7 +395,7 @@
                         <field name="nombre_nota_vendedor"/>
                         <field name="notas"/>
                     </group>
-                    <group string="Notas de Administración" groups="base.group_system">
+                    <group string="Notas de Administración">
                         <field name="comentarios"/>
                     </group>
 
