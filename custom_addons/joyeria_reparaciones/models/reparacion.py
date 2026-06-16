@@ -166,7 +166,7 @@ class Reparacion(models.Model):
     qr = fields.Binary(string='Código QR', attachment=True)
     nombre_nota_vendedor = fields.Char(string="Nombre Vendedor")
     notas = fields.Text(string='Nota Vendedor')
-    comentarios = fields.Text(string="Nota Administrador", groups="base.group_system")
+    comentarios = fields.Text(string="Nota Administrador")
 
     lineas_operacion_ids = fields.One2many(
         'joyeria.operacion', 'reparacion_id', string='Operaciones')
