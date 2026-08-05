@@ -11,14 +11,35 @@
           'margin_right': 2
       }"/>
       <t t-foreach="docs" t-as="o">
+        <t t-set="es_sin_costo"
+          t-value="o.precio_unitario == 0 and o.abono == 0 and o.saldo == 0"/>
         <!-- 👇 fuente base 12px -->
         <div class="page" style="font-size:12px; text-align:center; line-height: 1.4;">
-          <p>************************</p>
-          <!-- RMA más grande (+1px sobre el original, 19px) -->
-          <p style="font-size:19px; font-weight:bold; margin: 4px 0;">
-            <t t-esc="o.name"/>
-          </p>
-          <p>************************</p>
+          <t t-if="es_sin_costo">
+              <p style="
+                  background:red;
+                  color:white;
+                  font-size:16px;
+                  font-weight:bold;
+                  padding:5px;
+                  margin:4px 0;">
+                  RMA SIN COSTO
+              </p>
+
+              <p style="font-size:19px; font-weight:bold; margin:4px 0;">
+                  <t t-esc="o.name"/>
+              </p>
+          </t>
+
+          <t t-else="">
+              <p>************************</p>
+
+              <p style="font-size:19px; font-weight:bold; margin:4px 0;">
+                  <t t-esc="o.name"/>
+              </p>
+
+              <p>************************</p>
+          </t>
 
           <p><strong>Local:</strong> <t t-esc="o.local_tienda"/></p>
           <p><strong>Cliente:</strong> <t t-esc="(o.cliente_id.name or '') + ' ' + (o.apellido_cliente or '')"/></p>
