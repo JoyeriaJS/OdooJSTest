@@ -466,7 +466,7 @@
                 <field name="tipo_joya"/>
                 <field name="cliente_id"/>
                 <field name="direccion_entrega"/>
-                <field name="vencimiento_garantia"/>
+                <field name="fecha_entrega"/>
                 <field name="estado"/>
             </tree>
         </field>
