@@ -45,6 +45,7 @@
           <p><strong>Cliente:</strong> <t t-esc="(o.cliente_id.name or '') + ' ' + (o.apellido_cliente or '')"/></p>
           <p><strong>Servicio:</strong> <t t-esc="o.servicio"/></p>
           <p><strong>Metal:</strong> <t t-esc="o.metal"/></p>
+          <p><strong>Tipo de Joya:</strong> <t t-esc="o.tipo_joya"/></p>
           <p><strong>Modelo:</strong> <t t-esc="o.modelo"/></p>
           <t t-if="o.n_cm_reparacion">
             <p><strong>Talla Reparacion:</strong> <t t-esc="o.n_cm_reparacion"/></p>
