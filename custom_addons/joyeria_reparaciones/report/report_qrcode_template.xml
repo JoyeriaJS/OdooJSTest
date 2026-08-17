@@ -58,7 +58,6 @@
           <p><strong>Saldo:</strong> <t t-esc="o.saldo"/></p>
           <p><strong>Ingreso:</strong> <t t-esc="o.fecha_recepcion"/></p>
           <p><strong>Entrega:</strong> <t t-esc="o.fecha_entrega"/></p>
-          <p><strong>Garantia:</strong> <t t-esc="o.vencimiento_garantia or ''"/></p>
           <p>Joyeria Sebastian no asumira responsabilidad por trabajos no retirados pasados 90 dias desde la fecha pactada para su entrega.</p>
           
           <div style="margin-top:10px; text-align:center;">
