@@ -1102,7 +1102,17 @@ class Reparacion(models.Model):
 ###write funcional"""""""""
     def write(self, vals):
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
-
+         # ============================================================
+        # 🔒 BLOQUEAR SOLICITUD DEL CLIENTE AL CONFIRMAR
+        # ============================================================
+        if 'solicitud_cliente' in vals:
+            for rec in self:
+                if rec.estado == 'confirmado':
+                    if vals['solicitud_cliente'] != rec.solicitud_cliente:
+                        raise ValidationError(
+                            "No se puede modificar la Solicitud del Cliente "
+                            "porque la reparación ya está confirmada."
+                        )
         # ============================================================
         # 🆕 CLIENTE ESPECIAL → HECHURA + BLOQUEO PRECIO
         # ============================================================
