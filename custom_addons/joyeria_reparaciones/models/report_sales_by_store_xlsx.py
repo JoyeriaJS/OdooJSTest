@@ -136,10 +136,10 @@ class ReportSalesByStoreXlsx(models.AbstractModel):
                 # =====================================
                 metal = (r.metal_utilizado or '').strip().lower()
 
-                if metal == 'oro amarillo 18k':
+                if 'oro' in metal and '18k' in metal and 'amarillo' in metal:
                     total_gramos_oro_amarillo_18k += gramos
 
-                elif metal == 'oro rosado 18k':
+                elif 'oro' in metal and '18k' in metal and 'rosado' in metal:
                     total_gramos_oro_rosado_18k += gramos
 
                 # =====================================
