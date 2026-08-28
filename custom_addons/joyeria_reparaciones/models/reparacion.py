@@ -891,20 +891,6 @@ class Reparacion(models.Model):
         is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
         is_import = bool(self.env.context.get('import_file') or self.env.context.get('from_import'))
 
-        code = False  # 🔥 guardar código temporalmente
-
-        # ============================================================
-        # 🆕 CLIENTE ESPECIAL → USAR HECHURA
-        # ============================================================
-        tipo_cliente = vals.get("tipo_cliente")
-
-        if tipo_cliente in ["cliente mayorista", "cliente preferente"]:
-            precio = vals.get("precio_unitario", 0) or 0
-
-            if precio > 0:
-                vals["hechura2"] = precio
-                vals["precio_unitario"] = 0
-
         # ============================================================
         # 🔐 VALIDACIÓN DE AUTORIZACIÓN PARA RMA SIN COSTO
         # ============================================================
@@ -929,7 +915,16 @@ class Reparacion(models.Model):
 
             vals["costo_cero_definitivo"] = True
 
+            # 🔥🔥🔥 NUEVO: Forzar expiración antes de validar
             self.env["joyeria.reparacion.authcode"].search([]).check_expired()
+
+            _logger = logging.getLogger(__name__)
+            _logger.warning("===== DEBUG AUTORIZACIÓN CREA =====")
+            _logger.warning("VALS codigo_ingresado = %s", vals.get("codigo_ingresado"))
+            _logger.warning("CÓDIGOS EN BD:")
+            for c in self.env["joyeria.reparacion.authcode"].search([]):
+                _logger.warning("ID %s | '%s' | used=%s", c.id, repr(c.codigo), c.used)
+            _logger.warning("====================================")
 
             codigo_ing = vals.get("codigo_ingresado")
             if not codigo_ing:
@@ -954,10 +949,18 @@ class Reparacion(models.Model):
             if not code:
                 raise ValidationError("❌ El código ingresado no existe o ya fue utilizado.")
 
+            code.write({
+                'used': True,
+                'usado_por_id': self.env.uid,
+                'fecha_uso': datetime.now(),
+                'reparacion_id': record.id
+                
+            })
+
             vals["codigo_autorizacion_id"] = code.id
 
         # ============================================================
-        # ⚙️ RESTO DE TU LÓGICA
+        # ⚙️ LÓGICA EXISTENTE — NO TOCAR
         # ============================================================
 
         if (not is_admin) and (not is_import) and vals.get('peso') == 'especial' and not vals.get('peso_valor'):
@@ -1016,22 +1019,26 @@ class Reparacion(models.Model):
 
         record = super().create(vals)
 
-        # 🔥 SOLO AQUÍ se marca usado y se relaciona al RMA
-        if code:
-            code.write({
-                'used': True,
-                'usado_por_id': self.env.uid,
-                'fecha_uso': datetime.now(),
-                'reparacion_id': record.id
-            })
-
         if hasattr(record, '_generar_codigo_qr'):
             record._generar_codigo_qr()
+
+        peso_str = str(record.peso_valor) if record.peso_valor not in (False, 0, 0.0) else "No especificado"
+        resumen = (
+            "📌 Resumen generado automáticamente\n"
+            f"🗓️ Vencimiento de la garantía: {record.vencimiento_garantia or 'No definida'}\n"
+            f"📄 Estado: {record.estado or 'No definido'}\n"
+            f"🔩 Metal Reparación: {record.metal or 'No definido'}\n"
+            f"⚖️ Peso del Producto: {peso_str}\n"
+            f"📝 Solicitud del Cliente: {record.solicitud_cliente or 'No especificada'}\n"
+            f"🕒 Registrado el: {ahora}"
+        )
+        mensajes.append(resumen)
 
         for msg in mensajes:
             record.message_post(body=msg)
 
         return record
+
 
 
 
