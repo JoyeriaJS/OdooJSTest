@@ -40,5 +40,25 @@
             <field name="perm_unlink" eval="1"/>
         </record>
 
+        <!-- ============================================================
+     PERFIL SOLO LECTURA - CONSULTA REPARACIONES
+     ============================================================ -->
+
+        <record id="grupo_consulta_reparaciones" model="res.groups">
+            <field name="name">Consulta Reparaciones</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
+        <!-- Permiso de solo lectura para reparaciones -->
+        <record id="joyeria_reparacion_consulta_rule" model="ir.model.access">
+            <field name="name">Acceso Consulta Reparaciones - Solo Lectura</field>
+            <field name="model_id" ref="model_joyeria_reparacion"/>
+            <field name="group_id" ref="joyeria_reparaciones.grupo_consulta_reparaciones"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
     </data>
 </odoo>
