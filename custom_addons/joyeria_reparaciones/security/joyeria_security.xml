@@ -12,8 +12,11 @@
         </record>
 
         <!--
-            Este grupo corresponde al usuario que trabaja con las
-            reparaciones: puede leer, crear y modificar, pero no eliminar.
+            Usuario que trabaja con las reparaciones:
+            - Leer: SI
+            - Crear: SI
+            - Modificar: SI
+            - Eliminar: NO
         -->
         <record id="joyeria_reparacion_estado_rule" model="ir.model.access">
             <field name="name">Acceso Gestión Estado Reparaciones</field>
@@ -36,11 +39,11 @@
         </record>
 
         <!--
-            Consulta Reparaciones:
-            - Puede leer
-            - No puede modificar
-            - No puede crear
-            - No puede eliminar
+            Usuario de consulta:
+            - Leer: SI
+            - Crear: NO
+            - Modificar: NO
+            - Eliminar: NO
         -->
         <record id="joyeria_reparacion_consulta_rule" model="ir.model.access">
             <field name="name">Acceso Consulta Reparaciones - Solo Lectura</field>
@@ -62,6 +65,7 @@
             <field name="model_id" ref="model_joyeria_reparacion"/>
             <field name="groups" eval="[(4, ref('joyeria_reparaciones.grupo_consulta_reparaciones'))]"/>
             <field name="domain_force">[(1, '=', 1)]</field>
+
             <field name="perm_read" eval="1"/>
             <field name="perm_write" eval="0"/>
             <field name="perm_create" eval="0"/>
