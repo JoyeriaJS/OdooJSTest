@@ -2,13 +2,16 @@
 <odoo>
     <data noupdate="0">
 
-        <!-- Crear grupo primero -->
+        <!-- ========================================================= -->
+        <!-- GRUPO: GESTIÓN ESTADO REPARACIONES                       -->
+        <!-- ========================================================= -->
+
         <record id="grupo_gestion_estado_reparacion" model="res.groups">
             <field name="name">Gestión Estado Reparaciones</field>
             <field name="category_id" ref="base.module_category_hidden"/>
         </record>
 
-        <!-- Permiso especial para el grupo creado -->
+        <!-- Permiso especial para Gestión Estado Reparaciones -->
         <record id="joyeria_reparacion_estado_rule" model="ir.model.access">
             <field name="name">Acceso Gestión Estado Reparaciones</field>
             <field name="model_id" ref="model_joyeria_reparacion"/>
@@ -19,7 +22,11 @@
             <field name="perm_unlink" eval="0"/>
         </record>
 
-        <!-- Permisos normales para usuarios -->
+
+        <!-- ========================================================= -->
+        <!-- PERMISOS NORMALES PARA USUARIOS                           -->
+        <!-- ========================================================= -->
+
         <record id="joyeria_reparacion_user_rule" model="ir.model.access">
             <field name="name">Acceso Usuarios Joyeria Reparacion</field>
             <field name="model_id" ref="model_joyeria_reparacion"/>
@@ -30,7 +37,56 @@
             <field name="perm_unlink" eval="1"/>
         </record>
 
-        <!-- Permisos normales para operaciones -->
+
+        <!-- ========================================================= -->
+        <!-- GRUPO: CONSULTA REPARACIONES                              -->
+        <!-- ========================================================= -->
+
+        <record id="grupo_consulta_reparaciones" model="res.groups">
+            <field name="name">Consulta Reparaciones</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
+        <!--
+            Consulta Reparaciones:
+            - Ver reparaciones: SI
+            - Crear: NO
+            - Modificar: NO
+            - Eliminar: NO
+
+            IMPORTANTE:
+            Este grupo es un permiso adicional.
+        -->
+        <record id="joyeria_reparacion_consulta_rule" model="ir.model.access">
+            <field name="name">Acceso Consulta Reparaciones - Solo Lectura</field>
+            <field name="model_id" ref="model_joyeria_reparacion"/>
+            <field name="group_id" ref="joyeria_reparaciones.grupo_consulta_reparaciones"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!--
+            Permite que Consulta Reparaciones vea todas las reparaciones.
+        -->
+        <record id="joyeria_reparacion_consulta_all_rule" model="ir.rule">
+            <field name="name">Consulta Reparaciones - Ver Todas</field>
+            <field name="model_id" ref="model_joyeria_reparacion"/>
+            <field name="groups" eval="[(4, ref('joyeria_reparaciones.grupo_consulta_reparaciones'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+
+        <!-- ========================================================= -->
+        <!-- PERMISOS NORMALES PARA OPERACIONES                        -->
+        <!-- ========================================================= -->
+
         <record id="joyeria_operacion_user_rule" model="ir.model.access">
             <field name="name">Acceso Usuarios Joyeria Operacion</field>
             <field name="model_id" ref="model_joyeria_operacion"/>
