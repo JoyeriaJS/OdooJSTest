@@ -3,7 +3,7 @@
     <data noupdate="0">
 
         <!-- ========================================================= -->
-        <!-- GRUPO: GESTIÓN ESTADO REPARACIONES                       -->
+        <!-- GESTIÓN ESTADO REPARACIONES                              -->
         <!-- ========================================================= -->
 
         <record id="grupo_gestion_estado_reparacion" model="res.groups">
@@ -11,13 +11,6 @@
             <field name="category_id" ref="base.module_category_hidden"/>
         </record>
 
-        <!--
-            Permisos para Gestión Estado Reparaciones:
-            Leer      = SI
-            Modificar = SI
-            Crear     = SI
-            Eliminar  = NO
-        -->
         <record id="joyeria_reparacion_estado_rule" model="ir.model.access">
             <field name="name">Acceso Gestión Estado Reparaciones</field>
             <field name="model_id" ref="model_joyeria_reparacion"/>
@@ -30,7 +23,7 @@
 
 
         <!-- ========================================================= -->
-        <!-- GRUPO: CONSULTA REPARACIONES                              -->
+        <!-- CONSULTA REPARACIONES                                     -->
         <!-- ========================================================= -->
 
         <record id="grupo_consulta_reparaciones" model="res.groups">
@@ -39,14 +32,14 @@
         </record>
 
         <!--
-            Permisos para Consulta Reparaciones:
+            SOLO LECTURA:
             Leer      = SI
             Modificar = NO
             Crear     = NO
             Eliminar  = NO
         -->
-        <record id="joyeria_reparacion_consulta_rule" model="ir.model.access">
-            <field name="name">Acceso Consulta Reparaciones</field>
+        <record id="joyeria_reparacion_consulta_access" model="ir.model.access">
+            <field name="name">Acceso Solo Lectura - Consulta Reparaciones</field>
             <field name="model_id" ref="model_joyeria_reparacion"/>
             <field name="group_id" ref="joyeria_reparaciones.grupo_consulta_reparaciones"/>
             <field name="perm_read" eval="1"/>
@@ -56,13 +49,14 @@
         </record>
 
         <!--
-            Consulta Reparaciones puede ver todas las reparaciones.
+            Puede consultar TODAS las reparaciones.
         -->
         <record id="joyeria_reparacion_consulta_all_rule" model="ir.rule">
-            <field name="name">Consulta Reparaciones - Ver Todas</field>
+            <field name="name">Consulta Reparaciones - Todas</field>
             <field name="model_id" ref="model_joyeria_reparacion"/>
             <field name="groups" eval="[(4, ref('joyeria_reparaciones.grupo_consulta_reparaciones'))]"/>
             <field name="domain_force">[(1, '=', 1)]</field>
+
             <field name="perm_read" eval="1"/>
             <field name="perm_write" eval="0"/>
             <field name="perm_create" eval="0"/>
@@ -71,7 +65,7 @@
 
 
         <!-- ========================================================= -->
-        <!-- PERMISOS NORMALES PARA OPERACIONES                        -->
+        <!-- OPERACIONES                                                -->
         <!-- ========================================================= -->
 
         <record id="joyeria_operacion_user_rule" model="ir.model.access">
