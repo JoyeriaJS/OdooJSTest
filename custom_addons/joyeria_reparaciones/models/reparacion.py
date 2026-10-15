@@ -154,6 +154,7 @@ class Reparacion(models.Model):
         ('local 383 online', 'Local 383 Online'),
         ('local maipu', 'Local Maipú'),
         ('local 921', 'Local 921'),
+        ('local providencia', 'Local Providencia')
     ], string='Tienda', required=True)
     precio_unitario = fields.Float(string='Precio unitario', tracking=True)
     extra = fields.Float(string='Extra', tracking=True)
