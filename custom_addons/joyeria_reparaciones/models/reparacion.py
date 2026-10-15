@@ -82,7 +82,8 @@ class Reparacion(models.Model):
         ('local 383 online', 'Paseo Estado 344, Local 383 Online, Santiago Centro, Metro Plaza de Armas (Galería Pasaje Matte)'),
         ('local 921', 'Paseo Estado 344, Local 921, Santiago Centro, Metro Plaza de Armas (Galería Pasaje Matte)'),
         ('local 584', 'Monjitas 873, Local 584, Santiago Centro, Metro Plaza de Armas'),
-        ('local maipu', 'Jumbo, Av. Los Pajaritos 3302 (Local Maipú), Metro Santiago Bueras')
+        ('local maipu', 'Jumbo, Av. Los Pajaritos 3302 (Local Maipú), Metro Santiago Bueras'),
+        ('local providencia', ' Av. Luis Thayer Ojeda (Local Maipú), Metro Tobalaba')
     ], string='Dirección de entrega', required=True)
     vencimiento_garantia = fields.Date(string='Vencimiento de la garantía',compute='_compute_vencimiento_garantia',store=True)
     fecha_entrega = fields.Date(string='Fecha de entrega', tracking=True, required=True)
@@ -259,7 +260,7 @@ class Reparacion(models.Model):
     rodinado = fields.Boolean("Rodinado")
 
 
-        # ==============================
+    # ==============================
     # CAMPOS FORMULARIO POR METAL
     # ==============================
 
@@ -638,6 +639,9 @@ class Reparacion(models.Model):
 
 
 
+
+
+
     @api.onchange('servicio')
     def _onchange_servicio_tipo_peso(self):
         for rec in self:
@@ -672,6 +676,7 @@ class Reparacion(models.Model):
                 "local 921": "local 921",
                 "local 584": "local 584",
                 "local maipu": "local maipu",
+                "local providencia": "local providencia"
             }
 
             # Si existe la clave, la usa; si no, no rompe
