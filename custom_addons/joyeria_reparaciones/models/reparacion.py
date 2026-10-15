@@ -83,7 +83,7 @@ class Reparacion(models.Model):
         ('local 921', 'Paseo Estado 344, Local 921, Santiago Centro, Metro Plaza de Armas (Galería Pasaje Matte)'),
         ('local 584', 'Monjitas 873, Local 584, Santiago Centro, Metro Plaza de Armas'),
         ('local maipu', 'Jumbo, Av. Los Pajaritos 3302 (Local Maipú), Metro Santiago Bueras'),
-        ('local providencia', ' Av. Luis Thayer Ojeda (Local Maipú), Metro Tobalaba')
+        ('local providencia', ' Av. Luis Thayer Ojeda 0130 (Local Providencia), Metro Tobalaba')
     ], string='Dirección de entrega', required=True)
     vencimiento_garantia = fields.Date(string='Vencimiento de la garantía',compute='_compute_vencimiento_garantia',store=True)
     fecha_entrega = fields.Date(string='Fecha de entrega', tracking=True, required=True)
