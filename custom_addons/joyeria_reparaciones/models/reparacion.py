@@ -1267,97 +1267,109 @@ class Reparacion(models.Model):
 
 ###write funcional"""""""""
     
+    
     def write(self, vals):
-            is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
+                is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
 
-            # ============================================================
-            # 🔒 BLOQUEAR MODIFICACIÓN DE PRECIOS Y EXTRAS TRAS CREAR RMA
-            # ============================================================
-            campos_bloqueados = {
-                'precio_unitario',
-                'extra',
-                'extra2',
-                'extra3',
-            }
+                # ============================================================
+                # 🔒 BLOQUEAR MODIFICACIÓN DE CAMPOS AL CONFIRMAR EL RMA
+                # ============================================================
+                campos_bloqueados = {
+                    'servicio',
+                    'tipo_joya',
+                    'metal',
+                    'n_cm_reparacion',
+                    'n_cm_fabricacion',
+                    'peso_valor',
+                    'cantidad',
+                    'solicitud_cliente',
+                    'precio_unitario',
+                    'extra',
+                    'extra2',
+                    'extra3',
+                }
 
-            campos_intentados = campos_bloqueados.intersection(vals.keys())
+                campos_intentados = campos_bloqueados.intersection(vals.keys())
 
-            if campos_intentados:
-                raise ValidationError(
-                    "No se pueden modificar los siguientes campos una vez creado el RMA: "
-                    + ", ".join(sorted(campos_intentados))
-                    + "."
-                )
-
-            # ============================================================
-            # 🔒 BLOQUEAR SOLICITUD DEL CLIENTE AL CONFIRMAR
-            # ============================================================
-            if 'solicitud_cliente' in vals:
-                for rec in self:
-                    if rec.estado == 'confirmado':
-                        if vals['solicitud_cliente'] != rec.solicitud_cliente:
+                if campos_intentados:
+                    for rec in self:
+                        if rec.estado == 'confirmado':
                             raise ValidationError(
-                                "No se puede modificar la Solicitud del Cliente "
-                                "porque la reparación ya está confirmada."
+                                "No se pueden modificar los siguientes campos porque "
+                                "la reparación ya está confirmada: "
+                                + ", ".join(sorted(campos_intentados))
+                                + "."
                             )
 
-            # ============================================================
-            # 🆕 CLIENTE ESPECIAL → HECHURA + BLOQUEO PRECIO
-            # ============================================================
-            for rec in self:
-                tipo = vals.get("tipo_cliente", rec.tipo_cliente)
+                # ============================================================
+                # 🔒 BLOQUEAR SOLICITUD DEL CLIENTE AL CONFIRMAR
+                # ============================================================
+                if 'solicitud_cliente' in vals:
+                    for rec in self:
+                        if rec.estado == 'confirmado':
+                            if vals['solicitud_cliente'] != rec.solicitud_cliente:
+                                raise ValidationError(
+                                    "No se puede modificar la Solicitud del Cliente "
+                                    "porque la reparación ya está confirmada."
+                                )
 
-                if tipo in ["cliente mayorista", "cliente preferente"]:
-
-                    precio = vals.get("precio_unitario", rec.precio_unitario) or 0
-
-                    if precio > 0:
-                        vals["hechura2"] = precio
-                        vals["precio_unitario"] = 0
-
-            # ============================================================
-            # 🔧 VALIDACIONES EXISTENTES (NO TOCAR)
-            # ============================================================
-            if not is_admin:
+                # ============================================================
+                # 🆕 CLIENTE ESPECIAL → HECHURA + BLOQUEO PRECIO
+                # ============================================================
                 for rec in self:
-                    if 'peso' in vals and vals['peso'] != rec.peso:
-                        raise ValidationError("No se permite cambiar el tipo de peso una vez creado el registro.")
+                    tipo = vals.get("tipo_cliente", rec.tipo_cliente)
 
-                    # Solo administración puede modificar comentarios
-                    if 'comentarios' in vals and vals['comentarios'] != rec.comentarios:
-                        raise ValidationError("Solo un administrador puede modificar la Nota Administrador.")
+                    if tipo in ["cliente mayorista", "cliente preferente"]:
 
-            # ============================================================
-            # 📲 QR (NO TOCADO)
-            # ============================================================
-            for rec in self:
+                        precio = vals.get("precio_unitario", rec.precio_unitario) or 0
 
-                if vals.get('clave_autenticacion_manual'):
-                    clave = vals['clave_autenticacion_manual'].strip().upper()
-                    vendedora = rec.env['joyeria.vendedora'].search([
-                        '|', '|',
-                        ('clave_autenticacion', '=', clave),
-                        ('clave_qr', '=', clave),
-                        ('codigo_qr', '=', clave),
-                    ], limit=1)
-                    if vendedora:
-                        vals['vendedora_id'] = vendedora.id
+                        if precio > 0:
+                            vals["hechura2"] = precio
+                            vals["precio_unitario"] = 0
 
-                if vals.get('clave_firma_manual'):
-                    clave = vals['clave_firma_manual'].strip().upper()
-                    vendedora_firma = rec.env['joyeria.vendedora'].search([
-                        '|', '|',
-                        ('clave_autenticacion', '=', clave),
-                        ('clave_qr', '=', clave),
-                        ('codigo_qr', '=', clave),
-                    ], limit=1)
-                    if vendedora_firma:
-                        vals['firma_id'] = vendedora_firma.id
-                        ahora_chile = datetime.now(pytz.timezone('America/Santiago'))
-                        ahora_utc_naive = ahora_chile.astimezone(pytz.UTC).replace(tzinfo=None)
-                        vals['fecha_firma'] = ahora_utc_naive
+                # ============================================================
+                # 🔧 VALIDACIONES EXISTENTES (NO TOCAR)
+                # ============================================================
+                if not is_admin:
+                    for rec in self:
+                        if 'peso' in vals and vals['peso'] != rec.peso:
+                            raise ValidationError("No se permite cambiar el tipo de peso una vez creado el registro.")
 
-            return super().write(vals)
+                        # Solo administración puede modificar comentarios
+                        if 'comentarios' in vals and vals['comentarios'] != rec.comentarios:
+                            raise ValidationError("Solo un administrador puede modificar la Nota Administrador.")
+
+                # ============================================================
+                # 📲 QR (NO TOCADO)
+                # ============================================================
+                for rec in self:
+
+                    if vals.get('clave_autenticacion_manual'):
+                        clave = vals['clave_autenticacion_manual'].strip().upper()
+                        vendedora = rec.env['joyeria.vendedora'].search([
+                            '|', '|',
+                            ('clave_autenticacion', '=', clave),
+                            ('clave_qr', '=', clave),
+                            ('codigo_qr', '=', clave),
+                        ], limit=1)
+                        if vendedora:
+                            vals['vendedora_id'] = vendedora.id
+
+                    if vals.get('clave_firma_manual'):
+                        clave = vals['clave_firma_manual'].strip().upper()
+                        vendedora_firma = rec.env['joyeria.vendedora'].search([
+                            '|', '|',
+                            ('clave_autenticacion', '=', clave),
+                            ('clave_qr', '=', clave),
+                            ('codigo_qr', '=', clave),
+                        ], limit=1)
+                        if vendedora_firma:
+                            vals['firma_id'] = vendedora_firma.id
+                            ahora_chile = datetime.now(pytz.timezone('America/Santiago'))
+                            ahora_utc_naive = ahora_chile.astimezone(pytz.UTC).replace(tzinfo=None)
+                            vals['fecha_firma'] = ahora_utc_naive
+
+                return super().write(vals)
 
 
 
