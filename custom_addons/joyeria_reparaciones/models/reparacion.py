@@ -1267,7 +1267,7 @@ class Reparacion(models.Model):
 
 ###write funcional"""""""""
     
-    
+   
     def write(self, vals):
                 is_admin = self.env.uid == SUPERUSER_ID or self.env.user.has_group('base.group_system')
 
@@ -1291,7 +1291,7 @@ class Reparacion(models.Model):
 
                 campos_intentados = campos_bloqueados.intersection(vals.keys())
 
-                if campos_intentados:
+                if campos_intentados and not is_admin:
                     for rec in self:
                         if rec.estado == 'confirmado':
                             raise ValidationError(
@@ -1304,7 +1304,7 @@ class Reparacion(models.Model):
                 # ============================================================
                 # 🔒 BLOQUEAR SOLICITUD DEL CLIENTE AL CONFIRMAR
                 # ============================================================
-                if 'solicitud_cliente' in vals:
+                if 'solicitud_cliente' in vals and not is_admin:
                     for rec in self:
                         if rec.estado == 'confirmado':
                             if vals['solicitud_cliente'] != rec.solicitud_cliente:
