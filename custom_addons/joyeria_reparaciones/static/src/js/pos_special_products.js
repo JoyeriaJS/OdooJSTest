@@ -3,7 +3,7 @@
 import { patch } from "@web/core/utils/patch";
 import { Order, Orderline } from "@point_of_sale/app/store/models";
 import { TextInputPopup } from "@point_of_sale/app/utils/input_popups/text_input_popup";
-import { NumberPopup } from "@point_of_sale/app/utils/number_popup";
+import { NumberPopup } from "@point_of_sale/app/utils/input_popups/number_popup";
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 
 patch(Order.prototype, {
@@ -13,7 +13,7 @@ patch(Order.prototype, {
         const rpc = this.env.services.rpc;
         const pos = this.pos || this.env.pos;
 
-        // ===================================
+                // ===================================
         // VALIDAR MAYORISTA / PREFERENTE
         // REQUIERE PRODUCTO NO INVENTARIADO
         // ===================================
@@ -214,231 +214,88 @@ patch(Order.prototype, {
         }
 
         // ===================================
-        // PRODUCTO NUEVO ABONO
-        // Primer abono para RMA sin abono registrado
-        // ===================================
-        if (product.name === "Producto NUEVO ABONO") {
+// PRODUCTO ABONO
+// ===================================
+if (product.name === "Producto ABONO") {
 
-            const rmaInput = await popup.add(TextInputPopup, {
-                title: "Ingrese número de RMA",
-                placeholder: "Ej: RMA/01160",
-            });
+    const rmaInput = await popup.add(TextInputPopup, {
+        title: "Ingrese número de RMA",
+        placeholder: "Ej: RMA/01160",
+    });
 
-            if (!rmaInput.confirmed || !rmaInput.payload || !rmaInput.payload.trim()) {
-                await popup.add(ErrorPopup, {
-                    title: "Dato obligatorio",
-                    body: "Debe ingresar el número de RMA.",
-                });
+    if (!rmaInput.confirmed || !rmaInput.payload) {
 
-                return;
-            }
+        await popup.add(ErrorPopup, {
+            title: "Dato obligatorio",
+            body: "Debe ingresar el número de RMA.",
+        });
 
-            let numeroRMA = rmaInput.payload.trim();
+        return;
+    }
 
-            numeroRMA = numeroRMA
-                .replace("RMA/", "")
-                .replace("RMA-", "")
-                .replace("rma/", "")
-                .replace("rma-", "")
-                .trim();
+    let numeroRMA = rmaInput.payload.trim();
 
-            // ===================================
-            // CONSULTAR RMA
-            // ===================================
-            const resultado = await rpc("/pos/buscar_rma", {
-                numero_rma: numeroRMA,
-            });
+    numeroRMA = numeroRMA
+        .replace("RMA/", "")
+        .replace("RMA-", "")
+        .replace("rma/", "")
+        .replace("rma-", "")
+        .trim();
 
-            if (resultado.error) {
-                await popup.add(ErrorPopup, {
-                    title: "Error",
-                    body: resultado.error,
-                });
+    const resultado = await rpc("/pos/buscar_rma", {
+        numero_rma: numeroRMA,
+    });
 
-                return;
-            }
+    if (resultado.error) {
 
-            const subtotal = parseFloat(resultado.subtotal || 0);
-            const abonoActual = parseFloat(resultado.abono || 0);
-            const saldo = parseFloat(resultado.saldo || 0);
+        await popup.add(ErrorPopup, {
+            title: "Error",
+            body: resultado.error,
+        });
 
-            // ===================================
-            // VALIDAR QUE NO TENGA ABONO
-            // ===================================
-            if (abonoActual > 0) {
-                await popup.add(ErrorPopup, {
-                    title: "RMA con abono registrado",
-                    body: "Este RMA ya tiene un abono registrado. Para cobrar el abono existente, utiliza Producto ABONO.",
-                });
+        return;
+    }
 
-                return;
-            }
+    const abono = parseFloat(resultado.abono || 0);
 
-            // ===================================
-            // VALIDAR SALDO
-            // ===================================
-            if (saldo <= 0) {
-                await popup.add(ErrorPopup, {
-                    title: "Sin saldo pendiente",
-                    body: "Este RMA no tiene saldo pendiente para registrar un nuevo abono.",
-                });
+    if (abono <= 0) {
 
-                return;
-            }
+        await popup.add(ErrorPopup, {
+            title: "Sin abono",
+            body: "Este RMA no tiene abono registrado.",
+        });
 
-            // ===================================
-            // SOLICITAR MONTO DEL NUEVO ABONO
-            // ===================================
-            const montoInput = await popup.add(NumberPopup, {
-                title: `Ingrese el primer abono (Saldo: $${saldo.toLocaleString("es-CL")})`,
-            });
+        return;
+    }
 
-            if (
-                !montoInput.confirmed ||
-                montoInput.payload === undefined ||
-                montoInput.payload === null ||
-                montoInput.payload === ""
-            ) {
-                return;
-            }
+    await super.add_product(product, {
+        price: abono,
+        quantity: 1,
+        merge: false,
+        permitir_linea_rma_aux: true,
+    });
 
-            const montoAbono = parseFloat(
-                String(montoInput.payload).replace(",", ".")
-            );
+    const line = this.get_selected_orderline();
 
-            // ===================================
-            // VALIDAR MONTO
-            // ===================================
-            if (!Number.isFinite(montoAbono) || montoAbono <= 0) {
-                await popup.add(ErrorPopup, {
-                    title: "Monto inválido",
-                    body: "El abono debe ser un monto mayor que cero.",
-                });
+    if (line) {
 
-                return;
-            }
+        line.numero_rma = resultado.rma;
 
-            if (montoAbono > saldo) {
-                await popup.add(ErrorPopup, {
-                    title: "Monto superior al saldo",
-                    body: `El abono ingresado ($${montoAbono.toLocaleString("es-CL")}) no puede superar el saldo pendiente ($${saldo.toLocaleString("es-CL")}).`,
-                });
+        line.es_linea_rma_aux = true;
 
-                return;
-            }
+        line.tipo_linea_rma = "abono";
 
-            // ===================================
-            // AGREGAR PRODUCTO AL CARRITO
-            // ===================================
-            await super.add_product(product, {
-                price: montoAbono,
-                quantity: 1,
-                merge: false,
-                permitir_linea_rma_aux: true,
-            });
+        line.precio_bloqueado = abono;
 
-            const lineNuevoAbono = this.get_selected_orderline();
+        line.subtotal_rma = parseFloat(resultado.subtotal || 0);
 
-            if (lineNuevoAbono) {
-                lineNuevoAbono.numero_rma = resultado.rma;
+        line.abono_rma = abono;
 
-                lineNuevoAbono.es_linea_rma_aux = true;
+        line.saldo_rma = parseFloat(resultado.saldo || 0);
+    }
 
-                lineNuevoAbono.tipo_linea_rma = "nuevo_abono";
-
-                lineNuevoAbono.precio_bloqueado = montoAbono;
-
-                lineNuevoAbono.subtotal_rma = subtotal;
-                lineNuevoAbono.abono_rma = abonoActual;
-                lineNuevoAbono.saldo_rma = saldo;
-            }
-
-            return;
-        }
-
-        // ===================================
-        // PRODUCTO ABONO
-        // ===================================
-        if (product.name === "Producto ABONO") {
-
-            const rmaInput = await popup.add(TextInputPopup, {
-                title: "Ingrese número de RMA",
-                placeholder: "Ej: RMA/01160",
-            });
-
-            if (!rmaInput.confirmed || !rmaInput.payload) {
-
-                await popup.add(ErrorPopup, {
-                    title: "Dato obligatorio",
-                    body: "Debe ingresar el número de RMA.",
-                });
-
-                return;
-            }
-
-            let numeroRMA = rmaInput.payload.trim();
-
-            numeroRMA = numeroRMA
-                .replace("RMA/", "")
-                .replace("RMA-", "")
-                .replace("rma/", "")
-                .replace("rma-", "")
-                .trim();
-
-            const resultado = await rpc("/pos/buscar_rma", {
-                numero_rma: numeroRMA,
-            });
-
-            if (resultado.error) {
-
-                await popup.add(ErrorPopup, {
-                    title: "Error",
-                    body: resultado.error,
-                });
-
-                return;
-            }
-
-            const abono = parseFloat(resultado.abono || 0);
-
-            if (abono <= 0) {
-
-                await popup.add(ErrorPopup, {
-                    title: "Sin abono",
-                    body: "Este RMA no tiene abono registrado.",
-                });
-
-                return;
-            }
-
-            await super.add_product(product, {
-                price: abono,
-                quantity: 1,
-                merge: false,
-                permitir_linea_rma_aux: true,
-            });
-
-            const line = this.get_selected_orderline();
-
-            if (line) {
-
-                line.numero_rma = resultado.rma;
-
-                line.es_linea_rma_aux = true;
-
-                line.tipo_linea_rma = "abono";
-
-                line.precio_bloqueado = abono;
-
-                line.subtotal_rma = parseFloat(resultado.subtotal || 0);
-
-                line.abono_rma = abono;
-
-                line.saldo_rma = parseFloat(resultado.saldo || 0);
-            }
-
-            return;
-        }
+    return;
+}
 
         // ===================================
         // PRODUCTO RMA
@@ -625,8 +482,7 @@ patch(Orderline.prototype, {
 
         if (
             this.tipo_linea_rma === "subtotal" ||
-            this.tipo_linea_rma === "abono" ||
-            this.tipo_linea_rma === "nuevo_abono"
+            this.tipo_linea_rma === "abono"
         ) {
 
             const precioBloqueado =
