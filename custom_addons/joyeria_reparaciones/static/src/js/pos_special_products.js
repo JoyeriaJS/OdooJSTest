@@ -213,6 +213,156 @@ patch(Order.prototype, {
             return;
         }
 
+
+        // ===================================
+        // PRODUCTO NUEVO ABONO
+        // ===================================
+        if (product.name === "Producto NUEVO ABONO") {
+
+            const rmaInput = await popup.add(TextInputPopup, {
+                title: "Ingrese número de RMA",
+                placeholder: "Ej: RMA/01160",
+            });
+
+            if (!rmaInput.confirmed || !rmaInput.payload) {
+
+                await popup.add(ErrorPopup, {
+                    title: "Dato obligatorio",
+                    body: "Debe ingresar el número de RMA.",
+                });
+
+                return;
+            }
+
+            let numeroRMA = rmaInput.payload.trim();
+
+            numeroRMA = numeroRMA
+                .replace("RMA/", "")
+                .replace("RMA-", "")
+                .replace("rma/", "")
+                .replace("rma-", "")
+                .trim();
+
+            // ===================================
+            // CONSULTAR RMA
+            // ===================================
+            const resultado = await rpc("/pos/buscar_rma", {
+                numero_rma: numeroRMA,
+            });
+
+            if (resultado.error) {
+
+                await popup.add(ErrorPopup, {
+                    title: "Error",
+                    body: resultado.error,
+                });
+
+                return;
+            }
+
+            const subtotal = parseFloat(resultado.subtotal || 0);
+            const abono = parseFloat(resultado.abono || 0);
+            const saldo = parseFloat(resultado.saldo || 0);
+
+            // ===================================
+            // VALIDAR QUE NO TENGA ABONO
+            // ===================================
+            if (abono > 0) {
+
+                await popup.add(ErrorPopup, {
+                    title: "RMA con abono registrado",
+                    body: "Este RMA ya tiene un abono registrado. Debe utilizar Producto ABONO.",
+                });
+
+                return;
+            }
+
+            // ===================================
+            // VALIDAR SALDO PENDIENTE
+            // ===================================
+            if (saldo <= 0) {
+
+                await popup.add(ErrorPopup, {
+                    title: "Sin saldo pendiente",
+                    body: "Este RMA no tiene saldo pendiente para registrar un nuevo abono.",
+                });
+
+                return;
+            }
+
+            // ===================================
+            // SOLICITAR MONTO DEL NUEVO ABONO
+            // ===================================
+            const montoInput = await popup.add(NumberPopup, {
+                title: "Ingrese monto del nuevo abono",
+            });
+
+            if (
+                !montoInput.confirmed ||
+                montoInput.payload === undefined ||
+                montoInput.payload === null ||
+                montoInput.payload === ""
+            ) {
+                return;
+            }
+
+            const montoAbono = parseFloat(montoInput.payload);
+
+            // ===================================
+            // VALIDAR MONTO
+            // ===================================
+            if (!Number.isFinite(montoAbono) || montoAbono <= 0) {
+
+                await popup.add(ErrorPopup, {
+                    title: "Monto inválido",
+                    body: "El abono debe ser mayor que cero.",
+                });
+
+                return;
+            }
+
+            if (montoAbono > saldo) {
+
+                await popup.add(ErrorPopup, {
+                    title: "Monto superior al saldo",
+                    body: `El abono ingresado no puede superar el saldo pendiente de $${saldo.toLocaleString("es-CL")}.`,
+                });
+
+                return;
+            }
+
+            // ===================================
+            // AGREGAR PRODUCTO AL POS
+            // ===================================
+            await super.add_product(product, {
+                price: montoAbono,
+                quantity: 1,
+                merge: false,
+                permitir_linea_rma_aux: true,
+            });
+
+            const lineNuevoAbono = this.get_selected_orderline();
+
+            if (lineNuevoAbono) {
+
+                lineNuevoAbono.numero_rma = resultado.rma;
+
+                lineNuevoAbono.es_linea_rma_aux = true;
+
+                lineNuevoAbono.tipo_linea_rma = "nuevo_abono";
+
+                lineNuevoAbono.precio_bloqueado = montoAbono;
+
+                lineNuevoAbono.subtotal_rma = subtotal;
+
+                lineNuevoAbono.abono_rma = abono;
+
+                lineNuevoAbono.saldo_rma = saldo;
+            }
+
+            return;
+        }
+
         // ===================================
 // PRODUCTO ABONO
 // ===================================
@@ -482,7 +632,8 @@ patch(Orderline.prototype, {
 
         if (
             this.tipo_linea_rma === "subtotal" ||
-            this.tipo_linea_rma === "abono"
+            this.tipo_linea_rma === "abono" ||
+            this.tipo_linea_rma === "nuevo_abono"
         ) {
 
             const precioBloqueado =
