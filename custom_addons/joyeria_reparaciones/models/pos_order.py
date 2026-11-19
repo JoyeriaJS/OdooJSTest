@@ -1,3 +1,4 @@
+
 from odoo import models, fields, api
 
 
@@ -82,6 +83,12 @@ class PosOrder(models.Model):
         store=True
     )
 
+    total_gasto = fields.Float(
+        string="Total Gasto",
+        compute="_compute_totales_pago",
+        store=True
+    )
+
     @api.depends('payment_ids.amount', 'payment_ids.payment_method_id')
     def _compute_totales_pago(self):
 
@@ -96,6 +103,7 @@ class PosOrder(models.Model):
             venta_efectivo = 0
             venta_credito = 0
             venta_transferencia = 0
+            gasto = 0
 
             for payment in order.payment_ids:
 
@@ -128,6 +136,9 @@ class PosOrder(models.Model):
                 elif metodo == "Venta Transferencia":
                     venta_transferencia += payment.amount
 
+                elif metodo == "Gasto":
+                    gasto += payment.amount
+
             order.total_efectivo = efectivo
             order.total_banco = banco
             order.total_cuenta_cliente = cuenta_cliente
@@ -137,6 +148,7 @@ class PosOrder(models.Model):
             order.total_venta_efectivo = venta_efectivo
             order.total_venta_credito = venta_credito
             order.total_venta_transferencia = venta_transferencia
+            order.total_gasto = gasto
 
     @api.model
     def create_from_ui(self, orders, draft=False):
